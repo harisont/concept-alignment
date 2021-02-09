@@ -36,8 +36,11 @@ The idea is that, in rule-based MT, using aligned phrases (as opposed to aligned
  
 Furthermore, taking syntax into account allows to easily deal with non-contiguous multiword expressions, another situation which is challenging to deal with by means of traditional statistical approaches. For instance, if we consider the sentence ``\textit{Without any linguistic knowledge, it is definitely hard}'' and its Italian translation ``\textit{Senza conoscenze linguistiche, è decisamente arduo}'', a syntactical analysis would make it possible to extract the correspondence ``\textit{is hard}''-``\textit{è arduo}'', even if in both cases the copula and its complement are separated by an adverb. \smallskip
 
+Last but not least, a syntax-based approach can produce correspondences between grammatical objects, as opposed to pairs of strings. Alignments of this kind are valuable, as they can more easily be utilized in rule-based MT systems. \smallskip
+
 % contribution (+ sw deliverables w technologies involved)
-With this thesis, we propose a syntax-based approach to both of the above mentioned variants of CA - concept extraction and concept propagation - and put it to the test by integrating it in a prototype domain-specific MT system composed of a neural Universal Dependencies (UD) parser, a rule-based alignment module and a target language generation component based on Grammatical Framework (GF).
+With this thesis, we propose a syntax-based approach to both of the above mentioned variants of CA - concept extraction and concept propagation - composed of a neural Universal Dependencies (UD) parser and a rule-based alignment module.
+We put our system to the test by integrating it in a prototype domain-specific MT system based on Grammatical Framework (GF).
 
 \section*{Structure of the thesis}
 This work is structured as follows. 
