@@ -1,0 +1,9 @@
+# newdoc
+# newpar
+# sent_id = 1
+# text = Katia is a psychologist
+1	Katia	Katia	PROPN	SP	_	4	nsubj	_	_
+2	is	be	AUX	V	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	4	cop	_	_
+3	a	a	DET	RI	Definite=Ind|Number=Sing|PronType=Art	4	det	_	_
+4	psychologist	psychologist	NOUN	S	Number=Sing	0	root	_	SpacesAfter=\n
+

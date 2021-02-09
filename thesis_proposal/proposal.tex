@@ -1,0 +1,163 @@
+\documentclass{article}
+
+
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\usepackage{graphicx}
+
+\usepackage[colorinlistoftodos]{todonotes}
+
+\usepackage{parskip}
+\setlength{\parskip}{10pt} 
+
+\usepackage{tikz}
+\usetikzlibrary{arrows, decorations.markings}
+
+\usepackage{chngcntr}
+\counterwithout{figure}{section}
+
+
+
+\begin{document}
+
+
+\begin{titlepage}
+  
+
+\centering
+  
+  
+{\scshape\LARGE Master thesis project proposal\\}
+  
+\vspace{0.5cm}
+  
+{\huge\bfseries Automating Concept Alignment for Machine Translation\\}
+
+\vspace{2cm}
+  
+{\Large Arianna Masciolini (\texttt{gusmasar@student.gu.se})\\}
+
+\vspace{0.2cm}
+  
+{\large Suggested Supervisor at CSE: Aarne Ranta\\}
+  
+\vspace{1.5cm}
+  
+{\large Relevant completed courses:\par}
+  
+{\itshape (LT2214, Computational Syntax)\\}
+{\itshape (LT2003, Natural Language Processing)\\}
+{\itshape (DIT143, Functional Programming)\\}
+{\itshape (DIT260, Advanced Functional Programming)\\}
+{\itshape (DIT231, Programming Language Technology)\\}
+{\itshape (DIT300, Compiler Construction)\\}
+{\itshape (DIT411, Introduction to Artificial Intelligence)\\}
+{\itshape (DIT866, Applied Machine Learning)\\}
+  
+\vfill
+\vfill
+  
+{\large \today\\} 
+
+
+\end{titlepage}
+
+\section{Introduction}
+% Briefly describe and motivate the project, and convince the reader of the importance of the proposed thesis work. A good introduction will answer these questions: Why is addressing these challenges significant for gaining new knowledge in the studied domain? How and where can this new knowledge be applied?
+Concept Alignment (CA) consists in finding semantical correspondences between parts of parallel texts in two or more different languages, of which the Rosetta Stone is a notable example. 
+Such task, which is routinely performed by learners of classical languages, who generally work with a translation alongside the original text, is often preliminary to further linguistic analysis.
+
+Another task that involves CA is natural language translation: the human translator, almost unconsciously, first identifies concepts in the source text and then looks for ways to render them in the target language. In this case, alignment can happen - and usually does happen simultaneously - at different levels of abstraction, ranging from word to sentence level.
+It is then natural to wonder wether it is possible to make use of CA in Machine Translation (MT) as well. The hypotheses motivating this project, whose objective is to develop and test strategies for automating CA, is that MT can benefit from CA in two ways:
+\begin{itemize}
+    \item on the one hand, if we aim to design a \textit{compositional} MT pipeline, CA is a necessary step, as it will become clearer in the following sections
+    \item on the other hand, if we address the problem from the perspective of XMT (eXplainable MT), providing the user of a MT application with a way to compare pairs of concepts instead of the entire text in the source language to its automatically translated counterpart can help building a more easily interpretable, and therefore more reliable MT system.
+\end{itemize}
+
+
+\section{Problem} 
+% This section is optional. It may be used if there is a need to describe the problem that you want to solve in more technical detail and if this problem description is too extensive to fit in the introduction.
+To give a more rigorous definition of CA, it is first necessary to specify what we mean by \textit{concept}. 
+
+\subsection{Concepts}
+Intuitively, concepts are the components of meaning, and therefore, in a multilingual context, the units of translation. The principle of semantic compositionality states that the meaning of a complex expression is a function solely of the meanings of its components and of the manner in which these components are combined \cite{semcom}. 
+If we assume this principle to be valid and apply it to translation, these meaning components, which we refer to as concepts, are the common denominator between an expression in the source language and its translation, which can be generated using them as the starting point.
+
+We can draw a very close parallel between MT and compiler pipelines: in this sense, concepts are the intermediate representation, or \textit{abstract syntax}, obtained by analyzing, or \textit{parsing}, the source language, while we will call \textit{backend} the portion of the pipeline aimed at \textit{generating} the target language by applying the concepts a set of rules.
+
+In this perspective, then, concepts are abstract syntax functions. In the simplest case, when they correspond to individual words, their arity is zero, but it is often the case that the concrete expressions corresponding to minimal translation units are, in one or both of the source and target language, lemgrams, multiword expressions - sometimes discontinuous - or even more complex constructions, whose intermediate representation is an abstract syntax function taking one or more arguments.
+
+\subsection{Alignment}
+Having defined concepts more accurately, we can turn to the more concrete problem of CA, the task of finding, at any abstraction level, correspondences between parallel, and in the case of translation multilingual texts.
+
+In order to facilitate its automation, CA can be divided into two subproblems subsequent to each other:
+\begin{enumerate}
+    \item \textit{concept creation}, the task of identifying concepts via language comparison, which is the main focus of this project
+    \item \textit{concept propagation}, i.e. the task of finding, in a language which was not used in the concept creation stage, the concrete expressions corresponding to previously identified concepts.
+\end{enumerate}
+
+
+\section{Context}
+% Use one or two relevant and high quality references for providing evidence from the literature that the proposed study indeed includes scientific and engineering challenges, or is related to existing ones. Convince the reader that the problem addressed in this thesis has not been solved prior to this project.
+The idea of taking advantage of semantic compositionality is not new in the field of MT. Introduced by Curry in the early 1960s \cite{curry61}, % TODO: check what the article actually says
+it was first put in practice two decades later in the form of an experimental interlingual translation system, not coincidentally named Rosetta, which requires the definition of two distinct logically isomorphic Montague grammars - one for the source language, one for the target language - and constructs an intermediate representation based on such isomorphism \cite{rosetta}. 
+
+\subsection{Grammatical Framework}
+Grammatical Framework (GF), a grammar formalism and programming language designed with the parallel between compilers and MT systems discussed in the previous section in mind, goes a step further in this direction: it introduces a clear distinction between the abstract syntax, a phrase structure tree-like representation capturing the syntactic structures all natural languages taken into account have in common, and the \textit{concrete syntaxes}, specific to each individual language, which consist in rules for the linearization of these Abstract Syntax Trees (ASTs) \cite{gf2004} \cite{gfbook}. 
+This makes it possible to deal with multiple language by writing only one grammar, whose components are an abstract syntax and several concrete syntaxes. 
+
+GF grammars can be used in a variety of contexts, one of which is interlingual MT. More in particular, experiments with GF grammars have been conducted in the field of XMT, as the ASTs produced by source language analysis can serve both as to some extent automatically checkable certificates for the correctness of translation - by backlinearization to the source language - and as fully inspectable explanations aimed towards expert users \cite{rantaxmt}.
+
+When it comes to CA itself, which could potentially provide more user-friendly explanations, the idea of performing \textit{syntax-based alignment} by comparing GF ASTs seems promising, especially if compared with the standard approaches used in statistical MT, like word alignment and its generalization, phrase alignment. Both approaches ignore sentence structure and therefore, while requiring a lot of data, their precision is low. 
+
+In practice, however, comparing GF ASTs presents a number of issues related to the fact that GF parsing is not robust enough to spelling and grammatical errors, unusual word orders and rare constructions in general \cite{rantaxmt}. It becomes then necessary, if we want to perform syntax-based alignment, to make use of an alternative parser. Preliminary experiments, not yet published, have been conducted exploiting the similarity between GF and UD (Universal Dependencies) \cite{gfud, udgf}.
+
+\subsection{Universal Dependencies}
+UD is a framework for cross-linguistically consistent grammatical annotation. 
+The UD project aims at developing parallel treebanks for many languages in order to support, among other things, the development of multilingual parsers.
+
+Existing UD parsers, such as \cite{udparsing}, are often neural pipelines trained on UD treebanks that, given raw text as input, output \textit{dependency trees}. The difference between such trees and those produced by GF parsing is that dependency is a one-to-one correspondence, meaning that words in a sentence are connected to each other by directed links, while phrase structure is one-to-many. % TODO: explain better even intuitive consequences
+
+If phrase structure trees seem to be a good starting point for natural (target) language generation, replacing them with dependency trees in the analysis step can prove to be a good basis for CA.
+In more concrete terms, if, as mentioned in the introduction, CA is seen as a step of compositional MT, a UD parser can be integrated in a GF-based pipeline, thus constructing a hybrid translation system, with a robust neural frontend and a phrase structure grammar-based backend. 
+In this case, dependency trees need to be converted into GF ASTs, even though nlike its reverse \cite{gfud}, the UD-GF conversion is a non-deterministic search problem, addressed in \cite{udgf}. 
+
+\section{Goals and Challenges}
+% Describe your contribution with respect to concepts, theory and technical goals. Ensure that the scientific and engineering challenges stand out so that the reader can easily recognize that you are planning to solve an advanced problem. 
+The overall goal of this project is to test and further develop the above mentioned ideas for CA automation. 
+
+A first part of the project consists in selecting an UD parser well suited to the task by manually evaluating the dependency trees obtained for a bilingual parallel text. Once an adequate parser is identified, the possibility of modifying such parser in order to tune it for the task at hand will be considered.
+
+When it comes to alignment itself, which is our proposed way to address concept creation and as such the core part of this project, an unpublished algorithm for UD dependency trees alignment exists, but preliminary experiments show that there is room for improvement. The algorithm, in fact, that orders the trees and pads them to then collect matching subtrees, still has very low precision. Examples of specific problems to work on are making it so that it cab recover from parse errors and dealing with irrelevant cross-lingual differences between parse trees.
+
+\subsection{Stretch goals}
+If time allows it, a natural extension to this project is to start using more than just two languages, as result may differ significantly for different language pairs. Our criteria for selecting which languages to compare are described in the following section.
+
+\section{Approach}
+%Various scientific approaches are appropriate for different challenges and project goals. Outline and justify the ones that you have selected. For example, when your project considers systematic data collection, you need to explain how you will analyze the data, in order to address your challenges and project goals. One scientific approach is to use formal models and rigorous mathematical argumentation to address aspects like correctness and efficiency. If this is relevant, describe the related algorithmic subjects, and how you plan to address the studied problem. For example, if your plan is to study the problem from a computability aspect, address the relevant issues, such as algorithm and data structure design, complexity analysis, etc.  If you plan to develop and evaluate a prototype, briefly describe your plans to design, implement, and evaluate your prototype by reviewing at most two relevant issues, such as key functionalities and their evaluation criteria. The design and implementation should specify prototype properties, such as functionalities and performance goals, e.g., scalability, memory, energy. Motivate key design selection, with respect to state of the art and existing platforms, libraries, etc.  When discussing evaluation criteria, describe the testing environment, e.g., test-bed experiments, simulation, and user studies, which you plan to use when assessing your prototype. Specify key tools, and preliminary test-case scenarios. Explain how and why you plan to use the evaluation criteria in order to demonstrate the functionalities and design goals. Explain how you plan to compare your prototype to the state of the art using the proposed test-case evaluation scenarios and benchmarks. 
+Building upon previous experiments, we will conduct a case study on the text of the General Data Protection Regulation (GDPR) \cite{gdpr}.
+As all European regulations, it is a highly multilingual parallel text, as it has a high quality translation for each of the 24 official languages of the European Union.
+Furthermore, for 5 of these languages (English, German, Spanish, Italian and French), a gold standard in terms of concept extraction, even if not publicly available, already exists.
+
+Our choices in terms of which languages to use in this project are of course also limited by the linguistic knowledge of the candidate.
+As for the initial language pair to start with, we intend to use Italian and English, which, apart from being respectively her first and second language, belong to two different branches - resp. Romance and Germanic - of the Indo-European language family, making CA a potentially harder, but at the same time more interesting task. 
+In the aforementioned case that we decide to also perform experiments with one or more other languages, it would be possible to work with yet another one for which we already have a gold standard available, Spanish, and/or we could consider using Swedish, which might involve a relatively demanding annotation process.
+
+For obtaining dependency trees, the starting point will be one of the existing UD parsers yet to be chosen, while the syntactic alignment component will be based on an initial Haskell prototype.
+
+\subsection{Evaluation}
+For a first evaluation, the aforementioned manually annotated 5-lingual parallel text of the GDPR will suffice.
+
+To assess the generalization capabilities of our model, however, it will be necessary to test it on other texts. As previously pointed out, the Official Journal of the European Union is itself a relatively large, highly multilingual parallel corpus of legal documents, but, even if good results within this context would already be somewhat meaningful, it would be interesting to put the system to the test in other domains, for instance using public domain literature.
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+%Reference all sources that are cited in your proposal using, e.g. the APA, Harvard2, or IEEE3 style.
+% TODO: cite GDPR properly
+
+\end{document}

@@ -1,0 +1,14 @@
+# direction:right
+# arrowSize:0.7
+# fillArrows:true
+#fill: #ffffff; #000000
+# stroke: #000000
+# font:serif
+# zoom:3
+# lineWidth: 1.5
+# title: compiler
+
+[<label> SL string] - [parsing]
+[parsing] -> [<label> AST]
+[<label> AST] - [linearization]
+[linearization] -> [<label>TL string]

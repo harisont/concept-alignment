@@ -1,0 +1,50 @@
+la prova è orale
+la prova non è orale
+la prova è orale
+la prova orale è importante
+il libro era importante
+il libro non era importante
+i libri non erano importanti
+questa funzione è ricorsiva
+queste funzioni sono ricorsive
+queste funzioni non sono ricorsive
+la programmazione dinamica è utile
+la programmazione dinamica è una tecnica
+la programmazione dinamica è una tecnica utile
+le lezioni sono fondamentali
+le lezioni sono più importanti del libro
+la lezione è più importante del libro
+la Frequenza delle lezioni è obbligatoria
+la Frequenza delle lezioni è obbligatoria
+io seguirò la lezione
+io seguirò una lezione
+tu seguirai una lezione
+lei seguirà il corso completo
+lei seguirà il corso fondamentale completo
+il docente espone la teoria
+il docente espone la teoria 
+i docenti espongono teorie 
+l' Esercitazione è completa
+questa Esercitazione è più completa delle Esercitazioni degli anni altri
+io realizzo il programma
+noi realizziamo il programma
+Sergio realizza il programma
+il docente discute la Didattica
+i docenti discuteranno la Didattica
+ogni docente conosce i limiti di questa teoria
+ogni docente conosce i limiti di questa teoria 
+questi docenti conoscevano i limiti di questa teoria
+questi docenti non conoscevano i limiti di questa teoria
+il libro presenta una tecnica utile
+il libro presenta una tecnica utile con miglioramenti vari
+il libro presenta una tecnica utile con vari miglioramenti di base 
+il libro presenta una tecnica utile con vari miglioramenti di base nella Didattica
+la discussione presenta un approccio nuovo
+il tutor presenta un approccio nuovo
+il tutor presenta approcci nuovi
+l' Apprendimento è più importante dei voti
+l' Apprendimento è più importante del voto finale
+l' Apprendimento è più importante del voto finale in questo caso
+la biblioteca fornisce il libro
+la biblioteca fornisce ogni libro
+la biblioteca fornisce libri utili

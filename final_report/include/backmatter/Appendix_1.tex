@@ -1,0 +1,73 @@
+% CREATED BY DAVID FRISK, 2016
+\chapter{Universal POS tags and dependency labels} \label{a}
+While some of them are also discussed briefly in Section \ref{ud}, this appendix provides systematic definitions for all the main UD Universal Part Of Speech tags and dependency relations used in the examples of this work. Complete lists and a good number of examples in several languages can be found in \cite{uddocs} and \cite{compsyn}.
+
+\section{\texttt{UPOS} tags} \label{a_pos}
+The official UD documentation \cite{uddocs} distinguishes between \textit{open class} or \textit{content} words and \textit{closed class} or \textit{function} words. 
+
+\subsection{Open class words}
+When it comes to open class words, the categories that are relevant to this work are the following:\smallskip
+\begin{itemize}
+    \item \texttt{NOUN}, the class of words typically denoting a person, place, thing, animal or idea. Unlike nouns in traditional grammars, \texttt{NOUN}s are intended for \textit{common} (as opposed to \textit{proper}) nouns only
+    \item \texttt{PROPN}, the class of nominals used as names (or part of names) of a specific individual, place, or object, i.e. \textit{proper nouns}
+    \item \texttt{VERB}, designating events and actions. This category refers to content verbs only, while auxiliaries should be assigned the tag \texttt{AUX} (cf. \ref{cc})
+\end{itemize}
+
+
+\subsection{Closed class words} \label{cc}
+Among closed class words, the categories used in the examples of this thesis are: \smallskip
+\begin{itemize}
+    \item \texttt{PRON}, defined as in traditional grammars: the class of substitutes for nouns or noun phrases, whose meaning is recoverable from the context
+    \item \texttt{AUX}, the class of function words that accompany the lexical verb of a verb phrase and express grammatical distinctions not carried by such lexical verb. The most common example of verbs that fall into this category is perhaps that of \textit{tense auxiliaries} (e.g. ``\textit{has}'' in the verb phrase ``\textit{\underline{has} completed}''), but \textit{passive auxiliaries}, like ``\textit{was}'' in ``\textit{\underline{was} completed}, modal auxiliaries like ``\textit{must}'' and ``\textit{should}'' and verbal copulas should also be tagged as \texttt{AUX}
+    \item \texttt{DET}, a wide-coverage class for the different types of determiners, i.e. words that modify nouns or noun phrases expressing the reference of the noun phrase in context. It includes articles, pronominal numerals and words like \textit{all} and \textit{every}.
+\end{itemize} \smallskip \smallskip
+
+Finally, UD groups together categories that apply to tokens that are not even necessarily considered words in traditional grammars, such as symbols. The only category of this kind mentioned in this work is \texttt{PUNCT}, which refers of course to punctuation.
+
+\section{\texttt{DEPREL}s} \label{a_lab}
+Dependency relation are used to label links connecting the word nodes of a dependency tree with their heads, indicating the syntactic relation occurring between them. \smallskip
+
+The only ``exceptional'' label is \texttt{root}, which connects a fake node to the \texttt{root}, i.e. usually the main \texttt{VERB}, of a sentence. To avoid discrepancies between languages, the \texttt{root} of a sentence is always supposed to be a content word, meaning for instance that, if the main verb is a copula, it is its complement that ought to be labelled \texttt{root}.
+
+The other dependency labels we refer to in this text can, like POS tags, be grouped according to the nature of the nature of the dependent they link to a head.
+
+\subsection{Open class dependents}
+Open class words can be assigned various kinds of labels: 
+\begin{itemize}
+    \item labels linking the core arguments of a verb to the verb they refer to (i.e., in case of a single-clause sentence, to its \texttt{root}): \begin{itemize}
+        \item \texttt{nsubj}, indicating the nominal subject of a clause (a noun, proper noun, pronoun or numeral)
+        \item \texttt{obj} and \texttt{iobj}, indicating its direct (resp. indirect) object. With \textit{direct object} we refer to the noun phrase that denotes the entity acted upon or which undergoes a change of state or motion, while the \textit{indirect object} of a verb is a nominal phrase that is a core argument of the verb but is not its subject or (direct) object 
+    \end{itemize}
+    \item \texttt{obl}, linking complements (i.e. non-core arguments, introduced by prepositions) to the verb they refer to
+    \item labels for modifier words:    
+    \begin{itemize}
+        \item \texttt{amod}, linking adjectives to the nominals they modify
+        \item \texttt{advmod}, linking adverbs to the words (which can belong to several categories) they modify
+        \item \texttt{nmod}, used for marking the relation between a nominal and another \texttt{NOUN}, \texttt{PNOUN} or noun phrase
+        \item \texttt{nummod}, linking number phrases to the \texttt{NOUN} they modify with a quantity
+    \end{itemize}
+    \item \texttt{flat}, used to connect the words following (in terms of position in the sentence) the head (i.e. the first word) of a flat multiword expression, and \texttt{compound}, playing a similar role in compound written as two or more separate words
+    \item labels linking non-\texttt{root} verbs to other verbs, specifying what kind of clause they are heads of:
+    \begin{itemize}
+        \item \texttt{csubj}, for clausal subjects
+        \item \texttt{ccomp}, for clausal complements, i.e. clauses that function as objects of a verb
+        \item \texttt{xcomp}, for open clausal complements, i.e. clausal complements whose subject is determined by the higher clause
+        \item \texttt{advcl}, for adverbial clauses modifying a predicate
+        \item \texttt{acl}, for clauses modifying a nominal
+    \end{itemize}
+\end{itemize}
+
+\subsection{Closed class dependents}
+When it comes to closed class words, commonly used dependency labels are:
+
+\begin{itemize}
+    \item \texttt{cop}, linking copulas to their complements
+    \item \texttt{aux}, linking an \texttt{AUX} to the lexical verb it refers to
+    \item \texttt{det}, marking the link between a determiner and the nominal it refers to
+    \item \texttt{case}, linking words (such as pre- and postpositions) marking the case of a \texttt{nmod} to the \texttt{nmod} itself in languages that do not express case morphologically
+\end{itemize} \smallskip
+
+
+Finally, corresponding to the POS tag \texttt{PUNCT} is \texttt{punct}, which links punctuation marks to the head of the clause they belong to. \smallskip
+
+

@@ -1,0 +1,44 @@
+1	this	this	DET	_	_	3	det	_	_
+2	malformed	malformed	ADJ	_	_	3	amod	_	_
+3	subtree	subtree	NOUN	_	_	0	root	_	_
+
+RTree {
+    root = UDWord {
+        udID = UDIdInt 3, 
+        udFORM = "subtree", 
+        udLEMMA = "subtree", 
+        udUPOS = "NOUN", 
+        udXPOS = "_", 
+        udFEATS = [], 
+        udHEAD = UDIdRoot, 
+        udDEPREL = "root", 
+        udDEPS = "_", udMISC = []}, 
+    subtrees = [
+        RTree {
+            root = UDWord {
+                udID = UDIdInt 1, 
+                udFORM = "this", 
+                udLEMMA = "this", 
+                udUPOS = "DET", 
+                udXPOS = "_", 
+                udFEATS = [], 
+                udHEAD = UDIdInt 3, 
+                udDEPREL = "det", 
+                udDEPS = "_", 
+                udMISC = []}, 
+            subtrees = []},
+        RTree {
+            root = UDWord {
+                udID = UDIdInt 2, 
+                udFORM = "malformed", 
+                udLEMMA = "malformed", 
+                udUPOS = "ADJ", 
+                udXPOS = "_", 
+                udFEATS = [], 
+                udHEAD = UDIdInt 3, 
+                udDEPREL = "amod", 
+                udDEPS = "_", 
+                udMISC = []}, 
+            subtrees = []}
+    ]
+}

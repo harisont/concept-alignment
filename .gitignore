@@ -1,0 +1,49 @@
+# latex
+*.aux
+*.glo
+*.idx
+*.log
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.dvi
+*.glg
+*.gls
+*.ilg
+*.ind
+*.lof
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# gf
+*.gfo
+*.pgf
+
+# stack
+*stack.yaml.lock
+*.stack-work/
+
+# ud trees
+*.svg
+
+# folder-specific things
+data/*.tex
+data/experiments/*.tex
+data/experiments/*.pdf
+.vscode/
+data/pud_treebanks/
+
+# pocketbook extracts
+*.html
+
+Test.hs

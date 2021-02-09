@@ -1,0 +1,50 @@
+la prova è dura
+la prova non è dura
+la prova è dura 
+la prova dura è importante
+il libro era importante
+il libro non era importante
+i libri non erano importanti
+questa caratteristica è ricorsivere 
+queste caratteristiche sono ricorsiveri 
+queste caratteristiche non sono ricorsiveri 
+la base dinamica è utile
+la base dinamica è una tecnica
+la base dinamica è una tecnica utile
+lezioni sono fondamentale
+lezioni sono più importante di il libro
+la lezione è più importante di il libro
+la Frequenza è Required
+la Frequenza è Required 
+io seguirò la classe
+io seguirò una classe
+tu seguirai una classe
+lei seguirà la conferenza completa
+lei seguirà la conferenza fondamentale completa
+il docente espone la teoria
+il docente espone la teoria 
+docenti espongono teorie 
+l' Esercitazione è completa
+questa Esercitazione è più completa di le Esercitazioni degli anni altri
+io realizzo l' elaboratore
+noi realizziamo l' elaboratore
+Sergio realizza l' elaboratore
+il docente discute la Didattica
+i docenti discuteranno la Didattica
+ogni docente calcola le tematiche di questa teoria
+ogni docente calcola le tematiche di questa teoria 
+questi docenti calcolavano le tematiche di questa teoria
+questi docenti non calcolavano le tematiche di questa teoria
+il libro presenta una tecnica utile
+il libro presenta una tecnica con miglioramenti vari utile
+il libro presenta una tecnica con miglioramenti basi vari utile
+il libro presenta una tecnica con miglioramenti nella Didattica basi vari utile
+la discussione presenta un approccio nuovo
+il tutor presenta un approccio nuovo
+il tutor presenta approcci nuovi
+l' Apprendimento è più importante di voti
+l' Apprendimento è più importante di il voto finale
+l' Apprendimento è più importante di il voto finale in questo caso
+la biblioteca fornisce il libro
+la biblioteca fornisce ogni libro
+la biblioteca fornisce libri utili

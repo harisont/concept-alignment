@@ -1,0 +1,50 @@
+tentamina är svåra
+tentamen är svår
+är tentamen svår 
+den här tentamen är svår
+den här laborationen är svårare än tentamen
+tentamina är obligatoriska
+tentamina följer den obligatoriska laborationen
+tentamen följer den obligatoriska laborationen
+lär sig maskiner 
+ska maskiner lära sig
+ska maskiner inte lära sig
+har Kursen obligatoriska moment 
+har Kursen obligatoriska moment för oss 
+har Kursen inte obligatoriska moment 
+funktionella program är korta
+funktionella program är kortare än andra program
+många funktionella program är kortare än andra program
+det här programmet är mer komplex än en grundläggande Implementation
+det här programmet ska vara mer komplex än den här grundläggande Implementationen
+en Implementation är tillgänglig
+en enkel Implementation var tillgänglig
+Implementationen var tillgänglig
+Syftet med Övningen är förbättring
+Syftet med de där Övningarna är förbättring
+Syftet med de där komplexa Övningarna var förbättring
+jag studerar datavetenskap
+jag studerade datavetenskap
+jag studerade datavetenskap regelbundet
+språkteknologiska mjukvaruresursar är inte många
+de språkteknologiska mjukvaruresursarna är många
+de här teoriarna är inte omfattande
+de här teoriarna är inte mera omfattande än en Introduktion
+en funktion följer en algoritm
+funktionen följer en algoritm
+funktionen följer algoritmen
+påverkar maskininlärning den energiförbrukningen av vissa komponenter i datorsystemet 
+ska maskininlärning påverka den energiförbrukningen av vissa komponenter i datorsystemet 
+det här programbiblioteket är onödigt för det här Syftet
+optimering är onödig för det här Syftet
+optimering är relevant för det här Syftet
+optimering är inte relevant för det här Syftet
+är optimering relevant för det här Syftet 
+är optimering mer relevant än bra design för det här Syftet 
+varje koncept är relevant för den slutliga tentamen
+är varje koncept relevant för den slutliga tentamen 
+är de här koncepten relevanta för den slutliga tentamen
+den här Kursen var inte simpel
+den där Kursen var inte praktisk
+de här kurserna var inte praktiska
+de här klassiska kurserna är inte praktiska

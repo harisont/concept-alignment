@@ -1,0 +1,652 @@
+% CREATED BY DAVID FRISK, 2016
+\chapter{Concept Extraction} \label{ch3} 
+As mentioned in Section \ref{aligns}, extracting a set of concepts via linguistic comparison is the first and most important step of CA. This chapter describes our CE module, delineates our strategy to evaluate it independently from the other components of the system illustrated in Figure \ref{sys} and presents the results of such preliminary evaluation.
+
+\section{Method and implementation} \label{ce}
+For the reasons discussed in Section \ref{ourapproach}, our syntax-based approach to CE is based on comparing, instead on ASTs, dependency trees, and UD trees in particular.
+The task of dealing with UD trees is facilitated by the existence of a series of Haskell modules written in the context of the development of the aforementioned \texttt{gf-ud} and of some preliminary unpublished CA experiments\footnote{Aarne Ranta and Prasanth Kolachina, code available at \url{https://github.com/aarneranta/concept-alignment/tree/master/old_ca_versions/v1}}. \smallskip
+
+In this context, as shown in Figure \ref{types}, dependency trees are represented as rose trees, i.e. tree data structures with an unbounded, variable number of branches per node.
+
+\begin{figure}[H]
+ \centering
+ \scriptsize
+ \begin{verbatim}
+1 another another DET _ _ 3 det _ _
+2 dependency dependency NOUN _ _ 3 compound _ _
+3 tree tree NOUN _ _ 0 root _ _
+
+ \end{verbatim}
+ \begin{verbatim}
+  
+RTree {
+ root = UDWord {
+  udID = 3, udFORM = "tree", udLEMMA = "tree", udUPOS = "NOUN", (...), udHEAD = 0,
+  udDEPREL = "root", (...)}, 
+ subtrees = [
+  RTree {
+  root = UDWord {
+   udID = 1, udFORM = "another", udLEMMA = "another", udUPOS = "DET", (...),
+   udHEAD = 3, udDEPREL = "det", (...)}, 
+  subtrees = []},
+  RTree {
+  root = UDWord {
+   udID = 2, udFORM = "dependency", udLEMMA = "dependency", udUPOS = "NOUN", (...), 
+   udHEAD = 3, udDEPREL = "compound", (...)}, 
+  subtrees = []}]}
+
+ \end{verbatim}
+
+ \begin{verbatim}
+  
+3 tree tree NOUN _ _ 0 root _ _
+ 1 another another DET _ _ 3 det _ _
+ 2 dependency dependency NOUN _ _ 3 compound _ _
+ \end{verbatim}
+ \caption[The CoNLL-U and rose tree representations of a dependency tree]{The CoNLL-U and rose tree representation of a dependency tree. In the rose tree in the middle, fields left black in the CoNLL-U representation are omitted for compactness. The third representation, easier to read, resembles CoNNL-U notation while graphically showing the structure of the tree. This notation will be used for the other examples of this chapter.}
+ \label{deptree}
+\end{figure}
+
+As shown in Figure \ref{types}, the type of the nodes of such trees, \texttt{UDWord}, is a record type whose fields mirror those of a CoNLL-U file (cf. \ref{conll}). Alignments are, as for Definition \ref{algndef}, simply pairs of UD trees.
+
+\begin{figure}[H] 
+ \centering
+ \lstinputlisting{pseudocode/BasicTypes.hs}
+ \caption[Fundamental data typesfor dependency trees]{Fundamental data types used for representing dependency trees in the CA module.}
+ \label{types}
+\end{figure}
+
+\subsection{Baseline} \label{baseline}
+The original CE algorithm, dating back to the above mentioned CA experiments, has two stages, sketched respectively in Figure \ref{basea} and \ref{baseb}. The first consists in, given two trees corresponding to a sentence and its translation, aligning the entire trees by recursively sorting and padding their lists of subtrees. In particular: \smallskip
+
+\begin{itemize}
+ \item sorting is based on the UD label of their root 
+ \item what is meant by \textit{padding} is the insertion of a dummy dependency subtree wherever a tree in the source (resp. target) language has a subtree with UD label $l$ that is missing in its target (resp. source) language counterpart. This is useful, for instance, for dealing with cases where a determiner in a sentence in the SL is omitted in its translation.\smallskip
+\end{itemize} \smallskip
+
+The result of this first step is a pair of \textit{perfectly aligned} trees, i.e. trees with identical shape that can later be used to extract the pairs of aligned subtrees. 
+
+\begin{figure}[H]
+ \centering
+ \lstinputlisting{pseudocode/BaselineA.hs}
+ \caption[The alignment step of the basic CE algorithm]{The alignment step of the basic CE algorithm. Given two full sentence trees, it aligns them by sorting and padding.}
+ \label{basea}
+\end{figure}
+
+Once two sentence trees are aligned, extracting pairs of aligned subtrees is just a matter of recursively obtaining the lists of all subtrees of each sentence and zipping them together. Every time a pair of subtrees with depth greater than 1 is extracted, in addition, a new pair of subtrees whose only nodes are their roots is added. This makes it possible to find single-word alignments, which we refer to as \textit{head alignments}, that would otherwise be ignored. 
+
+\begin{figure}[H]
+ \centering
+ \lstinputlisting{pseudocode/BaselineB.hs}
+ \caption[The extraction step of the basic CE algorithm]{The extraction step of the basic CE algorithm. Given two perfectly aligned trees, it returns a list of pairs of aligned subtrees. To do that, it extracts all subtrees (at any depth, cf. \texttt{subst'}) of each member of the sentence alignment. For each extracted subtree, a new tree whose only node is its root is also created (cf. \texttt{headt}).}
+ \label{baseb}
+\end{figure}
+
+After extracting subtree alignments, it is possible and generally useful to remove the dummy subtrees added during alignment they contain.
+
+Obviously, the ``full-sentence'' tree pair is itself an alignment, even though a trivial one, as it represents a sentence-level correspondence in a case where, due to the approach being syntactic comparison, the inputs are assumed to be sentences that correspond to each other\footnote{contrary to what it may seem, however, sentence-level alignment is in general not at a trivial task, as it is often the case, especially in certain language pairs, that one \textit{orthographic} sentence, i.e. a sentence defined based on the presence of a full stop, maps to more than one orthographic sentences in the translated text, or vice versa.}.
+
+\begin{figure}[H]
+ \centering
+ \small
+ \begin{figure}[H]
+  \scriptsize
+  \begin{subfigure}{.46\textwidth}
+  \centering
+  \begin{verbatim}
+4 aligned aligned ADJ _ _ 0 root _ _
+ 1 we we PRON _ _ 4 nsubj _ _
+ 2 are be AUX _ _ 4 cop _ _
+ 3 perfectly perfectly ADV _ _ 4 advmod _ _
+  \end{verbatim}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+  \centering
+  \begin{verbatim}
+3 allineati allineato ADJ _ _ 0 root _ _
+ 1 siamo essere AUX _ _ 3 cop _ _
+ 2 perfettamente perfettamente ADV _ _ 3 advmod _ _
+  \end{verbatim}
+  \end{subfigure}
+ \end{figure}
+ $\Downarrow$ sorting
+ \begin{figure}[H]
+  \scriptsize
+  \begin{subfigure}{.46\textwidth}
+  \centering
+  \begin{verbatim}
+4 aligned aligned ADJ _ _ 0 root _ _
+ 3 perfectly perfectly ADV _ _ 4 advmod _ _
+ 2 are be AUX _ _ 4 cop _ _
+ 1 we we PRON _ _ 4 nsubj _ _
+\end{verbatim}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+  \centering
+  \begin{verbatim}
+3 allineati allineato ADJ _ _ 0 root _ _
+ 2 perfettamente perfettamente ADV _ _ 3 advmod _ _
+ 1 siamo essere AUX _ _ 3 cop _ _
+     \end{verbatim}
+  \end{subfigure}
+ \end{figure}
+ $\Downarrow$ padding
+ \begin{figure}[H]
+  \scriptsize
+  \begin{subfigure}{.46\textwidth}
+  \centering
+  \begin{verbatim}
+4 aligned aligned ADJ _ _ 0 root _ _
+ 3 perfectly perfectly ADV _ _ 4 advmod _ _
+ 2 are be AUX _ _ 4 cop _ _
+ 1 we we PRON _ _ 4 nsubj _ _
+   \end{verbatim}
+  \end{subfigure}
+  \begin{subfigure}{.5\textwidth}
+  \centering
+  \begin{Verbatim}[commandchars=\\\{\}]
+3 allineati allineato ADJ _ _ 0 root _ _
+ 2 perfettamente perfettamente ADV _ _ 3 advmod _ _
+ 1 siamo essere AUX _ _ 3 cop _ _
+ \textbf{D}
+        \end{Verbatim}
+  \end{subfigure}
+ \end{figure}
+ \begin{figure}[H]
+ \begin{subfigure}{.5\textwidth}
+ \centering
+ \setlength{\unitlength}{0.26mm}
+ \scriptsize
+ \begin{picture}(277.0,110.0)
+ \put(0.0,0.0){we}
+ \put(46.0,0.0){are}
+ \put(83.0,0.0){perfectly}
+ \put(174.0,0.0){aligned}
+ \put(0.0,15.0){{\tiny PRON}}
+ \put(46.0,15.0){{\tiny AUX}}
+ \put(83.0,15.0){{\tiny ADV}}
+ \put(174.0,15.0){{\tiny ADJ}}
+ \put(97.0,30.0){\oval(172.27586206896552,100.0)[t]}
+ \put(10.862068965517238,35.0){\vector(0,-1){5.0}}
+ \put(82.0,83.0){{\tiny nsubj}}
+ \put(120.0,30.0){\oval(125.65625,66.66666666666667)[t]}
+ \put(57.171875,35.0){\vector(0,-1){5.0}}
+ \put(105.0,66.33333333333334){{\tiny cop}}
+ \put(138.5,30.0){\oval(87.7032967032967,33.333333333333336)[t]}
+ \put(94.64835164835165,35.0){\vector(0,-1){5.0}}
+ \put(123.5,49.66666666666667){{\tiny advmod}}
+ \put(189.0,110.0){\vector(0,-1){80.0}}
+ \put(194.0,100.0){{\tiny root}}
+ \end{picture}
+ \end{subfigure}%
+ \begin{subfigure}{.5\textwidth}
+ \scriptsize
+ \centering
+ \setlength{\unitlength}{0.26mm}
+\begin{picture}(349.0,110.0)
+ \put(0.0,0.0){\textbf{D}}
+ \put(46.0,0.0){siamo}
+ \put(101.0,0.0){perfettamente}
+ \put(228.0,0.0){allineati}
+ \put(0.0,15.0){{}}
+ \put(46.0,15.0){{\tiny AUX}}
+ \put(101.0,15.0){{\tiny ADV}}
+ \put(228.0,15.0){{\tiny ADJ}}
+ \put(124.0,30.0){\oval(226.68421052631578,100.0)[t]}
+ \put(10.65789473684211,35.0){\vector(0,-1){5.0}}
+ \put(109.0,83.0){{}}
+ \put(147.0,30.0){\oval(180.35164835164835,66.66666666666667)[t]}
+ \put(56.824175824175825,35.0){\vector(0,-1){5.0}}
+ \put(132.0,66.33333333333334){{\tiny cop}}
+ \put(174.5,30.0){\oval(124.63779527559056,33.333333333333336)[t]}
+ \put(112.18110236220471,35.0){\vector(0,-1){5.0}}
+ \put(159.5,49.66666666666667){{\tiny advmod}}
+ \put(243.0,110.0){\vector(0,-1){80.0}}
+ \put(248.0,100.0){{\tiny root}}
+\end{picture}
+ \end{subfigure}
+\end{figure}
+ \scriptsize
+ \smallskip
+ \smallskip
+ \smallskip
+ \begin{itemize}
+ \item $\langle$\textit{we are perfectly aligned, siamo perfettamente allineati}$\rangle$
+ \item $\langle$\textit{aligned,allineati}$\rangle$ (head alignment)
+ \item $\langle$\textit{are}$\rangle$
+ \item $\langle$\textit{siamo}$\rangle$
+ \item $\langle$\textit{perfectly,perfettamente}$\rangle$
+ \item $\langle$\textit{aligned,allineati}$\rangle$
+ \end{itemize}
+ \caption[Steps of the baseline CE algorithm.]{Steps of the baseline CE algorithm. First, the rose tree representations of two yet-to-align dependency trees. Just below, the two rose trees after sorting and padding. Finally, the graphical representations of the resulting perfectly aligned trees and the linearizations of the aligned subtrees extracted from them. Since, in Italian, the subject is implicit, a dummy node, marked as \textbf{D}, is added to the corresponding tree during the padding step.}
+ \label{prefal}
+\end{figure}
+
+As we will see in the following sections, such algorithm is useful both as a baseline and as a source of inspiration for our improved CE program.
+
+\subsection{Proposed improvements} \label{improvements}
+While one of the most important ideas in the improved version of the CE module proposed in this thesis remains aligning (sub)trees with identical root UD labels, using this criterion alone makes our baseline both unable to detect many of the existing correspondences and prone to extract incorrect ones. This happens both when syntactic similarity is only apparent and when words are aligned based exclusively on the fact that they are the roots of two aligned subtrees\footnote{see Section \ref{heads} for a more detail discussion on head alignment.}.
+As a consequence, the objective of this part of the project is to improve both the precision and the recall of the algorithm (or rather, for reasons that will be discussed in Section \ref{metrics}, two approximations of such metrics). 
+
+\subsubsection{Multiple alignment criteria} \label{criteria}
+One obvious way to increase the total number of alignments the algorithm detects is to, instead of considering as aligned only subtrees in \textit{matching contexts}, i.e. whose heads are attached to the same node, and with matching UD labels, make use of a set of additional, possibly more relaxed, criteria. In the following, formal definitions of all the criteria used in the current implementation, including the original one, are given.
+
+\paragraph{Label matching}
+As mentioned in section \ref{baseline}, the only alignment criterion the original version of the CE module makes use of is based on comparing the UD labels of each pair of trees candidate for alignment, i.e. of each pair of trees in matching contexts. Formally: \smallskip
+
+\begin{criterion}[Matching UD labels] \label{udmatch}
+ Two dependency trees $t$, $u$ will be aligned if their roots share the same UD label.
+\end{criterion} \smallskip
+
+When referring to UD labels we disregard, unless otherwise specified, subtypes.
+
+\paragraph{POS-equivalence}
+As mentioned in Section \ref{ud}, dependency trees provide information not only on the syntactic role of each word, but also on their grammatical category, represented as a universal Part Of Speech (POS) tag. Intuitively, if the words corresponding to the nodes of two trees in matching contexts have the same POS tags, the two trees are generally more likely to correspond to each other than if not. 
+As a consequence, a useful relation to define between dependency trees is that of \textit{POS-equivalence}: \smallskip
+
+\begin{criterion}[POS-equivalence] \label{poseq}
+ Two dependency trees $t$, $u$ are POS-equivalent (and, as such, will be aligned) if $M_1 = M_2 \neq \emptyset$, where $M_i$ is defined as the multiset of POS tags of all the meaning-carrying word nodes of $t_i$. 
+\end{criterion} \smallskip
+
+The definition specifies that the two multisets should not contain the POS tags of all the words in the sentence but rather only those of the \textit{meaning-carrying} ones, referring to words belonging to a particular set of classes. 
+Words that should generally be taken into account, in fact, correspond roughly to content words (cf. Section \ref{upos}), but this term was deliberately avoided in Definition \ref{poseq} due to the fact that it can be useful also to include some function words, for instance pronouns and some kinds of determiners.
+In particular, the current implementation considers as meaning-carrying all words that belong to an open class - defined as in the UD documentation \cite{openpos} - and numerals, but this set of tags has been obtained empirically working with English-Italian and might not be ideal for all language pairs.
+On the other hand, words belonging to other classes, such as auxiliary verbs, adpositions and conjunctions can and should be in most cases ignored as they are often omitted or rendered with words with different POS tags when the sentence is translated to another language, especially if the two languages in the pair at hand differ significantly. \smallskip
+
+Applied alone, this criterion can be used to capture correspondences that would otherwise be missed, thus increasing recall, but a decrease in precision is also to be expected. Perhaps more interestingly, however, another way to apply this criterion is in conjunction with other ones, and in particular together with UD label matching (cf. Criterion \ref{udmatch}), in context where high precision is more important than recall. We will get back to combining criteria in Section \ref{ceres}.
+
+\paragraph{Handling divergences} \label{divs}
+While we do not want to make our CE module language pair-specific, there are many cases where parallel texts present significant and systematic cross-linguistic distinctions. Some of these distinctions, formalized in \cite{divs}, have nothing to do with idiomatic usage or aspectual, discourse, domain or word knowledge and are not specific of particular language pairs, even though they do occur more often in some than they do in others. 
+Drawing inspiration from \cite{divs} and \cite{divs2}, we refer to these distinctions as \textit{divergences} and introduce a third alignment criterion based on them: \smallskip
+
+\begin{criterion}[Known divergence]
+ Two dependency trees $t$, $u$ will be aligned if they match a known divergence pattern. 
+\end{criterion} \smallskip
+
+In \cite{divs}, seven classes of divergences are identified: \textit{thematic}, \textit{promotional}, \textit{demotional}, \textit{structural}, \textit{conflational}, \textit{categorial} and \textit{lexical}. 
+However, because the author's proposed way to resolve divergences assumes the availability of more than merely syntactic information\footnote{in particular, of a lexicon of Root Lexical Conceptual Structures specifying, for instance, the logical subject, arguments and modifiers of each verb.} and because, working with UD trees, we do not have access to anything but strictly syntactical and morphological annotations, the very task of identifying these distinctions at this level of granularity becomes, in our position, extremely challenging. 
+Consequently, we refer to the simpler classification and less formal definitions proposed in \cite{divs2}, where promotional and demotional divergences are merged in a wider-coverage category of \textit{head-swapping} divergences and where lexical divergences, the hardest to handle in the absence of any kind of semantic information, do not appear at all.
+In the following, we give definitions and examples for each of these classes of divergences, specifying to what extent and how\footnote{unless otherwise specified, each divergence can be expressed as a set of simple rules in the form of boolean functions taking the two UD trees candidate for alignment as input.} each of them is handled in the proposed language-agnostic CE module. We do not attempt to cover all possible cases, but rather provide a few examples as a proof of concept.
+
+\subparagraph*{Categorial divergence}
+A categorial divergence happens when the translation of a word with POS tag $P_1$ is a word with a different POS tag $P_2$. 
+The instances of this class of divergences our CE module handles explicitly are some of those that cannot be captured by Criterion \ref{udmatch} alone due to the fact that the difference in POS tags also causes the UD labels to be different, and in particular:
+
+\begin{itemize}
+ \item cases where an adverb in the source language corresponds to an adjective in the target language (and vice versa: all rules the program is based on are symmetrical), e.g.
+ \begin{example}
+ ``Roberta listens \underline{distractedly}'' VS ``Roberta lyssnar \underline{distraherad}''
+ \end{example}
+ where the English ``\textit{distractedly}'' is an adverb and the Swedish ``\textit{distraherad}'' is an adjective and, as such, would be labelled respectively as an \texttt{advmod} of ``\textit{lyssnar}'' and as an \texttt{amod} of ``\textit{Roberta}''
+ \item cases where a nominal modifier (\texttt{nmod}) in the source language is rendered as an adjectival modifier (\texttt{amod}) in the target language, like the following, where the English adjective ``\textit{doctoral}'' becomes the Italian noun ``\textit{dottorato}'', preceded by the preposition ``\textit{di}'':
+ \begin{example} \label{herb}
+ ``Herbert completed his \underline{doctoral} thesis'' VS ``Herbert ha completato la sua tesi \underline{di dottorato}''
+ \end{example}
+ \item cases where an adverb is rendered as an oblique, such as
+ \begin{example}
+ ``Nicola studies \underline{consistently}'' VS ``Nicola studia \underline{con costanza}''
+ \end{example}
+\end{itemize} \smallbreak
+
+There are indeed other divergences of this kind that can occur in a parallel text and cannot be captured by Criterion \ref{udmatch}, such as
+\begin{example}
+ ``Claudio is \underline{hungry}'' VS ``Claudio ha \underline{fame}''
+\end{example}
+where, in the original sentence, the complement of the copula \textit{am}, \textit{hungry}, would be labelled as its \texttt{root} but, in Italian, the noun \textit{fame} is the object of the root verb \textit{ha}. 
+It proved hard to detect cases like this via purely syntactic rules without causing the program to extract a lot of incorrect alignments as well, but if necessary it is easy to modify the program by removing or adding rules of this kind, potentially even language-specific.
+
+\subparagraph*{Conflational divergence} \label{confl}
+Conflational divergences involve the translation of two or more words in the source language using a single word that combines their meanings in the target language. A straightforward example is that of compounds, for instance
+\begin{example} 
+ ``Filippo is interested in \underline{game design}'' VS ``Filippo är intresserad av \underline{spelutvekling}''
+\end{example}
+but there are also other cases, like
+\begin{example} 
+ ``I'll come and \underline{say hello} to Bruno and Andrea'' VS ``Verrò a \underline{salutare} Bruno e Andrea''
+\end{example} 
+where the single word \textit{salutare} is not a compound but expresses the same meaning as ``say'' and ``hi'' together. \smallskip
+Divergences like the one described in the latter example are usually captured by Criterion \ref{udmatch}, while compounds often need to be taken care of explicitly. For reasons that will become clear later, these cases are discussed in Section \ref{heads}.
+
+\subparagraph*{Structural divergence}
+Structural divergences happen when the subject, object or indirect object of a sentence in the source language are rendered as obliques in the source language. For instance, in the sentences
+\begin{example}
+ ``I called \underline{Francesco}'' VS ``Ho telefonato \underline{a Francesco}''
+\end{example}
+what is the direct object in English (\textit{Francesco}) becomes a prepositional phrase (\textit{a Francesco}) in Italian. 
+Even though in many cases these divergences can be captured by POS-equivalence, in order to ensure higher precision, the CE module handles all of them explicitly via rules that combine it with UD label checking and whose priority is higher than that of the basic Criterion \ref{poseq}.
+
+\subparagraph*{Head swapping divergences}
+Head swapping divergences always involve a head verb and a logical modifier and occur when the logical modifier is placed lower (resp. higher) in the source language sentence than in its target language counterpart. For instance, in the following example
+\begin{example}
+ ``Anna \underline{usually} goes for walks'' VS ``Anna \underline{brukar} promenera''
+\end{example} 
+in Swedish, the logical modifier \textit{usually} is implicitly expressed by the verb \textit{brukar} itself, i.e. placed ``higher up''. \smallskip
+
+These divergences are, while not uncommon, hard to handle without access to a lexicon where entries for verbs are complete with a list of arguments and modifiers\footnote{on the other hand, developing the CA module further could be a way to construct such a ``rich'' lexicon, as will be discussed in Chapter \ref{ch6}.}.
+
+\subparagraph*{Thematic divergence}
+Thematic divergences can happen when the logical subject of a sentence in the target language differs from its grammatical subject. An example of thematic divergence is the following:
+\begin{example} \label{them}
+ ``\underline{Yana} likes \underline{books}'' VS ``\underline{A Yana} piacciono \underline{i libri}''
+\end{example}
+In this case, in the Italian translation, the (logical and grammatical) subject of the English sentence, \textit{Yana}, is expressed, even though it is still the logical subject of the sentence, as an oblique; the object \textit{books} becomes the grammatical subject (\textit{i libri}) in Italian, while the head verb remains in both cases the root. \smallskip
+
+Similar to this are the cases where a passive sentence in the source language is rendered as active in the target language and, as a consequence, the subject and complements are swapped:
+\begin{example} \label{pass}
+ ``\underline{The game} had only been tried \underline{by Andrea}'' VS ``Solo \underline{Andrea} aveva provato \underline{il gioco}''
+\end{example} \smallskip
+
+One could object that divergences like the above (and some other) could - and maybe \textit{should} - be avoided when translating a text. We will not dwell upon this, since what matters for the purpose of CA is not what is desirable in natural language translation but rather what divergences do occur in the human-translated parallel texts available for analysis. \smallskip
+
+Given that UD provides a subtype \texttt{pass} for \texttt{nsubj}s and auxiliary verbs, it is easier to explicitly handle cases such that of Example \ref{pass}, while those that resemble Example \ref{them} are left, for the moment, unhandled.
+
+\subsubsection{New extraction algorithm} \label{extralg}
+The decision to use different alignment criteria simultaneously, together with the nature of the criteria described in the above themselves, implies that perfect alignment must be given up: the new algorithm is such that aligned subtrees are not extracted from a pair of sorted and padded sentence trees but rather obtained by direct comparison between the original trees. Aligning a pair of sentences means, then, checking if the corresponding UD trees $t$, $u$ match any of the criteria at hand and, if they do, considering them as the members of an alignment, adding the alignment to a collection and recursively repeating the same procedures for all possible pairs $t'$, $u'$, where $t'$ is a subtree of $t$ and $u'$ is a subtree of $u$.
+
+\begin{figure}[H]
+ \centering
+ \lstinputlisting{pseudocode/Extract.hs}
+ \caption[Basic version of the improved CE algorithm]{Basic version of the improved CE algorithm. Instead of aligning full sentence trees and only then extract concepts comparing the structure of the trees and their UD labels only, it recursively extracts pairs of aligned subtrees directly. To do so, for each pair of subtrees occurring in the same context, it tries to apply multiple criteria, implemented as boolean functions telling whether two trees should become the members of an alignment.}
+ \label{extr}
+\end{figure}
+
+\paragraph{Pruning alignments} \label{pruning} 
+In its most basic version, this algorithm does nothing to avoid subtrees in the source language to be aligned with multiple subtrees in the target language and vice versa. As a consequence, it systematically \textit{overgenerates} alignments. \smallskip
+
+To avoid overgeneration, or rather to counter it, we need a way to select, in the very common case that the algorithm detects several alignments alternative to each other within the same sentence, the one that is more likely to be correct. A way to do this is to sort such alignments based on their ``reliability'' and only keeping the first alternative. The question becomes, then, how to sort the alignments. \smallskip
+
+To answer this, it must be first of all said that the criteria described in Section \ref{criteria} are not to be considered equally reliable nor describe equally frequent situations. For this reason, a way to obtain a series of alignments that are, in part, implicitly sorted is to apply criteria (or particular combinations of criteria) in a specific order that can be determined empirically and is easily modifiable thanks to the fact that, in its current implementation, the algorithm outlined above takes a list of criteria assumed to be in order of priority as one of its parameters. \smallskip
+
+It can happen, however, that two trees match \textit{more than one} of the criteria. For instance, two trees might have their roots sharing the same UD label (cf. Criterion \ref{udmatch}) \textit{and} be POS-equivalent. In such cases, it intuitively makes sense to consider them more likely to be exact, as there are literally more reasons to align them. This makes the implicit ordering that the solution just described produces ``for free'' insufficient and leads to the necessity to keep track of the set of reasons why an alignment has been extracted and only then sort the alternative alignments. From the implementative point of view, each alignment is simply associated with a \texttt{Set} of labels, whose type is in fact named \texttt{Reason} and has an ordering defined over. The final sorting is based on:\smallskip
+
+\begin{enumerate}
+ \item the number of reasons for alignment
+ \item the priority level of the highest-priority reason
+\end{enumerate} \smallskip
+
+These labels can even be part of the final output of the CE module, thus adding an ulterior level of explainability to the system it belongs to.
+
+\paragraph{Aligning heads} \label{heads}
+As mentioned in Section \ref{baseline}, the original version of the algorithm creates, every time an alignment is extracted, an additional one for the for the heads of its two members, which we refer to as a \textit{head alignment}. Doing this is a crucial part of the algorithm, as the following example, concerning a straightforward to align pair of sentences, shows: \smallskip
+\begin{example}
+ Consider the English sentence ``Enrico eats a banana'' and its Italian equivalent ``Enrico mangia una banana''. As the figure below shows, their trees are perfectly aligned without any need for padding or sorting:
+ \begin{figure}[h]
+ \centering
+ \setlength{\unitlength}{0.25mm}
+ \begin{subfigure}{.5\textwidth}
+ \centering
+ \begin{picture}(241.0,90.0)
+  \put(0.0,0.0){Enrico}
+  \put(64.0,0.0){eats}
+  \put(110.0,0.0){a}
+  \put(147.0,0.0){banana}
+  \put(0.0,15.0){{\tiny PROPN}}
+  \put(64.0,15.0){{\tiny VERB}}
+  \put(110.0,15.0){{\tiny DET}}
+  \put(147.0,15.0){{\tiny NOUN}}
+  \put(42.0,30.0){\oval(59.3125,33.333333333333336)[t]}
+  \put(12.34375,35.0){\vector(0,-1){5.0}}
+  \put(27.0,49.66666666666667){{\tiny nsubj}}
+  \put(138.5,30.0){\oval(28.89189189189189,33.333333333333336)[t]}
+  \put(124.05405405405405,35.0){\vector(0,-1){5.0}}
+  \put(123.5,49.66666666666667){{\tiny det}}
+  \put(125.5,30.0){\oval(79.3855421686747,66.66666666666667)[t]}
+  \put(165.19277108433735,35.0){\vector(0,-1){5.0}}
+  \put(110.5,66.33333333333334){{\tiny obj}}
+  \put(79.0,90.0){\vector(0,-1){60.0}}
+  \put(84.0,80.0){{\tiny root}}
+ \end{picture}
+ \end{subfigure}%
+ \begin{subfigure}{.5\textwidth}
+  \centering
+  \setlength{\unitlength}{0.25mm}
+  \begin{picture}(259.0,90.0)
+  \put(0.0,0.0){Enrico}
+  \put(64.0,0.0){mangia}
+  \put(128.0,0.0){una}
+  \put(165.0,0.0){banana}
+  \put(0.0,15.0){{\tiny PROPN}}
+  \put(64.0,15.0){{\tiny VERB}}
+  \put(128.0,15.0){{\tiny DET}}
+  \put(165.0,15.0){{\tiny NOUN}}
+  \put(42.0,30.0){\oval(59.3125,33.333333333333336)[t]}
+  \put(12.34375,35.0){\vector(0,-1){5.0}}
+  \put(27.0,49.66666666666667){{\tiny nsubj}}
+  \put(156.5,30.0){\oval(28.89189189189189,33.333333333333336)[t]}
+  \put(142.05405405405406,35.0){\vector(0,-1){5.0}}
+  \put(141.5,49.66666666666667){{\tiny det}}
+  \put(134.5,30.0){\oval(98.02970297029702,66.66666666666667)[t]}
+  \put(183.5148514851485,35.0){\vector(0,-1){5.0}}
+  \put(119.5,66.33333333333334){{\tiny obj}}
+  \put(79.0,90.0){\vector(0,-1){60.0}}
+  \put(84.0,80.0){{\tiny root}}
+ \end{picture}
+ \end{subfigure}
+ \label{enrico}
+ \end{figure}
+ 
+ Without head alignments, the output of the algorithm described so far would be:
+ \begin{itemize}
+ \item $\langle$Enrico eats a banana, Enrico mangia una banana$\rangle$
+ \item $\langle$Enrico, Enrico$\rangle$
+ \item $\langle$a banana, una banana$\rangle$
+ \item $\langle$a, una$\rangle$
+ \end{itemize} 
+ while introducing head alignment leads to detecting two additional, equally relevant one-word correspondences\footnote{note how, even with head alignments, not all potentially interesting alignments are found. In this example, for instance, it could be useful to align the verb phrase ``\textit{eats a banana}'' with its Italian counterpart ``\textit{mangia una banana}'', whose members are also not, strictly speaking, subtrees of the original sentences. The approach we use for head alignment, as we will discuss in Chapter \ref{ch6}, could be generalized to cases like this.}:
+ \begin{itemize}
+ \item $\langle$eats, mangia$\rangle$
+ \item $\langle$banana, banana$\rangle$
+ \end{itemize} 
+\end{example}
+
+While it is of extreme importance not to miss alignments like the last two in the example above, aligning heads is not always appropriate, especially when, as in the present case, common translation divergence patterns are one of the criteria. For instance, when two trees are aligned because of a categorial divergence such as that of Example \ref{herb}, where \textit{doctoral} corresponds to \textit{di dottorato}, it is at least questionable to also align \textit{doctoral} with \textit{dottorato}. Consequently, in the current implementation of the algorithm, each alignment criterion is associated with a flag telling whether heads should also be aligned whenever a new alignment is extracted because of that criterion. \smallskip
+
+In a way, even though it is handled differently from the others discussed so far, that of aligning heads could also be seen as another alignment criterion: \smallskip
+
+\begin{criterion}[Heads of matching trees] \label{cheads}
+ The roots $n_1$, $n_2$ of two trees $t$, $u$ will be aligned if $t$ and $u$ are aligned.
+\end{criterion}
+
+There are also cases where some sort of head alignment is desirable but it is not as simple as creating an additional alignment from the roots of each pair of aligned subtrees. As a consequence, an important part of the improved CE module developed within this project is a function \texttt{alignHeads} that performs head alignment with the necessary caveats. Following are the two special cases its current implementation is able to handle correctly despite being less straightforward. As for translation divergences, there may well be other cases that can be taken care of similarly: the objective of what has been implemented so far is mostly to demonstrate how this can be done. 
+
+\subparagraph*{Auxiliaries}
+When the translation counterpart of a verb in the SL is composed of a lexical verb and one or more auxiliaries (or vice versa), it is desirable to align the SL verb to the entire TL subtree composed of the head verb and its auxiliaries, like in the following example:
+\begin{example}
+ ``Many important decisions \underline{were taken} by Tommaso'' VS ``Många viktiga beslut \underline{togs} av Tommaso''
+\end{example}
+Achieving this is relatively straightforward: before aligning a pair of head verbs, their dependents labelled \texttt{aux} must be looked for. In case the head verb in the TL has one or more such dependents, but its SL counterpart does not, the TL member of the new alignment will not be composed by the head exclusively, but will include the \texttt{aux} subtrees.
+
+\subparagraph*{Compounds}
+We mentioned compounds as a type of conflational divergence (cf. Section \ref{confl}). Given the variety of ways in which the translation equivalent of a compound can be expressed and the subsequent variety of related UD labels (a compound can be rendered as another compound, as a \texttt{compound} (space-separated) expression, as a noun modified by an adjective and/or another noun, as a \texttt{flat} multiword expression, as a combination of these things...), compounds are slightly harder to align than main verb + auxiliaries constructions in practice, but the solution is conceptually the same: before aligning two heads, we check whether the list of their immediate dependents contains anything labelled \texttt{compound}, \texttt{flat}, \texttt{amod} or \texttt{nmod}. If that's the case in, for instance, only the sentence in the source language, then it is likely that the head of the tree in the target language is in fact a compound. If so, it is aligned not just with the head of the tree in the source language, but with the tree composed of the head and the list of subtrees labelled as \texttt{compound}, \texttt{flat}, \texttt{amod} or \texttt{nmod}. In this way, our program is generally able to find the counterparts of a compound even when they are very complex, such as in the following case:
+\begin{example} 
+ ``I took a course on \underline{Machine Learning techniques}'' VS ``Jag deltog i en kurs om \underline{maskininlärningstekniker}''
+\end{example}
+
+\paragraph{Counting and reusing alignments}
+We mentioned how knowing why a certain alignment was identified is important to know to what extent we can trust the program to having taken the right decision. When working on a full parallel text instead of on a single sentence, another important information is the number of occurrences of that alignment (disregarding all sentence-specific information such as the linear positions of its nodes) throughout the entire corpus: unless it is the result of a systematic error (and even in this case, having it presented as a first-class alignment will help finding the mistake), an alignment occurring multiple times can be considered ``more reliable'' as it is in a way ``corroborated''. As a consequence each alignment produced by our CE module is associated with a pair whose first element is the set of reasons for that specific alignment and whose second element is its total number of occurrences. \smallskip
+
+Furthermore, the fact that an alignment has already occurred can be used as an additional, backup criterion for when none of those described in section \ref{criteria} apply: \smallskip
+
+\begin{criterion}[Known alignment] \label{known}
+ Two dependency trees $t$, $u$ will be aligned if such alignment belongs to a set $K$ of known ones.
+\end{criterion} \smallskip
+
+In the case at hand, $K$ is initialized as empty and iteratively augmented with the results of aligning each pair of sentences, but it is not hard to imagine cases in which starting with a nonempty set would be useful.
+
+\section{Evaluation} \label{eval2}
+We conclude this chapter by describing the data and the approaches used to evaluate the CE module described in Section \ref{ce} independently from the subsequent stages of the proposed pipeline and by presenting the results of such early evaluation.
+
+\subsection{Data} \label{pud}
+\subsubsection{PUD treebanks}
+Because we want part of our evaluation to be independent from the quality of the dependency trees obtained by automatically parsing sentence-aligned text, a portion of the data used for this purpose consist in manually annotated data. \smallskip
+
+In particular, we use a subset of the Parallel UD (PUD) corpus, a set of handcrafted\footnote{for some languages, dependency labels were actually automatically converted to UD format from other standards. Furthermore, manual annotation often only concerns some of fields of the CoNLL-U files, but some manual annotation is generally involved in assigning POS tags and dependency relations.} multilingual treebanks in CoNLL-U format created for the CoNLL 2017 shared task on Multilingual Parsing from Raw Text to Universal Dependencies \cite{mprtud}. This prevents the CE module from failing because of parse errors, even though a small number of annotation inconsistencies and imprecisions is still present. \smallskip
+
+PUD treebanks are available in 20+ languages, of which we selected Italian, English and Swedish, and are composed of 1000 sentences taken from the news domain and from Wikipedia. Due to the lack of a gold standard to refer to in terms of CE and to the consequent need to manually assess the correctness of each alignment obtained, for most of the evaluation we only use the first 100 of these sentences. \smallskip
+
+\subsubsection{Course plans} \label{plans}
+When it comes to testing the program on raw text to be parsed automatically, we use two bilingual sentence-aligned corpora consisting of course plans from the Department of Mathematics and Computer Science of the University of Perugia (for English-Italian) and from the Department of Computer Science and Engineering (CSE) shared between the University of Gothenburg and the Chalmers University of Technology (for English-Swedish). For brevity, we will refer to these two datasets as to the DMI and CSE corpora throughout the text.\smallskip
+
+Part of this data were collected and sentence-aligned specifically for this work, but a core of CSE plans had already been gathered as part of another thesis project \cite{thesis}. \smallskip
+
+Our parser of choice is UDPipe \cite{udpipe1}. For parsing the two corpora, we use language models trained on two distinct parallel treebanks: for English-Italian, we selected ParTUT, an originally Italian-only treebank including texts of various genres, while for English-Swedish our choice was LinES, a larger bilingual treebank \cite{uddocs}.
+
+\subsection{Evaluation metrics} \label{metrics}
+While precision and recall are two well-known performance metrics that would be very well suited to the evaluation of our CE module, the lack of a CE gold standard forces us to approximate them with respectively: \smallskip
+
+\begin{itemize}
+ \item the number of correct alignments the program is able to extract
+ \item the ratio between such number and the total number of alignments extracted
+\end{itemize} \smallskip
+
+Determining whether an alignment is correct is not, however, a completely trivial task, since there are correspondences which are correct but not easily reusable in contexts other than that in which they were found. For instance, in the following case: \smallskip
+
+\begin{example} \label{extrain}
+ ``He missed the \underline{boat}'' VS ``Ha perso il \underline{treno}''
+\end{example} \smallskip
+
+it is hard to deny that \textit{boat} has been ``translated'' as \textit{treno}, ``train'', so our CE module would - and should - be able to detect it, but in most situations it is by no means desirable that such correspondence at the word level is made use of, for instance by storing it in an bilingual lexicon!
+As a consequence, each alignment can be marked as:
+\begin{itemize}
+ \item correct and useful for translation (\texttt{+})\footnote{at least to some extent: we observe that perfect translation equivalents that can be replaced with each other in all contexts are extremely rare, just like perfect synonyms.}
+ \item correct but not useful for translation (\texttt{=}). This means that the CE module is working as expected and that we are are faced with a divergence in the broader sense of the term, i.e. potentially due to an idiomatic usage of language
+ \item incorrect (\texttt{-}).
+\end{itemize} \smallskip
+ 
+For instance, if we feed the CE module the pair of sentences of Example \ref{extrain}, as a result\footnote{this is what the actual output of the program in evaluation (or ``linearized") mode after annotation looks like. The abbreviations in square brackets refer to alignment Criteria \ref*{udmatch}, \ref{poseq} and \ref{cheads} described in the above.} we get: \smallskip \label{cann}
+\begin{verbatim} 
+ +he missed the boat|ha perso il treno[UD,POS]1
+ +missed|ha perso[UD,POS,HEAD]1
+ =the boat|il treno[UD,POS]1
+ =boat|treno[UD,POS,HEAD]1
+ +the|il[UD]1
+\end{verbatim} 
+\smallskip
+
+Furthermore, the absence a reference solution makes it so that comparing the updated versions of the module with the baseline described in Section \ref{baseline}, thus focussing on measuring the improvements with respect to it rather than the quality of the results under absolute terms, is in practice the best way to assess the results.
+While not ideal, repeatedly performing this kind of evaluation, starting already during the early stages of its development, proved to be useful to understand the impact of each of the changes made, thus guiding further modifications and helping debugging the program when necessary. \smallskip
+
+\subsection{Implementation details} \label{evalign}
+In order to be able to perform the type of evaluation described in the above Section and because manual inspection of the results was indispensable, the program was made able to write alignments in the reader-friendly output format shown above. The notation is the following: \smallskip
+
+\begin{verbatim}
+ linearized SL tree|linearized TL tree[R1,R2,...,Rn]N
+\end{verbatim} \smallskip
+
+where \texttt{[R1,R2,...,Rn]} is the list of criteria the members of the alignment match and \texttt{N} is the number of occurrences of the alignment in the corpus. \smallskip
+
+With alignments in this format available, a simple way to evaluate a specific version of the CE module is to manually assess the correctness of each of the correspondences the program identifies and compute some statistics about them. 
+A separate Haskell module, \texttt{EvAlign}, was written to parse files in the above format and compute a series of useful statistics: \smallskip
+\begin{itemize}
+ \item the total number of alignments found
+ \item the number of \textit{distinct} alignments, i.e. the number of alignments with distinct linearizations
+ \item the percentage of correct alignments
+ \item the percentage of correct alignments that are also useful for translation
+ \item the percentage of alignments found due to each combination of criteria, and how many of them are correct.
+\end{itemize} \smallskip
+
+While labelling all alignments by hand was necessary to evaluate the baseline, as long as the corpus does not change, it is possible to evaluate later versions of the program semi-automatically, as the correctness of many alignments is most likely already known thanks to the first round of manual annotation or to any of the successive ones. \texttt{EvAlign} can in fact also be run interactively with a labelled file and an unlabelled file as input. When this is the case, the program tries to label as many alignments as possible based on the content of the labelled file (which, of course, can even be the result of merging multiple files obtained with different versions of the program), asking the user to assess the correctness of newly found ones only. If run in this modality, the program also displays some more statistics that make comparison it with the older, labelled file easier, such as the number of new correct alignment found and that of incorrect alignments lost. 
+
+\subsection{Evaluating CE against a baseline} \label{ceres}
+Table \ref{tbase} compares the results obtained with the baseline with those obtained with the proposed improved version on the 100-sentence manually annotated corpus described in Section \ref{pud}, both for English-Italian and for English-Swedish.
+
+% Please add the following required packages to your document preamble:
+% \usepackage[normalem]{ulem}
+% \useunder{\uline}{\ul}{}
+\begin{table}[H]
+ \centering
+ \small
+ \begin{tabular}{|l|l|l|l|l|}
+ \hline
+   & \multicolumn{2}{l|}{\textbf{baseline}} & \multicolumn{2}{l|}{\textbf{improved version}} \\ \hline
+ \textbf{}   & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}  & \textbf{en-sv} \\ \hline
+ \textbf{distinct alignments} & 1097  & 1257 & 1198   & 1314  \\ \hline
+ \textbf{correct (+ and =)} & 830 (58.12\%) & 995 (79.15\%)  & 964 (80.46\%) & 1105 (84.03\%) \\ \hline
+ \textbf{correct and useful (+)} & 776 (54.34\%) & 976 (77.64\%)  & 896 (74.79\%) & 1082 (82.28\%) \\ \hline
+ \end{tabular}
+ \caption[Comparison between the baseline and the improved version of the CE on manually annotated data]{Comparison between the baseline and the improved version of the CE module using manually annotated sentences from the PUD treebank in two different language pairs, English-Italian and English-Swedish.}
+ \label{tbase}
+ \end{table}
+
+As the table shows, for both language pairs, the raw number of distinct alignments extracted increases, which suggests an increase in recall. Most importantly, the percentage of correct alignments, our approximation for precision, increases significantly, and in particular by more than 20\% for English-Italian, the language pair most used during development. 
+There are also significant, but easily explainable differences between the two language pairs considered: in general, results are better for English-Swedish due to the syntactical similarity between the two. \smallskip
+
+\subsection{Evaluating specific criteria}
+When it comes to the improved version, it is also interesting to look at criterion-specific statistics, summarized in Table \ref{treas}. \smallskip
+
+One of the main things the results suggests is that, even though most alignments are still found by applying the original criterion (cf. Criterion \ref{udmatch} in Section \ref{improvements}), a combination of criteria \ref{udmatch} and \ref{poseq} is still able to detect many correspondences (more than 30\% of the total for both language pairs, if we combine regular and head alignments extracted in this way) while having higher (>90\%) precision. \smallskip
+
+This data also give an empirical confirmation of the observation made in Section \ref{heads} about the problem that the baseline has when it comes to head alignment, indicating that POS-equivalence is especially important when extracting head alignments. 
+The small size of the corpus cause Criterion \ref{known} to remain extremely marginal.
+Cross-language pair differences are, in this case, minimal, confirming that the criteria used and their priority order are not specifically tailored for the language pair used for under-development experiments. \smallskip
+
+\begin{table}[H]
+ \small
+ \centering
+ \begin{tabular}{|l|l|l|l|l|}
+ \hline
+ \textbf{criteria}       & \multicolumn{2}{l|}{\textbf{alignments extracted}} & \multicolumn{2}{l|}{\textbf{correct (+ and =)}} \\ \hline
+ \textbf{}       & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}  & \textbf{en-sv}  \\ \hline
+ \textbf{matching UD labels}      & 39.39\%  & 37.71\%  & 78.60\%  & 80.24\%  \\ \hline
+ \textbf{POS-equivalence}       & 3\%  & 1.82\%  & 83.33\%  & 83.33\%  \\ \hline
+ \textbf{known divergence}       & 2.08\%   & 1.36\%  & 52\%   & 55.55\%  \\ \hline
+ \textbf{known alignment}       & 0\%  & 0\%  & -  & -  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + POS-equivalence\end{tabular}}  & 20.95\%  & 24.71\%  & 93.03\%  & 94.76\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + head alignment\end{tabular}}  & 21.78\%  & 19.61\%  & 67.81\%  & 76.74\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}POS-equivalence\\ + head alignment\end{tabular}}  & 1.33\%   & 1.29\%  & 75\%   & 64.70\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + known alignment\end{tabular}}  & 0.25\%   & 0.45\%  & 66.66\%  & 83.33\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + POS-equivalence\\ + head alignment\end{tabular}} & 10.85\%  & 12.69\%  & 95.38\%  & 90.41\%  \\ \hline
+ \end{tabular}
+ \caption[Criterion-specific statistics]{Criterion-specific statistics. The leftmost column specifies a criterion or combination of criteria. The central column indicates the percentage of alignments extracted because of each set of criteria, and the rightmost one specifies how many of them were marked as \texttt{+} or \texttt{-}.}
+ \label{treas}
+ \end{table}
+
+\subsection{Working with raw text}
+Of course, it is also interesting to compare the performance of the CE module on manually annotated data with the results obtained on the automatically parsed course plans corpora, summarized in Table \ref{tcereal}.
+% Please add the following required packages to your document preamble:
+% \usepackage[normalem]{ulem}
+% \useunder{\uline}{\ul}{}
+\begin{table}[H]
+ \small
+ \centering 
+ \begin{tabular}{|l|l|l|}
+ \hline
+ \textbf{}   & \textbf{DMI (en-it, 798 sentences)} & \textbf{CSE (en-sv, 498 sentences)} \\ \hline
+ \textbf{distinct alignments} & 352  & 529  \\ \hline
+ \textbf{correct (+ and =)} & 243 (69.03\%) & 368 (69.56\%) \\ \hline
+ \textbf{correct and useful (+)} & 229 (65.05\%) & 351 (66.35\%) \\ \hline
+ \end{tabular}
+ \caption[Performance of CE on barely sentence-aligned data]{Performance of CE on barely sentence-aligned data, parsed automatically. Two distinct corpora of different size have been used for the two different language pairs, so the two columns are not to be compared with each other, but rather with Table \ref{tbase}.}
+ \label{tcereal}
+\end{table}
+
+As it is to be expected, results are not as good for automatically parsed sentences as they are for manually annotated data. In particular, the percentage of correct alignments drops - but interestingly it is virtually the same for both language pairs. 
+The difference between the two pairs seems instead to be in the total number of alignments found: despite English-Italian corpus being significantly larger, more concepts are extracted for the Swedish-Italian one. \smallskip
+
+\subsection{Comparison with methods from Statistical MT}
+Another kind of evaluation that can be performed before the aligned dependency subtrees are converted to GF ASTs to be fed to the last stage of the pipeline is to compare them with those obtained by means of application of existing statistical algorithms. Among the well known solutions mentioned in Section \ref{statmt}, we have chosen to focus on \texttt{fast\_align} \cite{fast} because of its ease of use and installation. \smallskip
+
+A Haskell script converts the CoNNL-U files that are fed to \texttt{AlignTrees} into the input format required by \texttt{fast\_align}, so that the exact same tokenization is used. \smallskip
+
+A second script converting its output into that used by \texttt{EvAlign} allows to reuse all of the evaluation infrastructure described in Section \ref{metrics}.
+Finally, Table \ref{tfast} summarizes the results of a comparison between the improved CE module and \texttt{fast\_align} run with 10 iterations in EM training and symmetrizing the alignments found by running the program in both directions. \smallskip 
+
+Because \texttt{fast\_align} is a purely statistical approach, we trained it not only on the same 100-sentence subset of PUD used for evaluating \texttt{AlignTrees} against the baseline, but also on the full 1000-sentences dataset. In the latter experiment, the alignments obtained for the last 900 sentences were discarded before evaluating the results.
+Due to the time required to manually annotate the numerous alignments extracted by \texttt{fast\_align}, this evaluation has been conducted only for the most challenging language pair, English-Italian. 
+For a fairer comparison, since \texttt{fast\_align} works at the word level, only the one-to-one, one-to-many and many-to-one word alignments produced by the CE module were kept.
+
+\begin{table}[H]
+ \centering
+ \small
+ \begin{tabular}{|l|l|l|l|}
+ \hline
+  & \textbf{\texttt{AlignTrees}} & \textbf{\texttt{fast\_align} 100} & \textbf{\texttt{fast\_align} 1000}\\ \hline
+  \textbf{distinct alignments} & 716 & 1440 & 1435 \\ \hline
+  \textbf{correct} & 536 (74.86\%) & 410 (28.47\%) & 656 (45.71\%)\\ \hline
+  \textbf{correct and useful} & 491 (68.57\%) & 371 (25.76\%) & 590 (41.11\%)\\ \hline
+ \end{tabular}
+ \caption[Comparison between the improved CE module and \texttt{fast\_align}]{Comparison between the improved CE module and \texttt{fast\_align} trained on the first 100 only (column 2) and on the whole PUD corpus (column 3).}
+ \label{tfast}
+\end{table}
+
+As the table shows, since \texttt{fast\_align} tries to find a correspondent in the TL for each word in the SL, the number of alignments found by our CE program is roughly half of that of those found statistically. The percentage of correct alignments is, however, much higher for our system, even when the full PUD corpus is used in the training step of \texttt{fast\_align}. This shows that our approach is particularly well suited to smaller datasets and can even be used on individual sentence pairs, provided that they are analyzed correctly.

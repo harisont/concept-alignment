@@ -1,0 +1,11 @@
+# newdoc
+# newpar
+# sent_id = 1
+# text = questo algoritmo seleziona gli allineamenti rilevanti
+1	questo	questo	DET	DD	Gender=Masc|Number=Sing|PronType=Dem	2	det	_	_
+2	algoritmo	algoritmo	NOUN	S	Gender=Masc|Number=Sing	3	nsubj	_	_
+3	seleziona	selezionare	VERB	V	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	_
+4	gli	il	DET	RD	Definite=Def|Gender=Masc|Number=Plur|PronType=Art	5	det	_	_
+5	allineamenti	allineamento	NOUN	S	Gender=Masc|Number=Plur	3	obj	_	_
+6	rilevanti	rilevare	ADJ	A	Number=Plur	5	amod	_	SpacesAfter=\n
+

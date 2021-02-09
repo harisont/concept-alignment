@@ -1,0 +1,881 @@
+MATHEMATICAL ANALYSIS - MOD. I
+Code
+GP004146
+CFU
+7
+Lecturer
+Paola Rubbioni
+Lecturers  
+Paola Rubbioni - Didattica Ufficiale
+Hours  
+49 Hours - Didattica Ufficiale - Paola Rubbioni
+Learning activities
+Base
+Area
+Formazione matematico-fisica
+Sector
+MAT/05
+Type of study-unit
+Obbligatorio (Required)
+Language of instruction
+Italian
+Contents  
+Sets, upper and lower extremes, numerical sequences, elementary functions.
+Limits, continuity and derivation for real functions of one variable.
+Riemann Integral.
+Reference texts
+Marco Bramanti Carlo Domenico Pagani Sandro Salsa
+Analisi matematica 1
+Zanichelli, 2008
+.Volume unico
+Pagine: 392 ISBN: 9788808064851
+.Ebook - versione Booktab
+ISBN: 9788808642752
+.Ebook licenza 9 mesi - versione Booktab
+ISBN: 9788808842541
+Marco Bramanti
+"Esercitazioni di Analisi matematica 1"
+Esculapio editore, 2018
+Educational objectives
+The course aims to provide students with the bases of Mathematical Analysis both from a methodological and a calculation point of view. 
+At the end of the Module I the student must: 
+have acquired the notions of limit, derivative, integral; 
+to be able to carry out the complete study of a function of one variable; 
+know how to calculate simple Riemann integrals; 
+know how to expose and discuss the definitions and theorems presented in class.
+Prerequisites
+First and second degree equations and inequalities, rational, irrational, transcendent. Elements of analytical geometry.
+Teaching methods
+Face-to-face lessons on all the topics of the course.
+In addition to a detailed theoretical presentation, for each topic will also be carried out the related exercises that will be a model to those proposed in the examination.
+Other information
+During the written test the use of: textbook is allowed; handwritten cards with their own personal notes inserted in a portalistini; sheets for draft; pens, pencils, ruler, ...
+It is not possible to keep with you: bags or backpacks; smartphones or notebooks or calculators or other similar devices; books other than text.
+For communications and any additional material, reference is made to the Unistudium platform.
+Learning verification modality
+The final exam is inclusive of both modules.
+For each module there are:
+a written test in which the student must perform two exercises in two hours to verify the knowledge and skills related to the calculation; 
+an oral test of about fifteen minutes of verification of the acquisition of the method, of the language and of the fundamental theoretical knowledge of the subject.
+The final grade is the average of the marks obtained in the two modules.
+
+For information on support services for students with disabilities and / or DSA visit http://www.unipg.it/disabilita-e-dsa
+Extended program
+Basic concepts on sets; elementary logic; real numbers; upper extreme.
+Functions of one variable: generality and elementary functions; composition of functions and inverse functions.
+Limits and continuity: numerical sequences; limits of functions, continuity, asymptotes; calculation of limits; global properties of continuous functions.
+Differential calculus for functions of one variable: derivative of a function; rules for calculating derivatives; the theorem of the mean value and its consequences; second derivative; study of the graph of a function.
+Riemann Integral: integral of a function; properties of the integral; the fundamental theorem of integral calculus; calculation of indefinite and defined integrals.
+
+MATHEMATICAL ANALYSIS - MOD. II
+Code
+GP004147
+CFU  7
+Lecturer
+Antonio Boccuto
+Lecturers  
+
+    Antonio Boccuto - Didattica Ufficiale
+
+Hours  
+49 Hours - Didattica Ufficiale - Antonio Boccuto
+Learning activities
+Base
+Area
+Formazione matematico-fisica
+Sector
+MAT/05
+Type of study-unit
+Obbligatorio (Required)
+Language of instruction
+ITALIAN
+Contents
+Series. Different types of techniques for solving them. 
+Double integrals and generalized integrals. 
+Applications to Probability and Statistics. 
+Maxima and minima of functions of several variables, and eigenvalues. 
+Taylor series and applications.
+Reference texts
+Didactic material given by the teacher
+Educational objectives
+The aim of the course is to give different techniques and methods of calculus for series, improper integrals, double integrals, local maxima and minima of functions of several variables, the Taylor series, with several applications, among which to Probability and Statistics and to the calculus of irrational numbers with a given fixed precision.
+Prerequisites
+The WHOLE Course of Mathematical Analysis I Modulus, of course.
+Teaching methods
+Theoretical lectures on a projector with examples and exercises, solved in detail.
+Other information
+Attending the lectures is very important, fundamental and warmly suggested.
+Learning verification modality
+Written (the time is 2 hours) and oral examination.
+The oral examination is given within two sessions after the written part. 
+In some cases there is the possibility of establishing a calendar, but in any case the exams have to be NECESSARILY BOOKED.
+The registration to both the written and the oral part MUST BE DONE BY E-MAIL, to which the teacher will answer, some day before the exam. 
+The address is antonio.boccuto@unipg.it
+It is not possible to receive non-booked or non-confirmed students.
+The written part consists of two exercises with theoretical sketches.
+The oral examination is on the WHOLE PROGRAM, included exercises.
+The material consists of the "set union" of the didactic material and the lectures of the teacher. 
+A RESPONSIBLE DAILY STUDY IS FUNDAMENTAL.
+Extended program
+Series. Different types of techniques for solving them. 
+Double integrals and generalized integrals. 
+Applications to Probability and Statistics. 
+Maxima and minima of functions of several variables, and eigenvalues. 
+Taylor series and applications.
+
+Study-unit COMPUTER ARCHITECTURE
+Course name 
+Informatics
+Study-unit Code 
+20009205
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Alfredo Navarra
+Lecturers 
+
+
+    Alfredo Navarra - Didattica Ufficiale
+    Raffaella Gentilini - Didattica Ufficiale (Codocenza)
+
+Hours 
+
+
+    42 Hours - Didattica Ufficiale - Alfredo Navarra
+    21 Hours - Didattica Ufficiale (Codocenza) - Raffaella Gentilini
+
+CFU 
+9
+Course Regulation 
+Coorte 2020
+Supplied 
+2020/21
+Supplied other course regulation 
+
+Learning activities 
+Base
+Area 
+Formazione informatica di base
+Sector 
+INF/01
+Period 
+whole year
+Type of study-unit 
+Obbligatorio (Required)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+Italian
+Contents 
+MODULE I: This module provides a primer in digital logic design, focusing on
+boolean functions and boolean algebra 
+combinational circuit analysis and synthesis
+basics of sequential circuits.
+
+MODULE II:
+Numbers representation: positional, sign-and-magnitude, twos' complement; Designs of adders, multipliers, and dividers; Floating points: 16 bit standard IEEE 754; Cellular automata: Game of Life, Scintillae and Computer architecture; Abstraction levels: Functional level, RTL. 
+Micro-oprerations. 
+Control Unit. 
+Machine cycle. 
+PDP8: register level, functional level, control unit, Assembly. 
+Cache memory. Pipelining.
+Reference texts 
+MODULE I:
+
+1. Cristiana Bolchini, Carlo Brandolese, Fabio Salice, Donatella Sciuto. 
+Reti Logiche. 
+Maggioli Editore, 2015, Apogeo Education.
+
+MODULE II:
+
+2. F. Barsi: Architettura degli elaboratori, parte seconda: struttura dei sistemi. Margiacchi-Galeno
+
+3. C. Hamacher, Z. Vranesic, S. Zaky, Naraig Manjikian: Introduzione all'architettura dei calcolatori III edizione. McGraw-Hill
+Educational objectives 
+Knowledge and understanding about basic properties of a computer, including assembly programming
+Prerequisites 
+none
+Teaching methods 
+Face-to-face
+Practical training
+Seminars
+Learning verification modality 
+examination in class
+Extended program 
+MODULE I: 
+Boolean algebra and logic gates: basic theorems and properties of boolean algebra, boolean functions, canonical forms, digital logic gates. 
+
+Study-unit PROCEDURAL PROGRAMMING WITH LABORATORY
+Course name 
+Informatics
+Study-unit Code 
+A002058
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Francesco Santini
+Lecturers 
+
+
+    Francesco Santini - Didattica Ufficiale
+
+Hours 
+
+
+    73 Hours - Didattica Ufficiale - Francesco Santini
+
+CFU 
+9
+Course Regulation 
+Coorte 2020
+Supplied 
+2020/21
+Supplied other course regulation 
+
+Learning activities 
+Caratterizzante
+Area 
+Discipline informatiche
+Sector 
+INF/01
+Period 
+I
+Type of study-unit 
+Obbligatorio (Required)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+Italian
+Contents 
+Introduction to programming.
+C programming language.
+Linked lists.
+Reference texts 
+C How to Program (8th Edition), Paul J. Deitel and Harvey M. Deitel (Authors), Publisher: Pearson; 8 edizione, ISBN-10: 0133976890, Pages: 1008, 2015.
+C Pocket Reference, Peter Prinz, Ulla Kirch-Prinzm, Publisher: O'Reilly Media, ISBN-10: 0596004362, Pages: 144, 2002.
+Educational objectives 
+Students will learn basic programming concepts and problem solving. 
+Moreover, we will directly acquire programming skills using C language. 
+Finally, we will be able to use a linked list and its basic operations, e.g., insertion and deletion of elements.
+Prerequisites 
+No prerequisite in particular.
+Teaching methods 
+Lectures with slides.
+Home assignments.
+Compilation examples.
+Classroom exercises.
+Other information 
+Attendance of lessons is strongly suggested
+
+Website: www.unistudium.unipg.it
+
+For the exam schedule, see:
+www.informatica.unipg.it
+Learning verification modality 
+Written exam with 9-10 exercises based on understanding and writing pieces of code in C language (duration: 2 hours and half).
+If the marks of the written exam are good enough, the student is required to give a lab exam where she will be asked to modify some parts of a project developed at home (duration: 1 hour). 
+Some further questions can asked at the end of the Lab exam, depending on the marks of the two previous tests. 
+The written exam is scored 18-30, then 4-5 more points will be given to the assigned project. 
+The oral exam is then used to assess the skills of a student and tune the final mark.
+For information on support services for students with disabilities and / or DSA visit the page http://www.unipg.it/disabilita-e-dsa
+Extended program 
+- Introduction to programming languages
+- Interpreted and compiled languages
+- Names, scope
+- Versioning systems (GitHub)
+- C language:
+Language Basics
+Types
+Literals
+Type conversions
+Expressions and operators
+Statements
+Loops
+Conditional statements
+Functions
+Arrays
+Pointers
+Structures and Unions
+Dynamic Memory Management
+Input and Output
+Pre-processing directives
+Compiling with GCC
+Debugging C Programs with GDB
+- Linked lists
+
+Study-unit OBJECT ORIENTED PROGRAMMING WITH LABORATORY
+Course name 
+Informatics
+Study-unit Code 
+A002059
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Stefano Marcugini
+Lecturers 
+
+
+    Stefano Marcugini - Didattica Ufficiale
+
+Hours 
+
+
+    78 Hours - Didattica Ufficiale - Stefano Marcugini
+
+CFU 
+9
+Course Regulation 
+Coorte 2020
+Supplied 
+2020/21
+Supplied other course regulation 
+
+Learning activities 
+Caratterizzante
+Area 
+Discipline informatiche
+Sector 
+INF/01
+Period 
+II
+Type of study-unit 
+Obbligatorio (Required)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+Italian
+Contents 
+OBJECT ORIENTED PROGRAMMING
+Model of the objects;
+Encapsulation;
+Inheritance;
+Polymorphism.
+
+INTRODUCTION TO JAVA LANGUAGE
+Structured programming.
+Array.
+Classes and methods;
+Applications and Applet;
+Java Packages;
+Ecceptions;
+Multithreading;
+Input and Output;
+Expressions;
+Event oriented programming;
+Socket; 
+Client-server applications.
+
+EXAMPLES OF ALGORITHMS
+
+Recursion.
+Reference texts 
+Concetti di informatica e fondamenti di Java settima edizione per Java 8, 9, 10 e 11
+di Cay Horstmann
+Maggioli Editore
+
+Available at the library:
+Java 1.2 - L.Lemay, C.L. Perkins, Edizioni Sams net
+Java 2 i fondamenti - Cay S. Horstmann e Gary Cornell - Mc Graw Hill;
+Java 2 tecniche avanzate - Cay S. Horstmann e Gary Cornell - Mc Graw Hill;
+
+in English:
+
+Core Java Volume I--Fundamentals, 9th Edition, Cay S. Horstman, Prentice Hall. 
+Part of the Pearson Custom Library: Computer Science series.
+
+Core Java, Volume II--Advanced Features, 9th Edition, Cay S. Horstman, Prentice Hall. 
+Part of the Pearson Custom Library: Computer Science series.
+Educational objectives 
+Understanding the concepts of object-oriented programming and events.
+Ability to build applications.
+Ability to compare possible solutions to choose the best.
+Ability to apply patterns of classical solutions to new problems.
+Ability to design the hierarchy of objects suitable to the specific problem.
+Ability to implement programs of professional interfaces.
+Prerequisites 
+It is useful to have taken the exam of Procedural programming.
+In particular it is important to be familiar with the following concepts: pointers, dynamic memory management, elementary algorithms.
+Teaching methods 
+Lectures, laboratory exercises.
+Other information 
+Website: www.unistudium.unipg.it
+For the exam schedule, see: www.informatica.unipg.it
+Learning verification modality 
+Written and oral exam. 
+Tests of exoneration are planned during the course.
+The written exam involves the solution of three exercises and is designed to test the ability to correctly apply the theoretical knowledge and understanding of the issues proposed.
+The written exam lasts three hours.
+The oral exam is a discussion lasting about 30 minutes designed to ascertain the level of knowledge and understanding about the theoretical contents of the course reached by the student. 
+Also the oral exam will test the ability of communication of the student and the ability of autonomous organization of the speech.
+At the request of the student the exam may be taken also in English.
+For information on support services for students with disabilities and / or DSA visit the page http://www.unipg.it/disabilita-e-dsa
+Extended program 
+OBJECT ORIENTED PROGRAMMING
+Model of objects for reference;
+
+Study-unit NUMERICAL ANALYSIS
+Course name 
+Informatics
+Study-unit Code 
+55007306
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Bruno Iannazzo
+Lecturers 
+
+
+    Bruno Iannazzo - Didattica Ufficiale
+
+Hours 
+
+
+    42 Hours - Didattica Ufficiale - Bruno Iannazzo
+
+CFU 
+6
+Course Regulation 
+Coorte 2020
+Supplied 
+2021/22
+Supplied other course regulation 
+
+Coorte 2019 - Will supplied in year 2020
+Learning activities 
+Affine/integrativa
+Area 
+Attività formative affini o integrative
+Sector 
+MAT/08
+Period 
+I
+Type of study-unit 
+Obbligatorio (Required)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+Italian
+Contents 
+Basics in numerical analysis: numerical stability, computational cost. 
+Numerical linear algebra and approximations of functions. 
+Case study: search engines, computer graphics.
+Reference texts 
+Material provided by the teacher.
+Educational objectives 
+To get familiar with numerical algorithms, their analysis, their implementation, their use in model problems.
+Prerequisites 
+Linear algebra. 
+Functions of one real variable. 
+Basic programming.
+Teaching methods 
+Face-to-face lectures.
+Learning verification modality 
+Written exam. 
+Optional oral exam.
+Extended program 
+Basics in numerical analysis: numerical stability, computational cost. 
+Numerical linear algebra and approximations of functions. 
+Case study: search engines, computer graphics.
+
+Study-unit COMPUTABILITY AND COMPLEXITY
+Share
+Course name 
+Informatics
+Study-unit Code 
+A002041
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Arturo Carpi
+Lecturers 
+
+
+    Arturo Carpi - Didattica Ufficiale
+
+Hours 
+
+
+    42 Hours - Didattica Ufficiale - Arturo Carpi
+
+CFU 
+6
+Course Regulation 
+Coorte 2020
+Supplied 
+2020/21
+Supplied other course regulation 
+
+Learning activities 
+Caratterizzante
+Area 
+Discipline informatiche
+Sector 
+INF/01
+Period 
+II
+Type of study-unit 
+Obbligatorio (Required)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+English
+Contents 
+Turing machine. 
+Goedel coding. 
+Church-Turing thesis.
+Unsolvable problems. 
+Universal Turing machine. 
+halting problem. 
+Hilbert tenth problem. 
+Partial recursive functions.
+Edmonds-Cook-Karp thesis. 
+Classes P and NP. 
+NP complete problems. 
+Classes L, NL, PSPACE, NPSPACE.
+Reference texts 
+C. Toffalori, F. Corradini, S. Leonesi, S. Mancini, Teoria della computabilità e della complessità, McGraw-Hill
+J. Hopcroft, R. Motwani, J. Ullman, Automi, linguaggi e calcolabilità, Pearson
+M. Davis, Computability and Unsolvability, Dover (ediz. Italiana: Abete, 1974)
+Educational objectives 
+The course will furnish to the student the knowledge of the main methods and results of the Computability and Complexity Theory.Moreover it will give the ability to apply this knowledge to identify the complexity of practical problems in various fields.
+Prerequisites 
+In order to attend the course,the student should have some basic knowledge of Formal Language Theory and of algorithm complexity analysis.
+This notions are present in the fundamental courses of the first level degree courses in Informatics.
+Teaching methods 
+Lectures
+Other information 
+Learning verification modality 
+The final evaluation consists is an oral exam.
+The goal of this exam is to verify the acquisition of the main theoretical aspect of the discipline and the ability to apply such knowledge in order to evaluate the structural complexity of problems in different fields.
+On student request, exam may be given in Italian, English or French.
+Extended program 
+Theory of computability:
+Alphabets, strings, languages.
+Turing machine. 
+Turing machines and languages. 
+Turing machines and functions. 
+Goedel coding. 
+Church-Turing thesis.
+Multi-tape Turing machines. 
+Non deterministic Turing machines.
+Algorithmically solvable problems and unsolvable problems. 
+Universal Turing machines. 
+halting problem.
+Decidable and semi-decidable sets. 
+Hilbert tenth problem.
+Recursive function. 
+Church-computabilty. 
+Partial recursive functions.
+Complexity theory:
+Time complexity classes. 
+The class P and Edmonds-Cook-Karp thesis. 
+The class NP. 
+The problem P=NP. 
+NP-completeness. 
+Cook-levin theorem.
+Space complexity classes. 
+The classes L, NL, PSPACE, NPSPACE. 
+Savitch theorem.
+
+Study-unit ADVANCED AND DISTRIBUTED ALGORITHMS
+Share
+Course name 
+Informatics
+Study-unit Code 
+A002042
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Maria Cristina Pinotti
+Lecturers 
+
+
+    Maria Cristina Pinotti - Didattica Ufficiale
+    Alfredo Navarra - Didattica Ufficiale (Codocenza)
+
+Hours 
+
+
+    21 Hours - Didattica Ufficiale - Maria Cristina Pinotti
+    42 Hours - Didattica Ufficiale (Codocenza) - Alfredo Navarra
+
+CFU 
+9
+Course Regulation 
+Coorte 2020
+Supplied 
+2020/21
+Supplied other course regulation 
+
+Learning activities 
+Caratterizzante
+Area 
+Discipline informatiche
+Sector 
+INF/01
+Period 
+I
+Type of study-unit 
+Obbligatorio (Required)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+Italian/English
+Contents 
+Advanced Combinatorial Algorithms. 
+Introduction to Distributed Systems. 
+Distributed algorithms and cost measures. 
+Classical algorithms revisited for the distributed environment.
+Behavior with respect to different graph topologies. 
+In-depth studies about recent research directions and simulation software for distributed systems.
+Reference texts 
+T. H. CORMEN, C. E. LEISERSON, R. L. RIVEST, C. STEIN Introduction to algorithms, McGraw-Hill, 2010, ISBN: 978-88-386-6515-8.
+N. Santoro: Design and Analysis of Distributed Algorithms. John Wiley & Sons.
+Educational objectives 
+Learning solutions to problems that recur in several applications.
+Advanced knowledge on distributed algorithm issues.
+Increasing critical and application skills
+Prerequisites 
+Algorithms at intermediate level
+Teaching methods 
+Lectures in class
+Seminars
+Learning verification modality 
+Oral exam
+Extended program 
+The Maximum Flow Problem:
+Cuts in a Flow Network
+The Preflow-Push Maximum Flow Algorithm
+Computational Geometry:
+Finding the convex hull
+Finding the closest pair of points
+Finding Delaunay triangulation
+Speeding-up Dynamic programming:
+The Monge property
+The SMAWK algorithm
+Applications.
+Introduction to Distributed Systems: 
+Entities, Events, Actions and Communications. 
+Axioms and Restrictions. 
+Costs and Complexity. 
+The Broadcast as example. 
+Flooding algorithm. 
+Complexity of Flooding. 
+States, Events and Configurations. 
+Problems and Solutions. 
+Termination and Correctness. 
+Lower bounds for the Broadcast. 
+Broadcast over complete graphs. 
+Hypercube topology. 
+Dimensional hypercubes. 
+Broadcasting over hypercubes. 
+Wake-Up problem. 
+Wake-Up over hypercubes. 
+Proof about the absence of cycles in Hk(x). 
+Wake-Up over trees. 
+Wake-up over complete graphs. 
+Adversary technique. 
+Traversal problem. 
+DF_Traversal algorithm. 
+Improvements for DF_Traversal algorithm: DF+, DF++. Spanning Tree problem. 
+Shout protocol. 
+Correctness, computational costs and improvements of the Shout protocol. 
+Anonymous graph exploration by means of a finite state automaton. 
+Ad-hoc local orientation for the construction of a Spanning Tree. 
+Right-hand rule. 
+Spanning tree with multiple initiators. 
+Spanning Tree with unique identifiers. 
+MultiShout protocol. 
+Introduction to the saturation technique. 
+Saturation technique. 
+Minimum value search by means of saturation. 
+Leader Election: impossibility results, tree topology, ring topology. 
+AsFar protocol. 
+Gathering problem. 
+Look-Compute-Move Model. 
+Gathering on Rings. 
+
+Study-unit COMPUTER SCIENCE TEACHING
+Course name 
+Informatics
+Study-unit Code 
+A001587
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Sergio Tasso
+Lecturers 
+
+
+    Sergio Tasso - Didattica Ufficiale
+    Nicla Palladino - Didattica Ufficiale (Codocenza)
+    Stefano Marcugini - Didattica Ufficiale (Codocenza)
+    Arturo Carpi - Didattica Ufficiale (Codocenza)
+    Francesco Santini - Didattica Ufficiale (Codocenza)
+
+Hours 
+
+
+    14 Hours - Didattica Ufficiale - Sergio Tasso
+    7 Hours - Didattica Ufficiale (Codocenza) - Nicla Palladino
+    7 Hours - Didattica Ufficiale (Codocenza) - Stefano Marcugini
+    7 Hours - Didattica Ufficiale (Codocenza) - Arturo Carpi
+    7 Hours - Didattica Ufficiale (Codocenza) - Francesco Santini
+
+CFU 
+6
+Course Regulation 
+Coorte 2020
+Supplied 
+2020/21
+Supplied other course regulation 
+
+Coorte 2019 - Will supplied in year 2020
+Learning activities 
+Affine/integrativa
+Area 
+Attività formative affini o integrative
+Sector 
+INF/01
+Period 
+I
+Type of study-unit 
+Opzionale (Optional)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+Italian
+Contents 
+General didactics and didactics of the discipline. 
+Teaching as a transmission of knowledge, the behaviorist model, the constructivist model. 
+The most common misconceptions in computer science. 
+Problem solving. 
+Epistemological obstacles. 
+Collaborative learning. 
+The general principles of peer tutoring.
+Introduction to the tutoring activity, exploring personal and psychological aspects of the student in difficulty.
+Procedural programming didactics (C language).
+Object-oriented programming didactics (Java language).
+Computer architecture didactics.
+Design of recovery activities on the topics on which the students encounter most difficulties.
+Reference texts 
+Lecture notes provided by the teachers
+Educational objectives 
+Ability to relate to students in difficulty and to provide effective tutoring, both as regards the specific aspects of the exams of the courses, and as regards personal and psychological difficulties.
+Ability to create educational material such as exercises and quizzes for e-learning platforms on topics of procedural programming (C language), Object-oriented programming (Java language) and Computer architecture.
+Prerequisites 
+It is useful to have taken the exam of Computer Architecture, Programming I and Programming II.
+In particular it is important to be familiar with the basic concepts of programming.
+Teaching methods 
+The course avails itself of the collaboration of experts in various sectors, and takes place through lectures, conferences, activities to be experienced in the first person.
+Discussion of material prepared by the students.
+Other information 
+Website: www.unistudium.unipg.it
+For the exam schedule, see: www.dmi.unipg.it
+Learning verification modality 
+Projects assigned by the teachers.
+Oral talks on the various covered topics.
+The development of the projects is aimed at verifying the ability to create teaching material such as exercises and quizzes for an e-learning platform.
+At the request of the student the exam may be taken also in English.
+For information on support services for students with disabilities and / or DSA visit the page http://www.unipg.it/disabilita-e-dsa
+Extended program 
+General didactics and didactics of the discipline. 
+Meaningful learning. 
+Teaching as a transmission of knowledge, the behaviorist model, the constructivist model. 
+Avoidable and inevitable misconceptions. 
+The most common misconceptions in computer science. 
+Problem solving and teaching characteristics for problems. 
+Epistemological obstacles. 
+The general principles of collaborative learning. 
+The general principles of peer tutoring. 
+The history of mathematics in computer science teaching. 
+Working for problems: history, mathematics and computer science in learning.
+Tasks of a tutor. 
+Attention and listening skills. 
+Didactic and psychological aspects in the request and in the activity of help. 
+Difficulty in informatics. 
+Special educational needs. 
+Dyslexia and dyscalculia. 
+A concrete approach to mathematics and computer science: an inclusive teaching tool.
+Review of the fundamental concepts of programming, in particular related to C and Java languages. 
+Review of the representation of analog and digital information: counting in binary.
+Logic connectors, Boolean functions, combinational circuits: from problems concrete to the circuit synthesis.
+The finite state model: examples and realization of the sequential circuits.
+The most frequent mistakes made by students.
+Design of recovery activities on topics on which students find it most difficult.
+The Moodle platform: activities, quizzes and lessons.
+
+Study-unit MACHINE LEARNING
+Course name 
+Informatics
+Study-unit Code 
+A002051
+Curriculum 
+Comune a tutti i curricula
+Lecturer 
+Valentina Poggioni
+Lecturers 
+
+
+    Valentina Poggioni - Didattica Ufficiale
+
+Hours 
+
+
+    68 Hours - Didattica Ufficiale - Valentina Poggioni
+
+CFU 
+9
+Course Regulation 
+Coorte 2020
+Supplied 
+2020/21
+Supplied other course regulation 
+
+Learning activities 
+Caratterizzante
+Area 
+Discipline informatiche
+Sector 
+INF/01
+Period 
+II
+Type of study-unit 
+Obbligatorio (Required)
+Type of learning activities 
+Attività formativa monodisciplinare
+Language of instruction 
+Italiano
+Contents 
+Introduction to machine learning. 
+Supervised semi-supervised and unsupervised approaches.
+Classification, clustering, anomaly detection. 
+Application to computer vision and speech recognition. 
+Introduction to deep learning. 
+Advanced neural network models.
+Reference texts 
+Tan, Steinbach, Karpatne, Kumar.
+Introduction to Data Mining, 2nd Edition
+2019. Pearson
+
+Charu C. Aggarwal.
+Neural Networks and Deep Learning: a text book. Springer 2018
+Educational objectives 
+The student will know the fundamentals and most important machine learning methods based on the supervised, semi-supervised and unsupervised approach.
+He/she will know also some of the most known methods of deep learning , with a particular focus on computer vision and speech recognition application. 
+He/she will able to design, implement, train and test intelligent systems for data classification, clustering and anomaly detection based on advanced neural network models.
+Prerequisites 
+None
+Teaching methods 
+In-class lessons and hands-on in computer lab
+Other information 
+For any other information www.unistudium.unipg.it
+Learning verification modality 
+Oral exam and final project. 
+Intermediate exams during the course
+Extended program 
+Introduction to machine learning. 
+Supervised, semi-supervised and unsupervised approaches.
+Data classification (decision trees, rule-based approach, naive bayes, nearest neighbors, SVM, neural networks, ensemble) , clustering (k-means, hierarchical approaches, density based approaches), anomaly detection. Applications to computer vision and speech recognition. 
+Introduction to deep learning. 
+Advanced neural networks models (convolutional NN, recurrent NN, generative models).

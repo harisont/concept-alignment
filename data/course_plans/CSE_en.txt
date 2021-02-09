@@ -1,0 +1,539 @@
+Course specific prerequisites
+Computer Organization and Design with a foundation in basic computer architecture design principles (pipelining and cache memory) corresponding to the Chalmers course EDA332/EDA331.
+
+Aim
+Computers are a key component in almost any technical system today because of their functional flexibility as well as ability to execute fast in a power efficient way. 
+In fact, the computational performance of computers has doubled every 18 months over the last several decades. 
+One important reason is progress in computer architecture, which is the engineering discipline on computer design, which conveys principles for how to convert the raw speed of transistors into application software performance through computational structures that exploit the parallelism in software. 
+This course covers the important principles for how to design a computer that offers high performance to the application software.
+
+Learning outcomes 
+(after completion of the course the student should be able to)
+master concepts and structures in modern computer architectures in order to follow the research advances in this field;
+understand the principles behind a modern microprocessor; especially advanced pipelining techniques that can execute multiple instructions in parallel
+understand the principles behind modern memory hierarchies
+proficiency in quantitatively establishing the impact of architectural techniques on the performance of application software using state-of-the-art simulation tools.
+
+Content
+The course covers architectural techniques essential for achieving high performance for application software.
+It also covers simulation-based analysis methods for quantitative assessment of the impact a certain architectural technique has on performance and power consumption. 
+The content is divided into the following parts:
+The first part covers trends that affect the evolution of computer technology including Moore s law, metrics of performance (execution time versus throughput) and power consumption, benchmarking as well as fundamentals of computer performance such as Amdahl's law and locality of reference. 
+It also covers how simulation based techniques can be used to quantitatively evaluate the impact of design principles on computer performance.
+The second part covers various techniques for exploitation of instruction level parallelism (ILP) by defining key concepts for what ILP is and what limits it. 
+The techniques covered fall into two broad categories: dynamic and static techniques. 
+The most important dynamic techniques covered are Tomasulo s algorithm, branch prediction, and speculation. 
+The most important static techniques are loop unrolling, software pipelining, trace scheduling, and predicated execution.
+The third part deals with memory hierarchies. 
+This part covers techniques to attack the different sources of performance bottlenecks in the memory hierarchy such as techniques to reduce the miss rate, the miss penalty, and the hit time. 
+Example techniques covered are victim caches, lockup-free caches, prefetching, virtually addressed caches. 
+Also main memory technology is covered in this part.
+The fourth part deals with multicore/multithreaded architectures. 
+At the system level it deals with the programming model and how processor cores on a chip can communicate with each other through a shared address space. 
+At the micro architecture level it deals with different approaches for how multiple threads can share architectural resources: fine-grain/coarse-grain and simultaneous multithreading.
+
+Organisation
+The course is organized into lectures, exercises, case studies, two laboratory tasks, and a mini research project assignment. 
+Lectures focus on fundamental concepts and structures. 
+Exercises provide in-depth analysis of the concepts and structures and train the students in problem solving approaches. 
+Case studies are based on state of the art computers that are documented in the scientific literature. 
+Students carry out the case studies and present them in plenary sessions to fellow students and the instructors. 
+Finally, students get familiar with simulation methodologies and tools used in industry to analyze the impact of design decisions on computer performance. 
+This is trained in a sequence of labs and in a small research project assignment.
+
+Course specific prerequisites
+Computer Architecture (DAT105) or equivalent is strongly recommended. Students must understand how the processor pipeline and caches work and must be comfortable reading assembly language.
+
+Aim
+The aim of the course is to make students aware of the importance of sustainability in computing and to show techniques to achieve it at the different levels of a computer system.
+
+Learning outcomes 
+(after completion of the course the student should be able to)
+Knowledge and understanding:
+describe why sustainable computing is an important current topic
+describe the electrical mechanisms that cause power to be dissipated
+describe circuit techniques for reducing power dissipation and the impact on performance
+describe computer architecture, memory, and secondary storage techniques for reducing energy consumption
+explain what affects the energy consumption of computer systems especially concerning their architecture
+Competence and skills:
+use specific devices to directly measure energy consumption of the whole system
+use performance counters to measure the energy consumption of certain components in the system
+use simulation tools to estimate the energy consumption of different system configurations
+Judgement and approach:
+identify the strengths and weaknesses of different classes of computer system components (e.g. processor, memory), with respect to energy efficiency
+evaluate and compare different architecture and system techniques in terms of the energy efficiency
+explain the methods for evaluating and reporting the energy consumption in computer systems and how these can be used to optimize the system
+judge the importance of energy consumption from societal and ethical perspectives
+interpret requirements on the architecture of computer systems to meet societal needs for sustainability
+
+Content
+The course is intended to give an overview of the energy efficiency aspects of computer systems and computing, ranging from the electronic circuits up to the applications for systems ranging from small IoT devices to large data centers.
+For instance, students will learn about approaches to measuring and estimating the energy consumption of different architectural components as well as architecture and software techniques to save energy in the system.
+
+Organisation
+The course consists of a lecture series, homework assignments, and labs assignments including a group project. 
+Students will be asked to present the results of their homework and in-class assignments through short oral presentations to demonstrate their understanding and to facilitate discussion. 
+Discussions will not only focus on technology, but also on how that technology affects the world's carbon footprint and will likely impact society now and in future generations.
+
+Literature
+Stefanos Kaxiras and Margaret Martonosi.
+2008.
+Computer Architecture Techniques for Power-Efficiency (1st ed.). Morgan and Claypool Publishers.
+Magnus Själander, Margaret Martonosi, Stefanos Kaxiras.
+2014.
+Power-efficient Computer Architectures: Recent Advances. 
+Morgan and Claypool Publishers.
+Articles from the research literature and trade magazines.
+
+Examination including compulsory elements
+The course is examined by an individual written exam done in an examination hall and approved lab exercises. 
+The lab work is done in groups of normally 2-3 students.
+
+Grades/
+The final grade is based on the results on the written exam.
+
+Course specific prerequisites
+The course DAT017 - Machine oriented programming or similar course is required
+The course TDA384 - Principles for Concurrent programming is recommended
+
+
+Aim
+This course looks at parallel programming models, efficient programming methodologies and performance tools with the objective of developing highly efficient parallel programs
+
+
+Learning outcomes 
+(after completion of the course the student should be able to)
+List the different types of parallel computer architectures, programming models and paradigms, as well as different schemes for synchronization and communication
+List the typical steps to parallelize a sequential algorithm
+List different methods for analysis methodologies of parallel program systems
+Apply performance analysis methodologies to determine the bottlenecks in the execution of a parallel program
+Predict the upper limit to the performance of a parallel program
+Given a particular software, specify what performance bottlenecks are limiting the efficiency of parallel code and select appropriate strategies to overcome these bottlenecks
+Design energy-aware parallelization strategies based on a specific algorithms structure and computing system organization
+Argue which performance analysis methods are important given a specific context
+
+Content
+The course consists of a set of lectures and laboratory sessions
+The lectures start with an overview of parallel computer architectures and parallel programming models and paradigms
+An important part of the discussion are mechanisms for synchronization and data exchange
+Next, performance analysis of parallel programs is covered
+The course proceeds with a discussion of tools and techniques for developing parallel programs in shared address spaces
+This section covers popular programming environments such as pthreads and OpenMP
+Next the course discusses the development of parallel programs for distributed address space
+The focus in this part is on the Message Passing Interface (MPI)
+Finally, we discuss programming approaches for executing applications on accelerators such as GPUs
+This part introduces the CUDA (Compute Unified Device Architecture) programming environment
+
+The lectures are complemented with a set of laboratory sessions in which participants explore the topics introduced in the lectures
+During the lab sessions, participants parallelize sample programs over a variety of parallel architectures, and use performance analysis tools to detect and remove bottlenecks in the parallel implementations of the programs
+
+Organisation
+The teaching consists of theory-oriented lectures and lab sessions in which the participants develop code for different types of parallel computer systems
+
+Literature
+Parallel Programming for Multicore and Cluster Systems, Thomas Rauber, Gudula Rünger (2nd edition, 2013)
+
+Examination including compulsory elements
+The course is examined by an individual written exam that is carried out in an examination hall and a laboratory report written in groups of two
+
+Course specific prerequisites
+The student should have good understanding of computer organization and basic knowledge in low level programming and be familiar with terms like assembler, interrupt and so on, i.e. contents of the course Machine oriented programming
+The student needs to also have knowledge on data structures e.g. trees, linked lists, hash tables, i.e. contents of the course "Data structures", as well as some programming skills (at least 7.5 course points in programming)
+Knowledge of basic probability theory can be an advantage, but can also be acquired during the course via complementary reading
+
+Aim
+Operating systems exist everywhere where computer systems exist, not just in desktops and servers but also in vehicles, phones and embedded industrial systems
+This course provides an introduction to the design and implementation of operating systems
+In particular, the aim is to explain the structure and function of an operating system and its cooperation with the computing system it supports; illustrate key operating system aspects and algorithms in operating system implementations; accompany with concrete examples and prepare students for future courses
+
+Learning outcomes 
+(after completion of the course the student should be able to)
+After successful completion of the course participants will be able to demonstrate knowledge and understanding of:
+The core functionality of modern operating systems
+Key concepts and algorithms in operating system implementations
+Implementation of simple OS components
+The participants will also be able to: 
+appreciate the design space and trade-offs involved in implementing an operating system
+Write C programs that interface to the operating system at the system call level
+* Implement a piece of system-level code in the C programming language
+* some programing using multithread synchronization constructs
+
+Content
+The course provides an introduction to the design and implementation of operating systems
+Topics covered include: concurrent processes, resource management, deadlocks, memory management techniques, virtual memory, processor scheduling, disk scheduling, file systems, distributed file systems and micro kernels, virtual machines and security and protection schemes
+During its development, the course does not only present key components of operating systems, but also discusses their design and implementation challenge and their evolution from pioneer to modern mobile-based ones
+Examples include Unix, Linux, Windows, mobile-devices operating systems
+
+Organisation
+Lectures, exercises and labs
+Part of the labs will use Pintos, an educational operating system supporting kernel threads, loading and running of user programs and a file system
+Pintos is among the international well-established platforms for top quality hands-on labs
+
+Course specific prerequisites
+Preparatory courses in concurrent programming and operating systems
+Knowledge corresponding to a course in machine-oriented programming using the high-level language C.
+
+Aim
+An embedded system is a computer system designed to perform one or a few dedicated functions
+It is embedded in the sense that it is part of a complete device, often including electrical hardware and mechanical parts
+For reasons of safety and usability, some embedded systems have strict constraints on non-functional behavior such as computational delay and periodicity
+Such systems are referred to as real-time systems
+Examples of real-time systems are control systems for cars, aircraft and space vehicles as well as computer games and multimedia applications
+This course is intended to give basic knowledge about methods for the design and analysis of real-time systems.
+
+Learning outcomes 
+(after completion of the course the student should be able to)
+After the course the students shall be able to:
+Formulate requirements for embedded systems with strict constraints on computational delay and periodicity.
+Construct concurrently-executing tasks (software units) for real-time applications that interface to hardware devices (sensors/actuators).
+Describe the principles and mechanisms used for designing run-time systems and communication networks for real-time applications.
+Apply the basic analysis methods used for verifying the temporal correctness of a set of executing tasks.
+
+Content
+Due to the extremely high costs associated with late discovery of problems in embedded systems, it is important to follow a good design methodology during the development of the software and hardware
+One means for that is to use a system architecture that offers good component abstractions and facilitates simple interfacing of components
+The system architecture philosophy dictates that the software of an embedded system is organized into multiple concurrently-executing tasks, where each task (or group of tasks) implements a specific functionality in the system
+This approach allows for an intuitive way of decomposing a complex system into smaller software units that are simple to comprehend, implement and maintain
+The software environment used in the course is based on the C programming language, enhanced with a software library that provides support for programming of concurrent tasks with timing (delay and periodicity) constraints
+To that end, a main objective of the course is to demonstrate how the enhanced C programming language is used for implementing communication/synchronization between tasks, resource management and mutual exclusion
+Since other programming languages uses monitors or semaphores to implement these functions, the course also contains a presentation of such techniques
+In addition, the course demonstrates how to use low-level programming in C to implement interrupt-driven interaction with hardware devices
+To demonstrate the general principles in real-time programming, the course also gives examples of how these techniques are implemented in other programming languages, such as Ada and Java
+In order to execute a program containing concurrent tasks there is a run-time system (real-time kernel) that distributes the available capacity of the microprocessor(s) among the tasks
+The course shows how a simple run-time system is organized
+The run-time system determines the order of execution for the tasks by means of a scheduling algorithm
+To that end, the course presents techniques based on cyclic time-table based scheduling as well as scheduling techniques using static or dynamic task priorities
+In addition, protocols for the management of shared hardware and software resources are presented
+Since many contemporary real-time applications are distributed over multiple computer nodes, the course also presents topologies and medium access mechanisms for some commonly-used communication networks
+In real-time systems, where tasks have strict timing constraints, it is necessary to make a pre-run-time analysis of the system schedulability
+The course presents three different analysis methods for systems that schedule tasks using static or dynamic priorities: utilization-based analysis, response-time analysis, and processor-demand analysis
+In conjunction with this, the course also gives an account on how to derive the maximum resource requirement (worst-case execution time) of a task.
+
+Organisation
+The course is organized as a series of lectures and a set of exercise sessions where the programming techniques and theories presented at the lectures are put into practice
+The course material is examined by means of a final written exam
+In addition, there is a compulsory laboratory assignment in which the students should implement the software for an embedded real-time application running on a hardware system consisting of multiple computer nodes interconnected by a bus network
+Apart from the programming of cooperating concurrent tasks with strict timing constraints, the laboratory assignment also encompasses low-level programming of hardware devices such as timers and network controllers
+
+Course specific prerequisites
+
+Aim
+The topic of the course is the theory and practice of optimization problems over discrete structures, and has strong connections to Optimization Theory (linear programming), Computer Science (algorithms and complexity), and Operational Research.
+Problems of this kind arise in many different contexts including transportation, telecommunications, industrial planning, finance, bioinformatics, hardware design and cryptology.
+A characteristic property of these problems are that they are difficult to solve. 
+The course intends to develop the skill of modelling real problems and to use mathematical and algorithmic tools to solve them, optimally or heuristically.
+
+Learning outcomes
+(after completion of the course the student should be able to)
+identify optimization problems in various application domains,
+formulate them in exact mathematical models that capture the essentials of the real problems but are still manageable by computational methods,
+assess which problem class a given problem belongs to,
+apply linear programming, related generic methods, and additional heuristics, to computational problems,
+explain the geometry of linear programming,
+dualize optimization problems and use the dual forms to obtain bounds,
+work with the scientific literature in the field.
+
+Content
+modelling, linear programs and integer linear programs, polytopes, duality in optimization, branch-and-bound and other heuristics, some special graph algorithms
+
+Organisation
+Lectures and homework assignments.
+
+Literature
+See separate literature list.
+
+Eligibility
+General entry requirements for bachelor's level (first cycle)
+Specific entry requirements
+The same as for the programme that owns the course.
+
+Aim
+Computer programming is a basic skill needed in both studies and professional life.
+This course gives the basic skills that the participants can both accomplish programming tasks typical of science and engineering tasks and understand the fundamental principles of computers and programming.
+Learning outcomes 
+(after completion of the course the student should be able to)
+Knowledge and understanding
+Express mathematical formulas as programming language expressions and algorithms
+Structure large programs into manageable and reusable units by the use of concepts such as modules, classes, and functions
+Search and find relevant program libraries and use them in adequate ways
+Explain the relations between hardware, operating system, and user programs
+Use programming for basic data analysis involving large files
+
+Competence and skills
+Write programs that manipulate numeric and textual data to perform standard programming tasks
+Build interactive programs with both text-based and graphical user interfaces
+Make programs that read, transform, and generate files in the file system
+Use standard libraries and follow best programming practices
+Test programs by methods such as unit, regression, and property-based testing
+Use programming tools such as code editors and revision control systems
+
+Judgement and approach
+Assess the difficulty and resources needed for typical programming tasks
+Analyse code written by others and find errors and possibilities for improvement
+
+Content
+The course is a first introduction to programming by using a general-purpose programming language.
+It gives a comprehensive knowledge of the language, enabling the student to write code for a wide variety of tasks and to read and reuse code written by other programmers.
+In parallel to learning the language, the student will be introduced to the basic concepts of computers and programming.
+These concepts include:
+Datatypes and their binary representations in the computer
+The relation between source code, compiler, and the machine
+The syntactic structure of expressions, statements, functions, classes, modules, etc
+The basics of algorithmic design by the use of iteration, recursion, decomposition to functions, and top-down vs. bottom-up
+The basics of software design in terms of functions, classes, modules, etc
+
+Organisation
+The course consists of lectures and exercise sessions.
+There is also a number of programming assignments where the skills can be trained in practice
+
+Literature
+Information about literature will be given on the course home-page before the start of the course
+
+Examination including compulsory elements
+Both modules include mandatory programming assignments.
+Course grade is based on a written exam, provided all mandatory assignments have been passed.
+
+Object-Oriented Programming 
+
+About
+Programming (or development or coding) is the act of solving computing problems using a programming language. 
+It involves the design, realisation, testing, troubleshooting, and maintenance of program code, in a programming language, on top of some programming platform, by the help of a development environment.
+The course introduces a contemporary object oriented programming language with associated platforms and environments, with emphasis on basic programming language concepts, object oriented concepts, and elementary data structures.
+It also introduces the notion of code quality, and contemporary methods for obtaining high code quality.
+In addition, the course introduces more advanced programming topics such as recursion and exception handling.
+
+Computability
+
+About
+
+This course is about the concept of "computation": how it can be modelled, and what its limits are. 
+To avoid unnecessary complexity one often chooses to study computation via simplified, but powerful, models. 
+These models can for instance be simple programming languages (like the -calculus), or idealised computers (like Turing machines). In the course several such models will be studied, both "imperative" and "functional".
+One or more models will be used to explore the limits of computation: problems that cannot be solved (within the confines of a given model), and programs that can run arbitrary programs (modelled in a certain way).
+The course also includes a discussion of the Church-Turing thesis, a hypothesis which states, roughly, that a function is computable in a certain intuitive sense only if it can be defined within one of several models of computation.
+
+Algorithms
+About
+In this course you will learn how to recognize that nontrivial computational problems which need to be solved by algorithms and also to formalize them.
+Model problems with binary relations as graph problems and solve them, using the fundamental graph algorithms.
+Perform in simple cases the whole development cycle of algorithms: problem analysis, choosing, modifying and combining suitable techniques and data structures, analysis of correctness and complexity, filling in implementation details, looking for possible improvements, etc.
+
+Algorithms, advanced course 
+
+About
+
+The course covers the following topics;
+
+approximation algorithms and approximation schemes for NP-complete problems, and their analysis
+use of linear programming, in particular for approximation
+network flow with some complex applications
+randomized algorithms and their analysis by appropriate random variables
+helpful input structures like tree structures and input parameters.
+
+Data Structures and Algorithms 
+
+About
+The course introduces the students to the role of data structures and algorithmic concepts in the detailed design and implementation of programs.
+The course has two general themes:
+(1) The role of algorithms in the design and development of programs
+(2) The role of data structures in the implementation of algorithms
+
+Machine Learning 
+
+Summary
+
+The purpose of the course is to give a broad introduction to machine learning topics, with special focus on their application in Natural Language Processing.
+
+About
+
+The purpose of the course is to give a broad introduction to machine learning topics, with special focus on their application in Natural Language Processing.
+
+Possible topics include:
+
+Supervised learning
+Automatic rule induction
+Lightly supervised approaches
+Learning theory
+Learning with structure
+Feature design for NLP applications.
+
+Applied Machine Learning
+
+About
+The course gives an introduction to machine learning techniques and theory, with a focus on its use in practical applications.
+During the course, a selection of topics will be covered in supervised learning, such as linear models for regression and classification, or nonlinear models such as neural networks, and in unsupervised learning such as clustering.
+The use cases and limitations of these algorithms will be discussed, and their implementation will be investigated in programming assignments. 
+Methodological questions pertaining to the evaluation of machine learning systems will also be discussed, as well as some of the ethical questions that can arise when applying machine learning technologies.
+There will be a strong emphasis on the real-world context in which machine learning systems are used.
+The use of machine learning components in practical applications will be exemplified, and realistic scenarios will be studied in application areas such as e-commerce, business intelligence, natural language processing, image processing, and bioinformatics. 
+The importance of the design and selection of features, and their reliability, will be discussed.
+
+Algorithms for Machine Learning and Inference
+
+About
+This course will discuss the theory and application of algorithms for machine learning and inference, from an AI perspective. 
+In this context, we consider as learning to draw conclusions from given data or experience which results in some model that generalises these data. 
+Inference is to compute the desired answers or actions based on the model.
+
+Algorithms of this kind are commonly used in for example classification tasks (e.g., character recognition, or to predict if a new customer is creditworthy) and in expert systems (e.g., for medical diagnosis). 
+A new and commercially important area of application is data mining, where the algorithms are used to automatically detect interesting information and relations in large commercial or scientific databases.
+
+The course intends to give a good understanding of this cross disciplinary area, with a sufficient depth to use and evaluate the available methods, and to understand the scientific literature. 
+During the course we may discuss potential problems with machine learning methods, for example, bias in training data and safety of autonomous agents.
+
+The following concepts are covered:
+
+Bayesian learning: likelihood, prior, posterior
+Supervised learning: Bayes classifier, Logistic Regression, Deep Learning, Support Vector Machines
+Unsupervised learning: Clustering algorithms, EM algorithm,Mixture models, Kernel methods
+Hidden Markov models, MCMC
+Reinforcement learning 
+
+Machine learning for statistical NLP: introduction 
+
+About
+
+The purpose of this course is to provide an introduction to probabilistic modeling and statistical machine learning techniques in terms of their use within the field of language technology. 
+We will review foundational concepts in mathematics and apply them to basic techniques and applications in statistical NLP. 
+We will also learn practical skills in programming text processing pipelines and analytical tools.
+
+Advanced Differential Calculus 
+
+About
+
+In this course we will study the foundations of differential and integral calculus on smooth manifolds, along with applications of the theory in topology and geometry. 
+One of the main purposes is to acquaint you with differential forms and their great usefulness in many areas of mathematics. 
+The course is one of the first you will take as a graduate student in mathematics.
+
+Prerequisites and selection
+Requirements
+
+General entry requirements and the equivalent of 90 credits in mathematics, including at least 7.5 credits from the second cycle.
+Selection
+
+Facilities
+
+Mathematical Sciences is a joint department of Chalmers/University of Gothenburg. 
+Your education takes place in the spacious and bright premises of Mathematical Sciences at the Chalmers campus Johanneberg, where there are lecture halls,
+computer rooms and group rooms. 
+Here you can also find student lunch room and reading room, as well as student counsellors and student office.
+
+Logic in Computer Science 
+
+About
+
+Powerful tools for verifying software and hardware systems have been developed. 
+These tools rely in a crucial way on logical techniques.
+This course provides a sound basis in logic and a short introduction to some logical frameworks used in modelling, specifying and verifying computer systems. 
+A sound basic knowledge in logic is a welcome prerequisite for courses in program verification, formal methods and artificial intelligence.
+The course covers propositional and predicate calculus, and model-checking.
+More concretely, the course gives a thorough introduction to fundamental notions of logic such as natural deduction, semantics of both propositional and predicate calculus,soundness and completeness, conjunctive normal forms, Horn clauses, undecidability and expressiveness of predicate logic, plus an introduction to model checking: Linear-time temporal logic (LTL) and Branching-time temporal logic (CTL).
+
+Prerequisites and selection
+Requirements
+To be eligible for the course, students must have successfully completed courses corresponding to 105 hec within the subject Computer Science or Mathematics. 
+Including 7.5 hec in discrete mathematics (for example DIT980 Discrete Mathematics for Computer Scientists or the sub-course Introductory Algebra of MMG200 Mathematics 1). 
+Applicants must prove knowledge of English: English 6/English B or the equivalent level of an internationally recognized test, for example TOEFL, IELTS.
+
+Introduction to Data science and AI 
+About
+During the course, a wide selection of methods for Data Science and AI will be introduced.
+The course is divided into three parts:
+Introduction to data science
+
+Implementation of data science solutions, using Python, basic data analysis and visualization.
+Introduction of the data science process, and appropriate methodology.
+Examples of core data science methods with case studies such as in clustering, classification and regression.  
+Data science put in context regarding ethics, regulations and limitations
+
+Statistical methods for data science and AI
+
+Introduction of some common stochastic models with examples of applications indata science and AI (for instance, naive Bayes classifiers, topic models for text and Hidden Markov Models for sequence data).
+
+Artificial Intelligence
+
+Introduction to classical AI and machine learning, including the relationship torelated areas such as algorithms and optimization, and AI philosophy.
+Examples of methods and applications of AI, in classical AI (search and constraint satisfaction), and ML-based (search engines, naive Bayes and neural networks)   
+Discussion of ethics and societal impact of AI.
+
+Research Methods for Data Science 
+
+About
+
+The following topics are covered in the course:
+
+technical writing in data science, being practiced on a topic of free choice and on a research proposal
+structuring a scientific text
+communicating a topic to different audiences
+theories on ethics, with examples from data science
+identification and analysis of ethical and societal issues in data science
+ethics and good practice in research and publishing
+
+Computer communication 
+
+About
+
+In the study of protocols, we start with application level protocols enabling the student to start with more familiar paradigms in the context of applications that we use regularly. 
+Moving to lower layers later in the course, we have the possibility to gradually uncover network services, their functionality and the ease/difficulty for achieving them.
+
+Topics covered include:
+
+Networking applications and protocol; HTTP, SMTP and DNS.
+Transport protocols TCP, UDP.
+Content distribution systems.
+Performance and congestion control.
+Internet Protocol ITv4 and addressing.
+Internet routing, mobile IPTv4.
+Local area networks LANs, medium access protocols; MAC protocols (IEEE 802.X and others),
+Ethernet, switches and VLANs. 
+Wireless LAN especially Wifi, Access Points, bridges and physical media.
+Detection and correction of bit errors.
+Multimedia applications and network security.
+
+Natural language processing
+
+Summary
+
+This course gives a theoretical view of problems encountered within Natural Language Processing and some solutions.
+
+About
+
+The course is divided into four main topics: one covering basic concepts and three covering subfields of NLP ? words, syntax and semantics/pragmatics.
+1. Basic concepts:
+Basic concepts in NLP.
+Automata theory and mathematical linguistics.
+Probability theory and machine learning.
+Evaluation measurement, correctness, precision, and recall.
+2. Words:
+Corpora and corpus annotation.
+Finite-state methods for segmentation and morphological analysis.
+Statistical language modeling with n-gram markov models.
+3. Syntax:
+Part-of-speech tagging and chunking/partial parsing, making use of methods within machine learning or/and finite-state technology.
+Common formal grammars, such as feature based and probabilistic context-free grammars.
+Syntactic parsing.
+4. Semantics and Pragmatics:
+Lexical semantics, lexica, Wordnet and FrameNet.
+Word sense disambiguation with machine learning.
+Text classification with machine learning.
+
+Functional Programming
+
+About
+
+This course introduces a functional programming language and related concepts to students that already have some knowledge in programming. 
+The primary goal is to make it possible for students to apply the functional approach to write realistic (small to medium-sized) programs, and transfer general programming skills to the functional programming domain.
+
+Concrete topics encountered in the course include;
+functions as first-class values
+compound data types (lists, tuples, and user-defined types)
+recursion and recursive data types
+using abstraction to avoid repetitive programming
+algebraic data types
+polymorphism and type classes
+time complexity: efficient and inefficient functional programs
+pure functions vs input-output
+modules and abstract data types
+testing functional programs
+lazy evaluation and infinite objects
+monads

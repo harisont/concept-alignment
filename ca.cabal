@@ -1,0 +1,137 @@
+name: ca
+version: 0
+author: Aarne Ranta, Arianna Masciolini
+maintainer: arianna.masciolini@gmail.com
+category: Language
+build-type: Simple
+extra-source-files: README.md
+cabal-version: >= 1.10
+
+
+executable extract-concepts
+  hs-source-dirs:
+    .,
+    gfud
+    -- gf-ud
+  main-is: ExtractConcepts.hs
+  other-modules:
+    -- own
+    ConceptAlignment,
+    Criteria,
+    FastAlignUtils,
+    ArgvParse,
+    -- from gf-ud (but modified)
+    RTree,
+    UDStandard,
+    UDConcepts
+  build-depends:
+    base,
+    containers,
+    gf,
+    multiset,
+    split
+  ghc-options: -main-is ExtractConcepts
+  default-language: Haskell2010
+
+executable propagate-concepts
+  hs-source-dirs:
+    .,
+    gfud
+  main-is: PropagateConcepts.hs
+  other-modules:
+    -- own
+    ConceptAlignment,
+    Criteria,
+    ArgvParse,
+    -- from gf-ud
+    RTree,
+    UDStandard,
+    UDConcepts
+  build-depends: 
+    base,
+    containers,
+    gf,
+    multiset,
+    split
+  ghc-options: -main-is PropagateConcepts
+  default-language: Haskell2010
+
+executable evalign
+  hs-source-dirs:
+    .,
+    gfud
+  main-is: EvAlign.hs
+  other-modules:
+    -- own
+    ConceptAlignment,
+    Criteria,
+    ArgvParse,
+    -- from gf-ud
+    RTree,
+    UDStandard,
+    UDConcepts
+  build-depends:
+    base,
+    containers,
+    gf,
+    multiset,
+    split
+  ghc-options: -main-is EvAlign
+  default-language: Haskell2010
+
+executable translate
+  hs-source-dirs:
+    .,
+    gfud
+  main-is: Translate.hs
+  build-depends:
+    base,
+    gf
+  ghc-options: -main-is Translate
+  default-language: Haskell2010
+
+executable generate-grammar
+  hs-source-dirs:
+    .,
+    gfud
+  main-is: GenerateGrammar.hs
+  other-modules:
+    -- from gf-ud
+    BuildGFGrammar,
+    GFConcepts
+    RTree,
+    UDConcepts,
+    UDStandard,
+    Backend,
+    DBNF,
+    UD2GF,
+    UDAnnotations,
+    UDOptions,
+    UDVisualization
+  build-depends:
+    base,
+    gf,
+    filepath,
+    containers,
+    process,
+    pretty
+  ghc-options: -main-is GenerateGrammar
+  default-language: Haskell2010
+
+library concept-alignment
+  hs-source-dirs:
+    .,
+    gfud
+  exposed-modules: ConceptAlignment
+  other-modules:
+    RTree,
+    UDStandard,
+    UDConcepts
+  build-depends:
+    base,
+    containers,
+    gf,
+    multiset,
+    split
+  ghc-options: -main-is EvAlign
+  default-language: Haskell2010

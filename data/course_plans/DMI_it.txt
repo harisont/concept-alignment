@@ -1,0 +1,881 @@
+ANALISI MATEMATICA - MODULO I
+Codice
+GP004146
+CFU
+7
+Docente responsabile
+Paola Rubbioni
+Docenti  
+Paola Rubbioni - Didattica Ufficiale
+Ore  
+49 Ore - Didattica Ufficiale - Paola Rubbioni
+Attività
+Base
+Ambito
+Formazione matematico-fisica
+Settore
+MAT/05
+Tipo insegnamento
+Obbligatorio (Required)
+Lingua insegnamento
+ITALIANO
+Contenuti  
+Insiemi, estremo superiore e inferiore, successioni numeriche, funzioni elementari.
+Limiti, continuità e derivazione per funzioni reali di una variabile.
+Integrale di Riemann.
+Testi di riferimento
+Marco Bramanti Carlo Domenico Pagani Sandro Salsa
+Analisi matematica 1
+Zanichelli, 2008
+.Volume unico
+Pagine: 392 ISBN: 9788808064851
+.Ebook - versione Booktab
+ISBN: 9788808642752
+.Ebook licenza 9 mesi - versione Booktab
+ISBN: 9788808842541
+Marco Bramanti
+"Esercitazioni di Analisi matematica 1"
+Esculapio editore, 2018
+Obiettivi formativi
+L'insegnamento si propone di fornire agli studenti le basi dell'Analisi Matematica sia dal punto di vista metodologico che del calcolo. 
+Al termine del Modulo I lo studente dovrà: ù
+aver acquisito le nozioni di limite, derivata, integrale; 
+saper effettuare lo studio completo di una funzione di una variabile; 
+saper calcolare semplici integrali di Riemann; 
+sapere esporre e discutere le definizioni e i teoremi presentati a lezione.
+Prerequisiti
+Equazioni e disequazioni di primo e secondo grado, razionali, irrazionali, trascendenti. Elementi di geometria analitica.
+Metodi didattici
+Lezioni frontali in aula su tutti gli argomenti del corso.
+Oltre ad una dettagliate esposizione teorica, per ciascun argomento saranno anche svolti gli esercizi relativi che faranno da modello a quelli proposti nelle prove d'esame.
+Altre informazioni
+Durante la prova scritta è consentito l'uso di: libro di testo; schede manoscritte con le proprie annotazioni personali inserite in un portalistini; fogli per brutta copia; penne, matite, righello, ...
+Non è invece possibile tenere con sé: borse o zaini; smartphone o notebook o calcolatrici o altri dispositivi similari; libri diversi da quello di testo.
+Per le comunicazioni e l'eventuale materiale aggiuntivo si fa riferimento alla piattaforma Unistudium.
+Modalità di verifica dell'apprendimento
+L'esame finale è comprensivo di entrambi i moduli.
+Per ciascun modulo sono previste:
+una prova scritta in cui lo studente deve svolgere in due ore due esercizi volti a verificare le conoscenze e le abilità relative al calcolo;
+una prova orale di circa quindici minuti di verifica dell'acquisizione del metodo, del linguaggio e delle conoscenze teoriche fondamentali della materia.
+Il voto finale è la media dei voti conseguiti nei due moduli.
+
+Per informazioni sui servizi di supporto agli studenti con disabilità e/o DSA visita la pagina http://www.unipg.it/disabilita-e-dsa
+Programma esteso
+Concetti di base sugli insiemi; logica elementare; numeri reali; estremo superiore.
+Funzioni di una variabile: generalità e funzioni elementari; funzioni composte e inverse.
+Limiti e continuità: successioni numeriche; limiti di funzioni, continuità, asintoti; calcolo dei limiti; proprietà globali delle funzioni continue.
+Calcolo differenziale per funzioni di una variabile: derivata di una funzione; regole di calcolo delle derivate; il teorema del valor medio e le sue conseguenze; derivata seconda; studio del grafico di una funzione.
+Integrale di Riemann: integrale di una funzione; proprietà dell'integrale; il teorema fondamentale del calcolo integrale; calcolo di integrali indefiniti e definiti.
+
+ANALISI MATEMATICA - MODULO II
+Codice
+GP004147
+CFU  7
+Docente responsabile
+Antonio Boccuto
+Docenti  
+
+    Antonio Boccuto - Didattica Ufficiale
+
+Ore  
+49 Ore - Didattica Ufficiale - Antonio Boccuto
+Attività
+Base
+Ambito
+Formazione matematico-fisica
+Settore
+MAT/05
+Tipo insegnamento
+Obbligatorio (Required)
+Lingua insegnamento
+ITALIANO
+Contenuti
+Serie e vari tipi di metodi di risoluzione. 
+Integrali doppi e generalizzati.
+Applicazioni alla Probabilità e alla Statistica. 
+Massimi e minimi di funzioni di più variabili. Cenni sugli autovalori. 
+Serie di Taylor e varie applicazioni.
+Testi di riferimento
+Dispense fornite dal docente
+Obiettivi formativi
+L'obiettivo del corso e' quello di fornire tecniche di calcolo per serie, integrali doppi e generalizzati, studio di problemi di massimo e minimo per funzioni di più variabili, serie di Taylor, con svariate applicazioni, tra cui alla Probabilità e alla Statistica, e al calcolo di numeri irrazionali con un certo numero (fissato) di cifre esatte.
+Prerequisiti
+TUTTO il Corso di Analisi Matematica I Modulo, ovviamente.
+Metodi didattici
+Lezioni teoriche sulla lavagna luminosa con esempi ed esercizi risolti dettagliatamente.
+Altre informazioni
+La frequenza è importantissima, fondamentale e caldamente consigliata.
+Modalità di verifica dell'apprendimento
+Prova scritta e orale. Lo scritto dura 2 ore.
+L'orale si svolge entro due appelli successivi a quello dello scritto.
+In alcuni casi c'è la possibilità di organizzare dei "turni" di comune accordo con il docente, ma in ogni caso gli esami (sia scritti sia orali) DEVONO ESSERE PRENOTATI. 
+Ci si iscrive CON UNA EMAIL ALLA QUALE IL DOCENTE RISPONDE PER LA CONFERMA, qualche giorno prima.
+L' indirizzo e' antonio.boccuto@unipg.it
+NON SONO AMMESSI STUDENTI NON PRENOTATI O NON CONFERMATI.
+Lo scritto consiste in due esercizi con richiami teorici.
+ L'orale verte su TUTTO IL PROGRAMMA, ESERCIZI COMPRESI.
+IL MATERIALE è costituito dall' "UNIONE INSIEMISTICA" DELLE DISPENSE DELLE VARIE PARTI DEL PROGRAMMA E DELLE LEZIONI.
+SI RACCOMANDA UNO STUDIO GIORNALIERO RESPONSABILE.
+Programma esteso
+Serie e vari tipi di metodi di risoluzione. 
+Integrali doppi e generalizzati.
+Applicazioni alla Probabilità e alla Statistica. 
+Massimi e minimi di funzioni di più variabili. Cenni sugli autovalori. 
+Serie di Taylor e varie applicazioni.
+
+Insegnamento ARCHITETTURA DEGLI ELABORATORI
+Nome del corso 
+Informatica
+Codice insegnamento 
+20009205
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Alfredo Navarra
+Docenti 
+
+
+    Alfredo Navarra - Didattica Ufficiale
+    Raffaella Gentilini - Didattica Ufficiale (Codocenza)
+
+Ore 
+
+
+    42 Ore - Didattica Ufficiale - Alfredo Navarra
+    21 Ore - Didattica Ufficiale (Codocenza) - Raffaella Gentilini
+
+CFU 
+9
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2020/21
+Erogato altro regolamento 
+
+Attività 
+Base
+Ambito 
+Formazione informatica di base
+Settore 
+INF/01
+Periodo 
+Annuale
+Tipo insegnamento 
+Obbligatorio (Required)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+ITALIANO
+Contenuti 
+MODULO I: Il modulo introduce le nozioni fondamentali della progettazione logica dei sistemi digitali. In particolare, verranno trattate 
+le caratteristiche e le proprieta' dell'algebra booleana e di commutazione 
+la sintesi e l'ottimizzazione delle reti logiche combinatorie 
+cenni ai sistemi sequenziali: macchine a stati finiti.
+
+MODULO II: 
+richiami sulla codifica dei numeri: rappresentazione posizionale; modulo e segno; complemento a due; Addizionatore: somma; sottrazione; moltiplicazione; divisione; Numeri in virgola mobile: addizione; moltiplicazione; standard IEEE 754 a 16 bit; Automi Cellulari: cenni sul Game of Life. Scintillae e sistemi di computazione; Livelli di Astrazione: Livello Funzionale, RTL.
+Micro-operazioni. 
+Controllo elaboratore. 
+Ciclo di macchina. 
+L'elaboratore PDP8: livello registri, livello funzionale, unità di controllo, linguaggio Assembly. 
+Memoria Cache; Tecnica del Pipelining.
+Testi di riferimento 
+MODULO I:
+
+1. Cristiana Bolchini, Carlo Brandolese, Fabio Salice, Donatella Sciuto. 
+Reti Logiche. 
+Maggioli Editore, 2015, Apogeo Education.
+
+MODULO II:
+
+2. F. Barsi: Architettura degli elaboratori, parte seconda: struttura dei sistemi. Margiacchi-Galeno
+
+3. C. Hamacher, Z. Vranesic, S. Zaky, Naraig Manjikian: Introduzione all'architettura dei calcolatori III edizione. McGraw-Hill
+Obiettivi formativi 
+Conoscenza e comprensione delle caratteristiche di base di un elaboratore elettronico, incluso la programmazione di basso livello
+Prerequisiti 
+nessuno
+Metodi didattici 
+Lezioni frontali
+Esercitazioni
+Seminari
+Modalità di verifica dell'apprendimento 
+prova scritta
+Programma esteso 
+MODULO I: 
+Algebra di Boole e di commutazione: proprieta' dell'algebra di Boole, algebra di commutazione, funzioni ed espressioni booleane, forme canoniche, porte logiche. 
+
+Insegnamento PROGRAMMAZIONE PROCEDURALE CON LABORATORIO
+Nome del corso 
+Informatica
+Codice insegnamento 
+A002058
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Francesco Santini
+Docenti 
+
+
+    Francesco Santini - Didattica Ufficiale
+
+Ore 
+
+
+    73 Ore - Didattica Ufficiale - Francesco Santini
+
+CFU 
+9
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2020/21
+Erogato altro regolamento 
+
+Attività 
+Caratterizzante
+Ambito 
+Discipline informatiche
+Settore 
+INF/01
+Periodo 
+Primo Semestre
+Tipo insegnamento 
+Obbligatorio (Required)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+ITALIANO
+Contenuti 
+Introduzione alla programmazione.
+Linguaggio di programmazione C.
+Liste dinamiche.
+Testi di riferimento 
+Il linguaggio C. Fondamenti e tecniche di programmazione. Ediz. mylab. Con espansione online, Paul J. Deitel and Harvey M. Deitel (Authors), Publisher: Pearson; 8 edizione, ISBN-10: 8891901652, Pages: 637, 2016.
+C Pocket Reference, Peter Prinz, Ulla Kirch-Prinzm, Publisher: O'Reilly Media, ISBN-10: 0596004362, Pages: 144, 2002.
+Obiettivi formativi 
+Lo studente apprenderà i concetti di base dei linguaggi di programmazione e di problem solving. 
+Inoltre acquisirà una conoscenza avanzata del linguaggio di programmazione C, che lo renderà in grado di scrivere direttamente del codice in questo linguaggio. 
+Infine, sarà in grado di gestire le operazioni base su una lista dinamica (per esempio inserzione e cancellazione).
+Prerequisiti 
+Nessun prerequisito in particolare.
+Metodi didattici 
+Lezioni frontali con slide in inglese.
+Esercizi a casa.
+Esempi di compilazione in aula.
+Esercitazioni in aula.
+Altre informazioni 
+Frequenza è fortemente consigliata.
+
+Sito del Corso: www.unistudium.unipg.it
+
+Calendario esami:
+consultare il sito www.informatica.unipg.it
+Modalità di verifica dell'apprendimento 
+Prova scritta che consiste in 9-10 esercizi basati sulla comprensione di alcune porzioni di codice C, e su scrittura di codice su carta (durata 2 ore e 30 minuti).
+Il superamento della prova scritta consente l'accesso ad una prova di laboratorio (durata 1 orai) in cui verrà richiesto di modificare un progetto di programmazione assegnato a casa (da consegnare prima della prova pratica). 
+In base alle due prove, possono essere poste alcune domande di teoria, alla fine della prova pratica. 
+La prova scritta è valutata in trentesimi, a cui si possono sommare fino a 4-5 punti per il progetto. 
+La restante prova orale è utilizzata per verificare le competenze e modificare la votazione finale.
+Per informazioni sui servizi di supporto agli studenti con disabilità e/o DSA visita la pagina http://www.unipg.it/disabilita-e-dsa
+Programma esteso 
+- Introduzione ai linguaggi di programmazione
+- Linguaggi interpretati e compilati
+- Nomi e visibilità
+- Sistemi di versionamento (GitHub)
+- Linguaggio C nello specifico:
+Language Basics
+Types
+Literals
+Type conversions
+Expressions and operators
+Statements
+Loops
+Conditional statements
+Functions
+Arrays
+Pointers
+Structures and Unions
+Dynamic Memory Management
+Input e Output
+Direttive Pre-processing
+Compilazione con GCC
+Debugging di Programmi C con GDB
+- Liste dinamiche
+
+Insegnamento PROGRAMMAZIONE ORIENTATA AGLI OGGETTI CON LABORATORIO
+Nome del corso 
+Informatica
+Codice insegnamento 
+A002059
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Stefano Marcugini
+Docenti 
+
+
+    Stefano Marcugini - Didattica Ufficiale
+
+Ore 
+
+
+    78 Ore - Didattica Ufficiale - Stefano Marcugini
+
+CFU 
+9
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2020/21
+Erogato altro regolamento 
+
+Attività 
+Caratterizzante
+Ambito 
+Discipline informatiche
+Settore 
+INF/01
+Periodo 
+Secondo Semestre
+Tipo insegnamento 
+Obbligatorio (Required)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+ITALIANO
+Contenuti 
+PROGRAMMAZIONE AD OGGETTI
+Modello degli oggetti per riferimento;
+Incapsulamento;
+Ereditarietà;
+Polimorfismo.
+
+INTRODUZIONE AL LINGUAGGIO JAVA
+Istruzioni strutturate;
+Array;
+Classi e metodi;
+Programmi stand-alone; Applet;
+Librerie Java;
+Eccezioni;
+Multithreading;
+Input ed Output; 
+Istruzioni, espressioni, operazioni;
+Programmazione orientata agli eventi.
+Socket;
+Applicazioni client-server.
+
+ESEMPI DI ALGORITMI
+
+Ricorsione
+Testi di riferimento 
+Concetti di informatica e fondamenti di Java settima edizione per Java 8, 9, 10 e 11
+di Cay Horstmann
+Maggioli Editore
+
+Disponibili in biblioteca:
+Java 1.2 - L.Lemay, C.L. Perkins, Edizioni Sams net
+Java 2 i fondamenti - Cay S. Horstmann e Gary Cornell - Mc Graw Hill;
+Java 2 tecniche avanzate - Cay S. Horstmann e Gary Cornell - Mc Graw Hill;
+
+in Inglese:
+
+Core Java Volume I--Fundamentals, 9th Edition, Cay S. Horstman, Prentice Hall. 
+Part of the Pearson Custom Library: Computer Science series.
+
+Core Java, Volume II--Advanced Features, 9th Edition, Cay S. Horstman, Prentice Hall. 
+Part of the Pearson Custom Library: Computer Science series.
+Obiettivi formativi 
+Comprensione dei concetti riguardanti la programmazione orientata agli oggetti ed agli eventi.
+Capacità di realizzare applicazioni.
+Capacità di comparare più soluzioni possibili per poter scegliere la migliore.
+Capacità di applicare schemi di soluzione classici a nuovi problemi.
+Capacità di progettare la gerarchia di oggetti adatta al problema specifico.
+Capacità di realizzare programmi con interfacce di tipo professionale.
+Prerequisiti 
+E' utile aver sostenuto l'esame di Programmazione procedurale.
+In particolare è importante avere familiarità con i seguenti concetti: puntatori, gestione dinamica della memoria, algoritmi elementari.
+Metodi didattici 
+lezioni frontali, esercitazioni al calcolatore.
+Altre informazioni 
+Sito del Corso: www.unistudium.unipg.it
+Calendario esami: consultare il sito www.informatica.unipg.it
+Modalità di verifica dell'apprendimento 
+Prova scritta e prova orale. 
+Sono previste prove in itinere esoneranti per lo lo scritto finale.
+La prova scritta prevede la soluzione di tre esercizi a stimolo chiuso e risposta aperta ed è finalizzata a verificare la capacità di applicare correttamente le conoscenza teoriche e la capacità di comprensione delle problematiche proposte.
+Il tempo di svolgimento previsto è di tre ore.
+La prova orale consiste in una discussione della durata di circa 30 minuti finalizzata a accertare il livello di conoscenza e di comprensione sui contenuti teorici del corso raggiunto dallo studente. 
+Inoltre la prova orale consentirà di verificare la capacità di comunicazione dello studente con proprietà di linguaggio ed organizzazione autonoma dell'esposizione.
+Su richiesta dello studente l'esame può essere sostenuto anche in lingua Inglese.
+Per informazioni sui servizi di supporto agli studenti con disabilità e/o DSA visita la pagina http://www.unipg.it/disabilita-e-dsa
+Programma esteso 
+PROGRAMMAZIONE ORIENTATA AGLI OGGETTI
+Modello di oggetti per riferimento.
+
+Insegnamento CALCOLO NUMERICO
+Nome del corso 
+Informatica
+Codice insegnamento 
+55007306
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Bruno Iannazzo
+Docenti 
+
+
+    Bruno Iannazzo - Didattica Ufficiale
+
+Ore 
+
+
+    42 Ore - Didattica Ufficiale - Bruno Iannazzo
+
+CFU 
+6
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2021/22
+Erogato altro regolamento 
+
+Coorte 2019 - Erogato nell'anno 2020
+Attività 
+Affine/integrativa
+Ambito 
+Attività formative affini o integrative
+Settore 
+MAT/08
+Periodo 
+Primo Semestre
+Tipo insegnamento 
+Obbligatorio (Required)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+ITALIANO
+Contenuti 
+Concetti di base dell'analisi numerica: stabilità numerica, costo computazionale. 
+Metodi numerici per l'algebra lineare e l'approssimazione di funzioni. 
+Applicazioni: motori di ricerca, grafica vettoriale.
+Testi di riferimento 
+Dispense fornite dal docente.
+Obiettivi formativi 
+Conoscenza e comprensione delle idee di base del calcolo numerico e dei principali algoritmi per la soluzione di problemi continui. Capacità di analizzare un modello matematico.
+Prerequisiti 
+Algebra lineare. 
+Studio di funzioni di una variabile reale. 
+Elementi di programmazione.
+Metodi didattici 
+Lezioni frontali.
+Modalità di verifica dell'apprendimento 
+Esame scritto. 
+Esame orale opzionale.
+Programma esteso 
+Introduzione ai concetti di base dell'analisi numerica: stabilità numerica, costo computazionale. 
+Metodi numerici per l'algebra lineare e l'approssimazione di funzioni. 
+Applicazioni: motori di ricerca, grafica vettoriale.
+
+Insegnamento COMPUTABILITY AND COMPLEXITY
+Condividi
+Nome del corso 
+Informatica
+Codice insegnamento 
+A002041
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Arturo Carpi
+Docenti 
+
+
+    Arturo Carpi - Didattica Ufficiale
+
+Ore 
+
+
+    42 Ore - Didattica Ufficiale - Arturo Carpi
+
+CFU 
+6
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2020/21
+Erogato altro regolamento 
+
+Attività 
+Caratterizzante
+Ambito 
+Discipline informatiche
+Settore 
+INF/01
+Periodo 
+Secondo Semestre
+Tipo insegnamento 
+Obbligatorio (Required)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+INGLESE
+Contenuti 
+Macchina di Turing. 
+Codifica di Goedel. 
+La Tesi di Church-Turing.
+Problemi insolubili. 
+La Macchina Universale. 
+Il Problema dell'arresto. 
+Il Decimo Problema di Hilbert.
+Funzioni parziali ricorsive
+Tesi di Edmonds-Cook-Karp. 
+Classi P e NP. 
+Problemi NP-completi. 
+Classi L, NL, PSPACE, NPSPACE.
+Testi di riferimento 
+C. Toffalori, F. Corradini, S. Leonesi, S. Mancini, Teoria della computabilità e della complessità, McGraw-Hill
+J. Hopcroft, R. Motwani, J. Ullman, Automi, linguaggi e calcolabilità, Pearson
+M. Davis, Computability and Unsolvability, Dover (ediz. Italiana: Abete, 1974)
+Obiettivi formativi 
+Il corso fornirà allo studente la conoscenza dei principali metodi e risultati della Teoria della Calcolabilità e della Complessità e l'abilità di applicarli per individuare la complessità di problemi in diversi campi.
+Prerequisiti 
+Per seguire con profitto il corso è opportuno che lo studente abbia familiarità con le nozioni di base della teoria deri linguaggi formali e con l'analisi di complessità degli algoritmi.
+Tali nozioni sono comunemente presenti nei corsi di base delle lauree triennali in Informatica.
+Metodi didattici 
+Lezioni frontali
+Altre informazioni 
+Modalità di verifica dell'apprendimento 
+L'esame consiste in una prova orale.
+Tale prova sarà un colloquio volto a verificare l'apprendimento dei principali aspetti teorici della disciplina nonché la capacità di applicare tali conoscenze per individuare la complessità di problemi in diversi campi.
+Su richiesta dello studente, l'esame potrà essere tenuto in lingua italiana, inglese o francese.
+Programma esteso 
+Teoria della computabilità:
+Alfabeti, stringhe, linguaggi.
+La Macchina di Turing. 
+Macchine di Turing e linguaggi. 
+Macchine di Turing e funzioni. 
+Codifica di Goedel. 
+La Tesi di Church-Turing.
+Macchine di Turing a più nastri. 
+Macchine di Turing non deterministiche.
+Problemi risolubili algoritmicamente e problemi insolubili. 
+La Macchina Universale. 
+Il Problema dell'arresto.
+Insiemi decidibili e semidecidibili. 
+Il Decimo Problema di Hilbert.
+Funzioni Ricorsive. 
+Calcolabilità secondo Church. 
+Le funzioni parziali ricorsive
+Teoria della complessità:
+Classi di Complessità Temporale. 
+La classe P e la Tesi di Edmonds-Cook-Karp. 
+La classe NP. 
+Il problema P=NP. 
+Problemi NP-completi. 
+Il teorema di Cook-Levin.
+Classi di Complessità spaziale. 
+Le classi L, NL, PSPACE, NPSPACE. 
+Il teorema di Savitch.
+
+Insegnamento ADVANCED AND DISTRIBUTED ALGORITHMS
+Condividi
+Nome del corso 
+Informatica
+Codice insegnamento 
+A002042
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Maria Cristina Pinotti
+Docenti 
+
+
+    Maria Cristina Pinotti - Didattica Ufficiale
+    Alfredo Navarra - Didattica Ufficiale (Codocenza)
+
+Ore 
+
+
+    21 Ore - Didattica Ufficiale - Maria Cristina Pinotti
+    42 Ore - Didattica Ufficiale (Codocenza) - Alfredo Navarra
+
+CFU 
+9
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2020/21
+Erogato altro regolamento 
+
+Attività 
+Caratterizzante
+Ambito 
+Discipline informatiche
+Settore 
+INF/01
+Periodo 
+Primo Semestre
+Tipo insegnamento 
+Obbligatorio (Required)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+ITALIANO/INGLESE
+Contenuti 
+Algoritmi combinatorici avanzati. 
+Introduzione agli Ambienti Distribuiti. 
+Algoritmi distribuiti e misure di costo. 
+Algoritmi classici rivisitati in ambienti distribuiti. 
+Comportamento rispetto a varie topologie di grafo. 
+Approfondimenti di tematiche di ricerca recenti in tale ambito e sul software di simulazione per ambienti distribuiti.
+Testi di riferimento 
+T. H. CORMEN, C. E. LEISERSON, R. L. RIVEST, C. STEIN Introduzione agli algoritmi e strutture dati (terza edizione), McGraw-Hill, 2010, ISBN: 978-88-386-6515-8.
+N. Santoro: Design and Analysis of Distributed Algorithms. John Wiley & Sons.
+Obiettivi formativi 
+Conoscere soluzioni per problemi con numerose applicazioni.
+Conoscenze avanzate su tematiche di algoritmi distribuiti. 
+Accrescimento capacità critiche e applicative
+Prerequisiti 
+Conoscenze algoritmiche di livello intermedio
+Metodi didattici 
+Lezione frontale
+Seminari
+Modalità di verifica dell'apprendimento 
+Esame Orale
+Programma esteso 
+Il flusso massimo
+Tagli e flusso massimo
+Preflow-Push Flusso Massimo Matching bipartito
+Geometria Computazionale
+Covex Hull
+Closest pair of points
+Delaunay triangulation
+Velocizzare la programmazione dinamica:
+La proprietà di Monge
+La ricerca dei massimi in una matrice monotona (SMAWK algorithm)
+Applicazioni.
+Introduzione agli Ambienti Distribuiti: 
+Entità, Eventi, Azioni e Comunicazioni. 
+Assiomi e Restrizioni. 
+Costo e Complessità. 
+Esempio del Broadcast. 
+Algoritmo Flooding. 
+Complessità dell'Algoritmo looding. 
+Stati, Eventi e Configurazioni. 
+Problemi e Soluzioni. 
+Terminazione e Correttezza. 
+Lower bounds per il problema del Broadcast. 
+Broadcast su alberi e grafi completi. 
+Topologia dell'ipercubo. 
+Ipercubi dimensionali. 
+Broadcasting sugli ipercubi. 
+Problema del Wake-Up. 
+Wake-Up su ipercubi. 
+Prova dell'assenza di cicli in Hk(x). 
+Wake-Up su alberi. 
+Wake-up su grafi completi. 
+Tecnica dell'avversario. 
+Probelma dell'attraversamento. 
+Algoritmo DF_Traversal. 
+Miglioramenti dell'algoritmo DF_Traversal: DF+, DF++. Costruzione di uno Spanning Tree. 
+Protocollo Shout. 
+Correttezza, costi computazionali e miglioramento del protocollo Shout. 
+Esplorazione di un grafo anonimo tramite automa a stati finiti.
+Orientamento locale ad-hoc per la costruzione di uno Spanning Tree. 
+Regola della mano destra. 
+Spanning tree con iniziatori multipli. 
+Spanning Tree con Identificatori unici. 
+Protocollo MultiShout. 
+Introduzione alla tecnica della saturazione. 
+Tecnica della saturazione. 
+Ricerca del minimo tramite saturazione. 
+Leader Election: Risultati di impossibilità, topologia ad albero, topologia a ring. 
+Protocollo AsFar. 
+Problema del Gathering. 
+Modello Look-Compute-Move. 
+Gathering su Ring. 
+
+Insegnamento DIDATTICA DELL'INFORMATICA
+Nome del corso 
+Informatica
+Codice insegnamento 
+A001587
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Sergio Tasso
+Docenti 
+
+
+    Sergio Tasso - Didattica Ufficiale
+    Nicla Palladino - Didattica Ufficiale (Codocenza)
+    Stefano Marcugini - Didattica Ufficiale (Codocenza)
+    Arturo Carpi - Didattica Ufficiale (Codocenza)
+    Francesco Santini - Didattica Ufficiale (Codocenza)
+
+Ore 
+
+
+    14 Ore - Didattica Ufficiale - Sergio Tasso
+    7 Ore - Didattica Ufficiale (Codocenza) - Nicla Palladino
+    7 Ore - Didattica Ufficiale (Codocenza) - Stefano Marcugini
+    7 Ore - Didattica Ufficiale (Codocenza) - Arturo Carpi
+    7 Ore - Didattica Ufficiale (Codocenza) - Francesco Santini
+
+CFU 
+6
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2020/21
+Erogato altro regolamento 
+
+Coorte 2019 - Erogato nell'anno 2020
+Attività 
+Affine/integrativa
+Ambito 
+Attività formative affini o integrative
+Settore 
+INF/01
+Periodo 
+Primo Semestre
+Tipo insegnamento 
+Opzionale (Optional)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+ITALIANO
+Contenuti 
+Didattica generale e didattica della disciplina. 
+Insegnamento come trasmissione di conoscenza, il modello comportamentista, il modello costruttivista. 
+Le più diffuse misconcezioni in informatica. 
+Il problem solving. 
+Gli ostacoli epistemologici. 
+Apprendimento collaborativo. 
+I principi generali del tutoraggio fra pari.
+introduzione all'attività di tutorato, approfondendo anche aspetti personali e psicologici dello studente in difficoltà.
+Didattica della programmazione procedurale (linguaggio C).
+Didattica della programmazione ad oggetti (linguaggio Java).
+Didattica dell'architettura degli elaboratori.
+Progettazione di attività di recupero sui temi su cui gli studenti incontrano più difficoltà.
+Testi di riferimento 
+Dispense fornite dai docenti
+Obiettivi formativi 
+Capacità di relazionarsi con studenti in difficoltà e fornire un tutoraggio efficace, sia per quanto riguarda gli aspetti specifici degli esami dei corsi, sia per quanto riguarda le difficoltà di tipo personale e psicologico.
+Capacità di realizzare materiale didattico come esercizi e quiz per piattaforme di e-learning su argomenti di programmazione procedurale (in linguaggio C), di programmazione ad oggetti (linguaggio Java).
+Prerequisiti 
+E' utile aver sostenuto l'esame di Architettura degli Elaboratori, Programmazione I con laboratorio e Programmazione II con laboratorio. 
+In particolare è importante avere familiarità con i concetti della programmazione.
+Metodi didattici 
+Il corso si avvale della collaborazione di esperti in vari settori, e si svolge attraverso lezioni, conferenze, attività da sperimentare in prima persona.
+Discussione di materiale preparato dagli studenti.
+Altre informazioni 
+Sito del Corso: www.unistudium.unipg.it
+Calendario esami: consultare il sito www.dmi.unipg.it
+Modalità di verifica dell'apprendimento 
+Progetti assegnati dai docenti.
+Colloqui orali sui vari temi trattati.
+Lo svolgimento dei progetti è finalizzato a verificare la capacità di realizzare materiale didattico come esercizi e quiz per una piattaforma e-learning.
+Su richiesta dello studente l'esame puo' essere sostenuto anche in lingua Inglese.
+Per informazioni sui servizi di supporto agli studenti con disabilità e/o DSA visita la pagina http://www.unipg.it/disabilita-e-dsa
+Programma esteso 
+Didattica generale e didattica della disciplina. 
+Apprendimento significativo. 
+Insegnamento come trasmissione di conoscenza, il modello comportamentista, il modello costruttivista. 
+Le misconcezioni evitabili ed inevitabili. 
+Le più diffuse misconcezioni in informatica. 
+Il problem solving e le caratteristiche dell’insegnamento per problemi. 
+Gli ostacoli epistemologici. 
+I principi generali dell’apprendimento collaborativo. 
+I principi generali del tutoraggio fra pari. 
+La storia della matematica nella didattica dell’informatica. 
+Lavorare per problemi: storia, matematica ed informatica nell’apprendimento.
+Compiti di un tutor. 
+Attenzione e capacità di ascolto. 
+Aspetti didattici e psicologici nella richiesta e nella attività di aiuto. 
+Difficoltà in informatica. 
+Bisogni educativi speciali. 
+Dislessia e discalculia. 
+Un approccio concreto alla matematica e all’informatica: uno strumento didattico inclusivo.
+Ripasso dei concetti fondamentali della programmazione (ed in particolare modo i linguaggi C e Java).
+Ripasso della rappresentazione dell'Informazione analogica e digitale: contare in binario.
+Connettori logici, funzioni Booleane, circuiti combinatori: dai problemi concreti alla sintesi dei circuiti.
+Il modello a stati finiti: esempi e realizzazione dei relativi circuiti sequenziali.
+Gli errori più frequenti commessi dagli studenti.
+Progettazione di attività di recupero sugli argomenti su cui gli studenti trovano più difficoltà.
+La piattaforma Moodle: attività, quiz e lezioni.
+
+Insegnamento MACHINE LEARNING
+Nome del corso 
+Informatica
+Codice insegnamento 
+A002051
+Curriculum 
+Comune a tutti i curricula
+Docente responsabile 
+Valentina Poggioni
+Docenti 
+
+
+    Valentina Poggioni - Didattica Ufficiale
+
+Ore 
+
+
+    68 Ore - Didattica Ufficiale - Valentina Poggioni
+
+CFU 
+9
+Regolamento 
+Coorte 2020
+Erogato 
+Erogato nel 2020/21
+Erogato altro regolamento 
+
+Attività 
+Caratterizzante
+Ambito 
+Discipline informatiche
+Settore 
+INF/01
+Periodo 
+Secondo Semestre
+Tipo insegnamento 
+Obbligatorio (Required)
+Tipo attività 
+Attività formativa monodisciplinare
+Lingua insegnamento 
+ITALIANO
+Contenuti 
+Introduzione al machine learning. 
+Approccio supervisionato, semi-supervisionato e non supervisionato.
+Classificazione, clustering, anomaly detection. 
+Applicazioni alla computer vision e per lo speech recognition. 
+Introduzione al deep learning. 
+Modelli avanzati di reti neurali.
+Testi di riferimento 
+Tan, Steinbach, Karpatne, Kumar.
+Introduction to Data Mining, 2nd Edition
+2019. Pearson
+
+Charu C. Aggarwal.
+Neural Networks and Deep Learning: a text book. Springer 2018
+Obiettivi formativi 
+Lo studente conoscerà i principali metodi del machine learning secondo i vari approcci supervisionato, semi-supervisionato e non supervisionato. 
+Conoscerà inoltre alcuni metodi tipici del deep learning anche applicato a problemi di computer vision e speech recognition.
+Sarà in grado di progettare implementare, addestrare e testare sistemi intelligenti per la classificazione, il clustering e l'anomaly detection basati su modelli avanzati di reti neurali.
+Prerequisiti 
+Nessuna
+Metodi didattici 
+Lezioni frontali in aula e lezioni pratiche in laboratorio
+Altre informazioni 
+Per qualsiasi altra informazione www.unistudium.unipg.it
+Modalità di verifica dell'apprendimento 
+Esame orale e progetto. 
+Prove intermedie durante il corso
+Programma esteso 
+Introduzione al machine learning. 
+Approccio supervisionato, semi-supervisionato e non supervisionato.
+Classificazione (decision trees, rule-based approach, naive bayes, nearest neighbors, SVM, neural networks, ensemble) , clustering (k-means, hierarchical approaches, density based approaches), anomaly detection. Applicazioni alla computer vision e per lo speech recognition. 
+Introduzione al deep learning. 
+Modelli avanzati di reti neurali (convolutional NN, recurrent NN, generative models).

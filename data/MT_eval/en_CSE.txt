@@ -1,0 +1,50 @@
+exams are difficult
+the exam is difficult
+is the exam difficult 
+this exam is difficult
+this lab is more difficult than the exam
+exams are mandatory
+exams follow the mandatory lab
+the exam follows the mandatory lab
+do machines learn 
+will machines learn  
+won't machines learn 
+does the course have compulsory elements 
+does the course have compulsory elements for us 
+doesn't the course have compulsory elements 
+functional programs are short
+functional programs are shorter than other programs
+many functional programs are shorter than other programs
+this program is more complex than an elementary implementation
+this program will be more complex than this elementary implementation
+an implementation is available
+a basic implementation was available
+the implementation was available
+the aim of the exercise is improvement
+the aim of those exercises is improvement
+the aim of those complex exercises was improvement
+I study computer science
+I studied computer science
+I studied computer science regularly
+NLP software resources aren't many
+the NLP software resources are many
+these theories aren't comprehensive
+these theories aren't more comprehensive than an introduction
+a function follows an algorithm
+the function follows an algorithm
+the function follows the algorithm
+does machine learning affect the energy consumption of certain components in the system 
+will machine learning affect the energy consumption of certain components in the system 
+this program library is unnecessary for this purpose
+optimization is unnecessary for this purpose
+optimization is relevant for this purpose
+optimization isn't relevant for this purpose
+is optimization relevant for this purpose 
+is optimization more relevant than good design for this purpose 
+every concept is relevant to the final exam
+is every concept relevant to the final exam 
+are these concepts relevant to the final exam 
+this course wasn't simple
+that course wasn't practical
+these courses weren't practical
+these classical courses aren't practical

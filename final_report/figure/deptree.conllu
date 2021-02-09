@@ -1,0 +1,11 @@
+# newdoc
+# newpar
+# sent_id = 1
+# text = This is a dependency tree.
+1	This	this	PRON	PD	Number=Sing|PronType=Dem	5	nsubj	_	_
+2	is	be	AUX	V	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	5	cop	_	_
+3	a	a	DET	RI	Definite=Ind|Number=Sing|PronType=Art	5	det	_	_
+4	dependency	dependency	NOUN	S	Number=Sing	5	nmod	_	_
+5	tree	tree	NOUN	S	Number=Sing	0	root	_	SpaceAfter=No
+6	.	.	PUNCT	FS	_	5	punct	_	SpacesAfter=\n
+

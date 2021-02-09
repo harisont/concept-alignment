@@ -1,0 +1,11 @@
+# newdoc
+# newpar
+# sent_id = 1
+# text = this algorithm selects the relevant alignments
+1	this	this	DET	DD	Number=Sing|PronType=Dem	2	det	_	_
+2	algorithm	algorithm	NOUN	S	Number=Sing	3	nsubj	_	_
+3	selects	select	VERB	V	Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	_
+4	the	the	DET	RD	Definite=Def|PronType=Art	6	det	_	_
+5	relevant	relevant	ADJ	A	Degree=Pos	6	amod	_	_
+6	alignments	alignment	NOUN	S	Number=Plur	3	obj	_	SpacesAfter=\n
+

@@ -1,0 +1,657 @@
+\chapter{Concept Alignment in Machine Translation} \label{ch5}
+We conclude this work by documenting a first attempt to put our CA component to use in a MT system. 
+The chapter starts with a discussion of how GF translation can benefit from using concepts extracted with our method as translation units.
+After that, we give a step-by-step description of how this is achieved, also indicating the changes made to the CA module to adjust it for this specific use case. 
+Finally, Section \ref{eval5} focuses on the actual evaluation of the resulting system and presents its results.
+
+\section{Method and implementation}
+As discussed in Section \ref{gf}, GF translation consists in parsing SL strings to obtain the corresponding ASTs to then linearize them according to the concrete syntax of the TL.
+As well as describing the morphological and syntactical features of the languages involved, a multilingual grammar suited for this task defines a \textit{translation lexicon}, i.e. a set of word senses and the corresponding expressions in the various languages. \smallskip
+
+Automating CA can be seen, then, as a first step for automatically generating such lexicon. 
+An important point is that our approach, as opposed to word alignment techniques, identifies concepts at different levels of abstraction.
+This allows us to construct lexical entries not only for the grammatical categories that typically correspond to single words (such as nouns, adjectives and adverbs), but also for phrases (with the term ``phrase'' now intended grammatically, as opposed to its meaning in SMT).
+Doing so enables GF translation, designed to preserve grammatically, to also render idiomatic expressions found in the data used for generating the lexicon correctly. \smallskip
+
+Obtaining a multilingual GF grammar from a set of aligned UD trees, however, is not immediate. In the following three sections, we illustrate the different steps of this process. We then introduce the simple GF-based MT module used for the experiments discussed in Section \ref{eval5} and describe the adjustments made to the CA component in order to optimize it for the task at hand. 
+
+\subsection{UD-to-GF conversion}
+The output of both CE and CP is, unless when linearized for evaluation purposes, a set of aligned UD trees in CoNNL-U format. In order to be used for GF-based translation, such trees need to be first converted into GF ASTs, which are then used to generate a set of grammar rules constiuting the above mentioned multilingual GF lexicon. \smallskip
+
+As discussed in Section \ref{udrelgf}, the UD-to-GF conversion, while being more complex than its reverse, can be performed by \texttt{gf-ud}, a program offering several functionalities useful to work with GF and UD simultaneously.
+Such program, however, cannot be fed the alignments obtained via CE and CP directly. This is due to the fact that the members of most of the relevant alignments are subtrees (or heads of subtrees) and not complete UD trees. 
+While this makes no difference in terms of the Haskell data type we represent them with (cf. Figure \ref{types}), trying to print them to files in the corresponding CoNNL-U notation with no postprocessing leads to malformed UD sentences. \smallskip
+
+The problem, which is due to the lack of a root labelled as such and illegal \texttt{ID} and \texttt{HEAD} values, was solved by implementing a simple normalization procedure, now part of the CA library. 
+Called every time a UD subtree has to be converted to CoNNL-U, it first replaces the UD label (\texttt{udDEPREL}) of its root node with \texttt{root} and assigns the special value 0 to its \texttt{udHEAD} field. After that, it proceeds to ``rescale'' the \texttt{udID} and \texttt{udHEAD} fields of all other nodes so that they end up into the range $[1,n]$, where $n$ is the number of nodes of the extracted subtrees\footnote{see Section \ref{conll} and Figure \ref{types} for definitions of all the fields of UD trees and their CoNNL-U representations.}. \smallskip
+
+\begin{figure}[H]
+\small
+\begin{Verbatim}[commandchars=\\\{\}]
+\textcolor{gray}{   
+    1  sadly  sadly  ADV  _  _  5  advmod  _  _}
+    2  this  this  DET  _  _  4  det  _  _
+    3  malformed  malformed  ADJ  _  _  4  amod  _  _
+    4  subtree  subtree  NOUN  _  5  nsubj  _  _
+    \textcolor{gray}{5  needs  need  VERB  _  _  0  root  _  _}
+    \textcolor{gray}{6  postprocessing  postprocess  VERB  _  _  5  xcomp}
+
+\end{Verbatim}
+\centering
+\large
+$\Downarrow$
+\small
+\begin{verbatim}
+
+
+    1	this	this	DET	_	_	3	det	_	_
+    2	malformed	malformed	ADJ	_	_	3	amod	_	_
+    3	subtree	subtree	NOUN	_	_	0	root	_	_
+\end{verbatim}
+\caption[A UD subtree and its normalization]{A vanilla noun phrase subtree (highlighted in black) in the context it was extracted from (gray) and the same subtree after normalization.}
+\label{normalization}
+\end{figure}
+
+Another practical problem that arises when trying to transform a CoNNL-U tree into a GF AST is that \texttt{gf-ud} easily becomes remarkably resource-intensive when dealing with ambiguous, large trees. 
+This is due to the fact that conversion in this direction is a nondeterministic search problem \cite{udgf}. 
+For this reason, it can be useful to limit the size\footnote{in this context, the size of an alignment is defined as the number of nodes of its largest member.} of the alignments that are actually kept after the extraction (or propagation) procedure. Since our CA component works at all levels of abstraction, thus also aligning full clauses, this turned out to be essential and became one of the command-line parameters of the final executables, as mentioned in Appendix \ref{b}. \smallskip
+
+\subsection{Grammar generation} \label{grgn}
+The result of this UD-to-GF conversion is still a series of tree alignments, but their resulting format makes a substantial difference, since GF ASTs can be used to obtain the rules of a generative grammar. \texttt{gf-ud} also provides a way to do this, given an \textit{extraction grammar} and a \textit{morphological dictionaries} of the languages of the alignments. \smallskip
+
+What we refer to as an \textit{extraction grammar} is of course a GF grammar, whose objective is to define the set of basic categories and syntactic rules the entries of the automatically generated GF lexicon is going to be based on. \smallskip
+
+A \textit{morphological dictionary}, on the other hand, contains correspondences between a large number of lemmas and various word forms. In this case, the morphological dictionaries themselves are implemented in GF. \smallskip
+
+The program responsible for generating the GF lexicon given these components has been written in parallel with - but not as part of - this thesis project and is still under development. As a consequence, some programming work was required to automate the few parts of the process that still had to be performed manually and some (minimal) postprocessing is sometimes required before the automatically generated grammars can be compiled. This happens for instance when Italian words are incorrectly POS-tagged as verbs and, not having a word ending typical of such category, produce pattern matching errors when the corresponding strings are passed to the constructor generating all the verb forms. \smallskip
+
+\subsubsection{Extending the extracted grammar} \label{extend}
+The extraction grammar is designed for the grammar generation module to produce grammar rules corresponding to small concepts: basic categories, noun phrases, verb phrases etc. 
+As a consequence, if used directly, grammars resulting from the above described generation step can only deal with very simple predicative sentences, with verbs in the present tense of the indicative mood, and their constituents, such as\smallskip
+
+\begin{example}
+    ``this sentence is simple''
+\end{example}
+
+Of course, some limited variation is still possible. For instance, the determiner can change or disappear, number can vary, the complement of the copula can become a noun and an adjectival modifiers and prepositional phrases can be added to each noun phrase. For instance:
+
+\begin{example} \ 
+    \begin{itemize}
+        \item ``the sentence is simple''
+        \item ``a sentence is simple''
+        \item ``sentences are simple''
+        \item ``these sentences are simple''
+        \item ``this sentence is an example''
+        \item ``this short sentence is simple''
+        \item ``this sentence of the text is simple''
+    \end{itemize}
+\end{example}
+
+For languages that are covered by the RGL, however, it is also extremely easy to extend such grammars with preexisting syntax rules so to make it possible to generate more complex clauses and sentences and add useful function words. The grammars used for the experiments that will be described in Section \ref{eval5}, for example, have been extended also to cover negative and interrogative forms, the past and future tense of verbs in the indicative mood and comparative adjectives. This allows for plenty of variations, such as:
+
+\begin{example} \
+    \begin{itemize}
+        \item ``this sentence isn't simple''
+        \item ``is this sentence simple?''
+        \item ``this sentence was simple''
+        \item ``this sentence will be simple''
+        \item ``this sentence is simpler than that sentence''
+    \end{itemize}
+\end{example}
+
+Of course, variations can be combined, so that the grammar can produce sentences like the following:
+
+\begin{example}
+    ``Won't these short sentences be simpler than that long sentence?''
+\end{example}
+
+This is accomplished by making the automatically generated grammars extend not only the extraction grammar itself, but also a module that simply imports the necessary standard RGL categories and functions.
+
+\subsection{Translation} \label{mt}
+Maybe counterintuitively, the MT module itself is by far the simplest component of the entire system. Built using PGF, the API meant to be used for embedding GF grammars in Haskell programs, it simply makes use of GF parsing and linearization.
+The only difference between translating inside the GF shell and using this ad-hoc program, apart from the increased ease of use of the latter, are that: \smallskip
+
+\begin{itemize}
+    \item while GF can parse the SL string in a variety of ways and, as a consequence, return multiple TL linearizations, our program only outputs the first candidate translation, preliminarily discarding trees containing terminal nodes that have no linearization in the TL\footnote{a linearization can be missing, for instance, if a concrete syntax is postprocessed by simply getting rid of an ``illegal'' verb causing compilation problems (cf. Section \ref{grgn})} 
+    \item to facilitate the experiments, our standalone program can translate several newline-separated sentences at once.
+\end{itemize}
+
+\subsection{Adjustments to the CA component} \label{tuning}
+
+While the domain of application of CA we focus on in this work is automatic translation, the system described so far is not in any way optimized for it and can also be made use of in other contexts. 
+For instance, it is easy to imagine using it to improve the user interface of online translation memories or to facilitate reading parallel texts in the context of language learning. \smallskip
+
+In our particular setting, however, some practical problems arise and some adjustments can be done in order to make the CA software more well suited to the generation of a translation lexicon. \smallskip
+
+In the following section, we discuss two ways to mitigate the impact of the annotation errors that inevitably derive from applying automatic dependency parsing on raw, possibly noisy data. Both techniques aim to increase the number of extracted alignments without significantly affecting precision.
+Section \ref{select}, going in a sense in the opposite direction, describes the strategies we apply to filter out irrelevant alignments.
+
+\subsubsection{Dealing with parse errors}
+As discussed in Sections \ref{eval2} and \ref{eval3}, both our CE and CP modules give promising results on manually annotated data. However, when run on UDPipe-generated dependency trees, performance, and recall in particular, is significantly affected by errors happening at the parsing stage. Because parsing itself is a process consisting of several stages, errors differ based on when they happen. In particular, UDPipe goes through the following steps, each potentially causing one ore more particular kinds of errors: \smallskip
+
+\begin{enumerate} 
+    \item \textit{\textbf{tokenization}}, which can, although it is unlikely for the languages considered in this work, lead to errors in identifying word boundaries
+    \item \textit{\textbf{morphological analysis}}, which can cause lemmatization and, consequently, POS-tagging errors
+    \item actual \textit{\textbf{dependency parsing}}, the potential cause of attachment and labelling errors
+\end{enumerate} \smallskip
+
+In this context, we focus on the syntax-level errors: attachment and labelling. Of course, lemmatization and POS-tagging errors can be the first cause of one such error. In particular, the fact that a word is lemmatized incorrectly can make it so that it is also attributed the wrong POS tag and, as a consequence, assigned the wrong dependency label and/or attached to the wrong node. \smallskip
+
+\begin{example}
+    Consider the Italian sentence ``quel fa è diesis'' (``that F is sharp'').
+    Notoriously, in Italian, the word ``fa'' can stand for the musical note F. Since ``fa'' is also the third person singular of the present indicative of the verb ``fare'' (``to do'', ``to make''), it is likely to be lemmatized so (instead of as ``fa''). If so, it will also probably POS-tagged as a \texttt{VERB} and assigned a dependency label typical of verbs (in this case, with no other lexical verbs in the sentence, most likely \texttt{root}, thus producing an attachment error as well), while the correct annotation is
+
+    \begin{figure}[H]
+        \begin{subfigure}{.5\textwidth}
+            \centering
+            \footnotesize
+            \begin{verbatim}
+    1	quel	quello	DET	_	_	2	det	_	_
+    2	fa	fa	NOUN	_	_	4	nsubj	_	_
+    3	è	essere	AUX	_	_	4	cop	_	_
+    4	diesis	diesis	ADJ	_	_	0	root	_	_
+            \end{verbatim}
+        \end{subfigure}
+        \begin{subfigure}{.5\textwidth}
+            \centering
+            \footnotesize
+            \begin{picture}(223.0,90.0)
+                \put(0.0,0.0){quel}
+                \put(46.0,0.0){fa}
+                \put(92.0,0.0){è}
+                \put(129.0,0.0){diesis}
+                \put(0.0,15.0){{\tiny DET}}
+                \put(46.0,15.0){{\tiny NOUN}}
+                \put(92.0,15.0){{\tiny AUX}}
+                \put(129.0,15.0){{\tiny ADJ}}
+                \put(33.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+                \put(13.26086956521739,35.0){\vector(0,-1){5.0}}
+                \put(18.0,49.66666666666667){{\tiny det}}
+                \put(97.5,30.0){\oval(79.3855421686747,66.66666666666667)[t]}
+                \put(57.80722891566265,35.0){\vector(0,-1){5.0}}
+                \put(82.5,66.33333333333334){{\tiny nsubj}}
+                \put(120.5,30.0){\oval(28.89189189189189,33.333333333333336)[t]}
+                \put(106.05405405405405,35.0){\vector(0,-1){5.0}}
+                \put(105.5,49.66666666666667){{\tiny cop}}
+                \put(144.0,90.0){\vector(0,-1){60.0}}
+                \put(149.0,80.0){{\tiny root}}
+              \end{picture}
+        \end{subfigure}
+    \end{figure}
+\end{example}
+\smallskip
+
+Nontheless, because we do not want to intervene on the parser directly (nor to modify its results), we ignore the causes and focus on the syntax-level errors directly. \smallskip
+
+\paragraph{Working at the clause level} \label{clauses}
+At the highest level of abstraction, the parser often fails to correctly identify the clauses a sentence is composed of. This happens in a variety of ways: at times, clauses are simply not identified as such or, on the contrary, non-clauses are labelled as clauses. 
+Most often, however, clauses are simply not attached to the right node and/or given a label that, while still identifying them as clauses, does not give correct information about their type. \smallskip
+
+To address this problem, the CE module has been modified so that it can try to align individual clauses instead of sentences. The idea is to obtain, from each pair of sentence trees to align, a pair of lists of subtrees whose heads are labelled \texttt{root}, \texttt{csubj}, \texttt{ccomp}, \texttt{xcomp}, \texttt{advcl} or  \texttt{acl}\footnote{all these clausal labels are defined in Appendix \ref{a_lab}}.
+
+\begin{figure}[h]
+\footnotesize
+\setlength{\unitlength}{0.222mm}
+\begin{picture}(817.0,150.0)
+  \put(0.0,0.0){this}
+  \put(46.0,0.0){sentence}
+  \put(128.0,0.0){\textbf{shows}}
+  \put(183.0,0.0){how}
+  \put(220.0,0.0){to}
+  \put(266.0,0.0){\textbf{work}}
+  \put(312.0,0.0){at}
+  \put(349.0,0.0){the}
+  \put(386.0,0.0){clause}
+  \put(450.0,0.0){level}
+  \put(505.0,0.0){to}
+  \put(551.0,0.0){\textbf{increase}}
+  \put(633.0,0.0){recall}
+  \put(0.0,15.0){{\tiny DET}}
+  \put(46.0,15.0){{\tiny NOUN}}
+  \put(128.0,15.0){{\tiny \textbf{VERB}}}
+  \put(183.0,15.0){{\tiny ADV}}
+  \put(220.0,15.0){{\tiny PART}}
+  \put(266.0,15.0){{\tiny \textbf{VERB}}}
+  \put(312.0,15.0){{\tiny ADP}}
+  \put(349.0,15.0){{\tiny DET}}
+  \put(386.0,15.0){{\tiny NOUN}}
+  \put(450.0,15.0){{\tiny NOUN}}
+  \put(505.0,15.0){{\tiny PART}}
+  \put(551.0,15.0){{\tiny \textbf{VERB}}}
+  \put(633.0,15.0){{\tiny NOUN}}
+  \put(33.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+  \put(13.26086956521739,35.0){\vector(0,-1){5.0}}
+  \put(18.0,49.66666666666667){{\tiny det}}
+  \put(97.0,30.0){\oval(78.34146341463415,33.333333333333336)[t]}
+  \put(57.829268292682926,35.0){\vector(0,-1){5.0}}
+  \put(82.0,49.66666666666667){{\tiny nsubj}}
+  \put(234.5,30.0){\oval(79.3855421686747,66.66666666666667)[t]}
+  \put(194.80722891566265,35.0){\vector(0,-1){5.0}}
+  \put(219.5,66.33333333333334){{\tiny advmod}}
+  \put(253.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+  \put(233.26086956521738,35.0){\vector(0,-1){5.0}}
+  \put(238.0,49.66666666666667){{\tiny mark}}
+  \put(217.0,30.0){\oval(135.82608695652175,100.0)[t]}
+  \put(284.9130434782609,35.0){\vector(0,-1){5.0}}
+  \put(202.0,83.0){{\tiny \textbf{xcomp}}}
+  \put(391.0,30.0){\oval(135.82608695652175,100.0)[t]}
+  \put(323.0869565217391,35.0){\vector(0,-1){5.0}}
+  \put(376.0,83.0){{\tiny case}}
+  \put(409.5,30.0){\oval(98.02970297029702,66.66666666666667)[t]}
+  \put(360.4851485148515,35.0){\vector(0,-1){5.0}}
+  \put(394.5,66.33333333333334){{\tiny det}}
+  \put(428.0,30.0){\oval(59.3125,33.333333333333336)[t]}
+  \put(398.34375,35.0){\vector(0,-1){5.0}}
+  \put(413.0,49.66666666666667){{\tiny nmod}}
+  \put(378.0,30.0){\oval(182.3695652173913,133.33333333333334)[t]}
+  \put(469.1847826086956,35.0){\vector(0,-1){5.0}}
+  \put(363.0,99.66666666666667){{\tiny obl}}
+  \put(538.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+  \put(518.2608695652174,35.0){\vector(0,-1){5.0}}
+  \put(523.0,49.66666666666667){{\tiny mark}}
+  \put(428.5,30.0){\oval(283.94736842105266,166.66666666666666)[t]}
+  \put(570.4736842105264,35.0){\vector(0,-1){5.0}}
+  \put(413.5,116.33333333333333){{\tiny \textbf{advcl}}}
+  \put(612.0,30.0){\oval(78.34146341463415,33.333333333333336)[t]}
+  \put(651.170731707317,35.0){\vector(0,-1){5.0}}
+  \put(597.0,49.66666666666667){{\tiny obj}}
+  \put(143.0,150.0){\vector(0,-1){120.0}}
+  \put(148.0,140.0){{\tiny \textbf{root}}}
+\end{picture}
+\begin{itemize}
+    \item ``\textit{this sentence \textbf{shows} how to work at the clause level to increase recall}''
+    \item ``\textit{how to \textbf{work} at the clause level to increase recall}''
+    \item ``\textit{to \textbf{increase} recall}''
+\end{itemize}
+\caption[A sentence and its decomposition into clauses]{A sentence and its decomposition into clauses. Note how the sentence is not actually segmented, but rather used to obtain a set of subsentences, each having their main verb, marked in bold, as root.}
+\end{figure}
+
+These lists of ``clauses''\footnote{``clauses'' is in quotes since what we are referring to as a clause includes its subclauses too. This means that the sentence is not segmented into clauses in the literal sense of the term, but rather that one tree per verb is extracted from them.} are then sorted by dependency label and distance from the root, so that in the absence of annotation errors, when there is in fact an evident correspondence, they appear in the same position. Finally, the program tries to align every possible pair of clauses and the pruning procedure described in \ref{pruning} is applied to only keep the ones that are more likely to be correct.
+
+\paragraph{Dealing with unaligned subtrees} \label{exclusion}
+Clearly, however, parse errors do not happen exclusively at the clause level: smaller units, e.g. verb arguments, can also be misclassified or attached to the wrong node. To partially work around the problem, the CE module supports what one could refer to as ``alignment by exclusion'': after the extraction procedure described in Section \ref{improvements} - or its modified version outlined in the above paragraph - is carried out, the program can try to find correspondences between the remaining unaligned subtrees. 
+The idea is the same as above: subtrees are sorted, aligned and lastly alignments are pruned.
+This is done ignoring, if necessary, the context in which the subtrees occur and potentially making only use of a subset of the alignments criteria, for instance the strictest and safest ones. \smallskip
+
+This is useful in cases such as that illustrated in Figure \ref{rest}, as well as in the event of actual attachment ambiguity or when the two versions of the text present syntactical differences that cannot be handled with the simple divergence patterns introduced in Section \ref{divs}.
+
+\begin{figure}[h]
+    \centering
+    \footnotesize
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \setlength{\unitlength}{0.2mm}
+      \begin{picture}(315.0,110.0)
+        \put(0.0,0.0){parse}
+        \put(55.0,0.0){this}
+        \put(101.0,0.0){sentence}
+        \put(183.0,0.0){with}
+        \put(229.0,0.0){care}
+        \put(0.0,15.0){{\tiny VERB}}
+        \put(55.0,15.0){{\tiny DET}}
+        \put(101.0,15.0){{\tiny NOUN}}
+        \put(183.0,15.0){{\tiny ADP}}
+        \put(229.0,15.0){{\tiny NOUN}}
+        \put(88.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+        \put(68.26086956521739,35.0){\vector(0,-1){5.0}}
+        \put(73.0,49.66666666666667){{\tiny det}}
+        \put(70.5,30.0){\oval(98.02970297029702,66.66666666666667)[t]}
+        \put(119.51485148514851,35.0){\vector(0,-1){5.0}}
+        \put(55.5,66.33333333333334){{\tiny obj}}
+        \put(216.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+        \put(196.26086956521738,35.0){\vector(0,-1){5.0}}
+        \put(201.0,49.66666666666667){{\tiny case}}
+        \put(134.5,30.0){\oval(227.68995633187774,100.0)[t]}
+        \put(248.34497816593887,35.0){\vector(0,-1){5.0}}
+        \put(119.5,83.0){{\tiny obl}}
+        \put(15.0,110.0){\vector(0,-1){80.0}}
+        \put(20.0,100.0){{\tiny root}}
+      \end{picture}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \setlength{\unitlength}{0.25mm}
+\begin{picture}(324.0,90.0)
+  \put(0.0,0.0){analizza}
+  \put(82.0,0.0){questa}
+  \put(146.0,0.0){frase}
+  \put(201.0,0.0){con}
+  \put(238.0,0.0){cura}
+  \put(0.0,15.0){{\tiny VERB}}
+  \put(82.0,15.0){{\tiny DET}}
+  \put(146.0,15.0){{\tiny NOUN}}
+  \put(201.0,15.0){{\tiny ADP}}
+  \put(238.0,15.0){{\tiny NOUN}}
+  \put(124.0,30.0){\oval(59.3125,33.333333333333336)[t]}
+  \put(94.34375,35.0){\vector(0,-1){5.0}}
+  \put(109.0,49.66666666666667){{\tiny det}}
+  \put(93.0,30.0){\oval(143.94520547945206,66.66666666666667)[t]}
+  \put(164.97260273972603,35.0){\vector(0,-1){5.0}}
+  \put(78.0,66.33333333333334){{\tiny obj}}
+  \put(229.5,30.0){\oval(28.89189189189189,33.333333333333336)[t]}
+  \put(215.05405405405406,35.0){\vector(0,-1){5.0}}
+  \put(214.5,49.66666666666667){{\tiny case}}
+  \put(212.0,30.0){\oval(88.73913043478261,66.66666666666667)[t]}
+  \put(256.3695652173913,35.0){\vector(0,-1){5.0}}
+  \put(197.0,66.33333333333334){{\tiny nmod}}
+  \put(15.0,90.0){\vector(0,-1){60.0}}
+  \put(20.0,80.0){{\tiny root}}
+\end{picture}
+    \end{subfigure}
+    \caption[A case where alignment ``by exclusion'' is beneficial]{A case where alignment ``by exclusion'' is beneficial. In this case, while the two sentences should appear to be structured identically to a human reader, the Italian parse tree contains a (reasonable) attachment error. As a consequence, vanilla CE would not be able to align the prepositional phase ``\textit{with care}'', attached to the main verb ``\textit{parse}'', to its Italian exact counterpart ``\textit{con cura}'', incorrectly linked to the noun ``\textit{frase}'' as an \texttt{nmod}. A second CE pass trying to put unaligned subtrees in relation with each other, however, is able to detect the POS-equivalence between the two phrases, thus producing three new correct alignments: $\langle$\textit{with care, con cura}$\rangle$, $\langle$\textit{care, cura}$\rangle$ and $\langle$\textit{with, con}$\rangle$.}
+    \label{rest}
+\end{figure}
+
+The results of this kind of optimization, however, as well as those of working at the clause level, vary widely depending on the quality of the parse trees and can be detrimental, in terms of precision, if applied to high-quality datasets.
+
+\subsubsection{Selecting relevant alignments} \label{select}
+The pruning procedure described in Section \ref{pruning} is aimed at filtering out alignments that, because of their number of occurrences and of the set of criteria thanks to which they have been extracted, are less likely to be correct. However, not all the alignments extracted in this way are relevant for the purposes of MT. \smallskip
+
+On the one hand, most alignments that do not contain any content word are not useful for the generation of a domain-specific grammar, as many common function words are already covered by the GF RGL\footnote{small alignments containing both function and content words, such as prepositional phrases, are on the other hand extremely useful, as they show which specific function word should be used in a particular context.}. \smallskip 
+
+On the other hand, the concepts represented in the GF grammar should intuitively, in most cases, be ``as small as possible''. If we reconsider the example in Figure \ref{cake} (sentences \textit{``finding useful correspondences is not exactly a piece of cake''} and \textit{``trovare corrispondenze utili non è proprio scontato''}), for instance, while the multi-word correspondence $\langle$\textit{a piece of cake, scontato}$\rangle$ is indeed useful there is usually no point in keeping correspondences such as $\langle$\textit{useful correspondences, corrispondenze utili}$\rangle$, even if they are correct, when it it also possible to extract the alignments $\langle$\textit{useful, utili}$\rangle$ and $\langle$\textit{correspondences, corrispondenze}$\rangle$: one-word and, in general, shorter alignments are more easily reusable in different contexts, especially since there are language-specific RGL rules capable of handling word order properly. 
+As a consequence, for the purposes of grammar generation, the CA modules should in this case only return the following set of alignments: \smallskip
+
+\begin{enumerate}
+    \item $\langle$\textit{finding, trovare}$\rangle$
+    \item $\langle$\textit{useful, utili}$\rangle$
+    \item $\langle$\textit{correspondences, corrispondenze}$\rangle$
+    \item $\langle$\textit{is, è}$\rangle$
+    \item $\langle$\textit{not, non}$\rangle$
+    \item $\langle$\textit{exactly, proprio}$\rangle$
+    \item $\langle$\textit{a piece of cake, scontato}$\rangle$.
+\end{enumerate} \smallskip
+
+If we consider that the RGL can already handle most function words correctly, we can even discard all alignments that do not contain any content word (in this case, alignments 4 and 5, which leaves us with only 5 alignment useful to GF). \smallskip
+
+In some situations, however, larger alignments (such as $\langle$\textit{useful correspondences, corrispondenze utili}$\rangle$) are considered to be relevant since they help understand which words can be safely used in conjunction with each other. For instance, while the Italian adjective ``\textit{brutto}'' (most often translated as ``\textit{ugly}'') is often used in conjunction with the word ``\textit{notizia}'' (``\textit{news}'') in expressions such as ``\textit{brutte notizie}'', in English the adjective ``\textit{bad}'' (as in ``\textit{bad news}'') is definitely more appropriate. Discarding a potential $\langle\textit{bad news}, \textit{brutte notizie}\rangle$ alignment is then not always the right choice, since in a context in which there are many alternative translation equivalents for the word ``\textit{brutto}'' it provides useful information about what adjective to use to refer to the noun ``\textit{news}''. \smallskip
+
+Because of this, and since CE could have applications other than MT, selection in this sense is performed - optionally - after the extraction phase itself and implemented as an independent function. It works as follows: first, alignments that do not present any content word are filtered out. Then, among the remaining ones, \textit{superficially} perfect alignments \textit{containing} other extracted alignments are also discarded.\smallskip
+
+To clarify such algorithm, it is worth defining perfect alignment - which was already mentioned in Section \ref{baseline} - more rigorously. \smallskip
+
+\begin{definition}
+    An alignment $A = \langle e_1,...,e_n \rangle$ is \textit{perfect} if its member dependency trees $e_1,...,e_n$ are identical both in their topology and in the dependency labels assigned to their nodes. 
+\end{definition} \smallskip
+
+The ``shallow'' version of perfect alignment the algorithm described above refers to, which we call \textit{superficially perfect alignment}, occurs when the definition applies at least to the roots of the two member trees and the roots of their immediate subtrees.\smallskip  
+
+\begin{example}
+    Consider the following pairs of English-Italian sentences:
+    \begin{enumerate}
+        \item $\langle$this algorithm selects \underline{the} relevant alignments, questo algoritmo seleziona gli allineamenti rilevanti$\rangle$
+        \item $\langle$this algorithm selects relevant alignments, questo algoritmo seleziona gli allineamenti rilevanti$\rangle$
+    \end{enumerate}
+
+    While the two English sentences are translated to Italian in the same way, alignment is perfect only in the first case, where the determiner ``\textit{the}'' is present. The two trees are in fact identical if not for the words themselves and their order.
+
+\begin{figure}[H]
+    \centering
+    \scriptsize
+    \begin{subfigure}{.5\textwidth}
+      \centering
+      \setlength{\unitlength}{0.145mm}
+\begin{picture}(479.0,110.0)
+  \put(0.0,0.0){this}
+  \put(46.0,0.0){algorithm}
+  \put(137.0,0.0){selects}
+  \put(210.0,0.0){the}
+  \put(247.0,0.0){relevant}
+  \put(329.0,0.0){alignments}
+  \put(0.0,15.0){{\tiny DET}}
+  \put(46.0,15.0){{\tiny NOUN}}
+  \put(137.0,15.0){{\tiny VERB}}
+  \put(210.0,15.0){{\tiny DET}}
+  \put(247.0,15.0){{\tiny ADJ}}
+  \put(329.0,15.0){{\tiny NOUN}}
+  \put(33.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+  \put(13.26086956521739,35.0){\vector(0,-1){5.0}}
+  \put(18.0,49.66666666666667){{\tiny det}}
+  \put(101.5,30.0){\oval(87.7032967032967,33.333333333333336)[t]}
+  \put(57.64835164835165,35.0){\vector(0,-1){5.0}}
+  \put(86.5,49.66666666666667){{\tiny nsubj}}
+  \put(279.5,30.0){\oval(116.47899159663865,66.66666666666667)[t]}
+  \put(221.26050420168067,35.0){\vector(0,-1){5.0}}
+  \put(264.5,66.33333333333334){{\tiny det}}
+  \put(298.0,30.0){\oval(78.34146341463415,33.333333333333336)[t]}
+  \put(258.8292682926829,35.0){\vector(0,-1){5.0}}
+  \put(283.0,49.66666666666667){{\tiny amod}}
+  \put(253.0,30.0){\oval(190.4375,100.0)[t]}
+  \put(348.21875,35.0){\vector(0,-1){5.0}}
+  \put(238.0,83.0){{\tiny obj}}
+  \put(152.0,110.0){\vector(0,-1){80.0}}
+  \put(157.0,100.0){{\tiny root}}
+\end{picture}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \setlength{\unitlength}{0.16mm}
+\begin{picture}(542.0,90.0)
+  \put(0.0,0.0){questo}
+  \put(64.0,0.0){algoritmo}
+  \put(155.0,0.0){seleziona}
+  \put(246.0,0.0){gli}
+  \put(283.0,0.0){allineamenti}
+  \put(401.0,0.0){rilevanti}
+  \put(0.0,15.0){{\tiny DET}}
+  \put(64.0,15.0){{\tiny NOUN}}
+  \put(155.0,15.0){{\tiny VERB}}
+  \put(246.0,15.0){{\tiny DET}}
+  \put(283.0,15.0){{\tiny NOUN}}
+  \put(401.0,15.0){{\tiny ADJ}}
+  \put(42.0,30.0){\oval(59.3125,33.333333333333336)[t]}
+  \put(12.34375,35.0){\vector(0,-1){5.0}}
+  \put(27.0,49.66666666666667){{\tiny det}}
+  \put(119.5,30.0){\oval(87.7032967032967,33.333333333333336)[t]}
+  \put(75.64835164835165,35.0){\vector(0,-1){5.0}}
+  \put(104.5,49.66666666666667){{\tiny nsubj}}
+  \put(274.5,30.0){\oval(28.89189189189189,33.333333333333336)[t]}
+  \put(260.05405405405406,35.0){\vector(0,-1){5.0}}
+  \put(259.5,49.66666666666667){{\tiny det}}
+  \put(239.0,30.0){\oval(125.65625,66.66666666666667)[t]}
+  \put(301.828125,35.0){\vector(0,-1){5.0}}
+  \put(224.0,66.33333333333334){{\tiny obj}}
+  \put(362.0,30.0){\oval(115.45762711864407,33.333333333333336)[t]}
+  \put(419.728813559322,35.0){\vector(0,-1){5.0}}
+  \put(347.0,49.66666666666667){{\tiny amod}}
+  \put(170.0,90.0){\vector(0,-1){60.0}}
+  \put(175.0,80.0){{\tiny root}}
+\end{picture}
+    \end{subfigure}
+\end{figure}
+
+    In the second case, however, alignment is still ``perfect'' if we only compare the root node and its immediate dependents, thus ignoring the determiner ``\textit{gli}'', which is absents in English, and the adjectival modifier ``\textit{relevant/rilevanti}'':
+
+    \begin{figure}[H]
+        \centering
+        \scriptsize
+        \begin{subfigure}{.5\textwidth}
+          \centering
+          \setlength{\unitlength}{0.16mm}
+          \begin{picture}(432.0,90.0)
+            \put(0.0,0.0){this}
+            \put(46.0,0.0){algorithm}
+            \put(137.0,0.0){selects}
+            \put(210.0,0.0){\textcolor{gray}{relevant}}
+            \put(292.0,0.0){alignments}
+            \put(0.0,15.0){{\tiny DET}}
+            \put(46.0,15.0){{\tiny NOUN}}
+            \put(137.0,15.0){{\tiny VERB}}
+            \put(210.0,15.0){{\tiny \textcolor{gray}{ADJ}}}
+            \put(292.0,15.0){{\tiny NOUN}}
+            \put(33.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
+            \put(13.26086956521739,35.0){\vector(0,-1){5.0}}
+            \put(18.0,49.66666666666667){{\tiny det}}
+            \put(101.5,30.0){\oval(87.7032967032967,33.333333333333336)[t]}
+            \put(57.64835164835165,35.0){\vector(0,-1){5.0}}
+            \put(86.5,49.66666666666667){{\tiny nsubj}}
+            \textcolor{gray}{\put(261.0,30.0){\oval(69,33.333333333333336)[t]}}
+            \textcolor{gray}{\put(221.8292682926829,35.0){\vector(0,-1){5.0}}}
+            \put(246.0,49.66666666666667){{\tiny \textcolor{gray}{amod}}}
+            \put(234.5,30.0){\oval(153.06451612903226,66.66666666666667)[t]}
+            \put(311.0322580645161,35.0){\vector(0,-1){5.0}}
+            \put(219.5,66.33333333333334){{\tiny obj}}
+            \put(152.0,90.0){\vector(0,-1){60.0}}
+            \put(157.0,80.0){{\tiny root}}
+          \end{picture}
+        \end{subfigure}%
+        \begin{subfigure}{.5\textwidth}
+            \centering
+            \setlength{\unitlength}{0.16mm}
+    \begin{picture}(542.0,90.0)
+      \put(0.0,0.0){questo}
+      \put(64.0,0.0){algoritmo}
+      \put(155.0,0.0){seleziona}
+      \put(246.0,0.0){\textcolor{gray}{gli}}
+      \put(283.0,0.0){allineamenti}
+      \put(401.0,0.0){\textcolor{gray}{rilevanti}}
+      \put(0.0,15.0){{\tiny DET}}
+      \put(64.0,15.0){{\tiny NOUN}}
+      \put(155.0,15.0){{\tiny VERB}}
+      \put(246.0,15.0){{\tiny \textcolor{gray}{DET}}}
+      \put(283.0,15.0){{\tiny NOUN}}
+      \put(401.0,15.0){{\tiny \textcolor{gray}{ADJ}}}
+      \put(42.0,30.0){\oval(59.3125,33.333333333333336)[t]}
+      \put(12.34375,35.0){\vector(0,-1){5.0}}
+      \put(27.0,49.66666666666667){{\tiny det}}
+      \put(119.5,30.0){\oval(87.7032967032967,33.333333333333336)[t]}
+      \put(75.64835164835165,35.0){\vector(0,-1){5.0}}
+      \put(104.5,49.66666666666667){{\tiny nsubj}}
+      \textcolor{gray}{\put(274.5,30.0){\oval(16.89189189189189,33.333333333333336)[t]}}
+      \textcolor{gray}{\put(260.05405405405406,35.0){\vector(0,-1){5.0}}}
+      \put(259.5,49.66666666666667){{\tiny \textcolor{gray}{det}}}
+      \put(239.0,30.0){\oval(125.65625,66.66666666666667)[t]}
+      \put(301.828125,35.0){\vector(0,-1){5.0}}
+      \put(224.0,66.33333333333334){{\tiny obj}}
+      \textcolor{gray}{\put(362.0,30.0){\oval(130,33.333333333333336)[t]}}
+      \textcolor{gray}{\put(419.728813559322,35.0){\vector(0,-1){5.0}}}
+      \put(347.0,49.66666666666667){{\tiny \textcolor{gray}{amod}}}
+      \put(170.0,90.0){\vector(0,-1){60.0}}
+      \put(175.0,80.0){{\tiny root}}
+    \end{picture}
+        \end{subfigure}
+    \end{figure}
+\end{example}
+
+Another concept introduced by this algorithm is that of alignments \textit{containing} each other. \smallskip
+
+\begin{definition}
+    An alignment $A = \langle e_1,...,e_n \rangle$ contains an alignment $B = \langle f_1,...,f_n \rangle$ if, for each of $B$'s members, $f_i$ is a subtree of $e_i$. 
+\end{definition}\smallskip
+
+Thus, the algorithm is safe - in the sense that it does not get rid of any potentially meaningful alignment - in that it gets rid of superficially perfect alignments whose subtrees are also members of smaller alignments. This means that when sentences vary widely syntax-wise, as it happens in cases where translation is not literal or in the presence of parse errors, the resulting extracted concepts can still contain a large number of nodes.
+
+\section{Evaluation} \label{eval5}
+To evaluate the effectiveness of the translation method described in the previous section, a first, small-scale experiment was designed. The main idea is to automatically translate a set of English sentences to Italian and Swedish, make native speakers of the TLs correct the output sentences, so to obtain a set of reference, both grammatically and semantically correct translations, and compare them to the original machine-generated ones. \smallskip
+
+The remaining part of this chapter describes the experiment in detail. Section \ref{gr} deals with the automatically generated GF lexica in play, while Sections \ref{eng} and \ref{ref} describe the way the corpus of English sentences and their reference translations were obtained. After that, Section \ref{bleu} introduces the evaluation metrics used in the experiments. Finally, the results of such experiments are presented in Section \ref{res5}.
+
+\subsection{Lexica} \label{gr}
+For this first experiment, two distinct GF lexica, built starting from the alignments extracted from the DMI and CSE course plans corpora respectively, were generated as described in Section \ref{grgn}. Both were then enriched with the syntactic constructs listed in Section \ref{extend}. \smallskip
+
+While building a trilingual grammar would have been optimal, the idea was abandoned because of the scarce amount of domain-specific terminology obtained by CE + CP, even making use of the adjustments described in Section \ref{tuning}, for all three languages, as we commented on in Section \ref{eval4r}. \smallskip
+
+This means that only alignments obtained via CE are put to the text in this first experiment, while CP was not made use of at all. 
+Using PUD treebanks instead of the two course plans corpora could have been a partial solution to the problem, but it would have resulted in a lexicon of terms and expressions belonging to the most disparate contexts.
+Most importantly, using manually annotated data would also have meant not testing all the key stages of the pipeline described in Section \ref{ourapproach}, where CP, unlike UD parsing, is seen as something optional.
+\smallskip
+
+\subsection{The English corpus} \label{eng}
+Even avoiding CP, the small size of these corpora, the limitations of the language models used for parsing and the issues encountered in the UD-to-GF conversion make both the lexica resulting from this process relatively small.
+This, together with the issues GF parsing suffers from, discussed in Chapter \ref{ch2}, makes working on arbitrary sentences taken from documents similar to those the course plans corpora are composed of extremely hard. \smallskip
+
+As a consequence, our choice for this first MT experiment was to generate the sentences to translate directly in the GF shell, making use of its random AST generation functionality. As discussed in Section \ref{extend}, in fact, the (extended) CSE and DMI grammars allow for arbitrary variations - both grammatical and in terms of content words - over a small set of basic sentences. \smallskip
+
+Grammatical variation (e.g. turning indefinite forms of nouns into definite forms, altering the tense of verbs etc.) is meant to highlight how the output of GF translation typically consists of well-formed sentences. Changes of content words, on the other hand, allow to test a larger variety of extracted concepts. \smallskip
+
+While it is indeed possible to generate both an initial subset of sentences and the corresponding variations entirely randomly, care has been put in selecting only sentences that are semantically plausible. This is meant to facilitate the task of the human translators and to avoid having them insisting in trying to find some meaning in the sentences and correcting them using excessively rare word senses. \smallskip
+
+The results of this process are two small testing corpora, each consisting of 50 sentences in English, generated using the abstract syntax and the English concrete syntax of the DMI and the CSE grammar respectively. 
+The TL concrete syntaxes of the two grammars (Italian in the former case and Swedish in the latter) were only used at a later stage, to make sure that all sentences did have a linearization in both the source and the target language. 
+A linearization can in fact be missing, even though rarely, because the grammar generation stage omits linearization rules derived from pairs of trees that cannot share the same root category.
+
+\subsection{Reference translations} \label{ref}
+Reference translations were obtained by asking two native speakers of Italian and Swedish also proficient in English to compare the original English sentences to their automatically translated counterparts and to correct the latter.
+The two participants were instructed to only make the minimal changes necessary to obtain, starting from the output of the translation module described in \ref{mt} a set of grammatically and semantically correct translations. \smallskip
+
+This makes the reference sentences as similar to the automatically obtained ones to evaluate as possible, allowing a more meaningful automatic evaluation, as we will discuss in the following Section.
+
+\subsection{Evaluation metrics} \label{bleu}
+The evaluation metric used for this experiment is the BLEU score \cite{bleu}, a widely adopted, simple, language-independent and inexpensive measure that claims good correlation with human judgments, as implemented in \cite{thesisbleu}. \smallskip
+
+Following conventions, we report the cumulative $n$-gram scores for values of $n$ from 1 to 4 (BLEU-1 to BLEU-4). However, being a significant portion of the sentences of length 4 or less, we also report BLEU-1 to BLEU-3 scores, BLEU-1 to BLEU-2 scores and scores obtained considering unigrams only. \smallskip
+
+The way in which the reference translations were obtained is strongly connected to the choice of this specific evaluation metric.
+Without going into all the details, it is in fact important to know that the BLEU score is computed by counting matching $n$-grams in the candidate translation to $n$-grams in the reference text. 
+This means that, if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading. \smallskip
+
+In a preliminary experiment conducted in this way, for instance, the Italian translation ``\textit{il docente discute la Didattica}'' of the English sentence ``\textit{the teacher discusses the didactics}'', was given the minimum score despite being completely correct and even idiomatic\footnote{typically, the adjective ``didattica'' is not use in its plural form ``didattiche'' when nominalized. The capital D is often used, for this particular term, in official university documents.}. 
+Looking at the two reference translations used at the time, it appears clear that such a low score is due to the capitalization of the word ``Didattica'' and the arbitrary (but equally correct) lexical choices made by the human translators, who rendered the sentence as ``il professore discute i metodi didattici'' and ``l' insegnante discute la didattica''\footnote{The terms ``docente'', ``professore'' and ``insegnante'' are almost perfect synonyms, even though ``docente'' is mostly used in formal documents to refer to university lecturers, ``professore'' is more common in secondary school and colloquial speech, and ``insegnante'' is the most generic. As such, it can also refer to elementary school teachers and in some cases even sport coaches. The expression ``metodi didattici'' is a perfectly sensible replacement for ``didattica''.}. 
+Coincidentally (but not unlikely for a language like Italian), this is a case in which these lexical differences affect the choice of the determiners used in the various translations (cf. ``\underline{l'}insegnante'' vs. ``\underline{il} professore'' and ``\underline{la} didattica'' vs. ``\underline{i} metodi didattici''), producing a BLEU-1 to 4 score of 0. \smallskip
+
+\subsection{Experimental results} \label{res5}
+Corpus-level BLEU scores for the automatic translations of the 50+50 sentences of the testing corpora generated as described in Section \ref{eng} are summarized in Table \ref{tbleu}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{}            & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
+    \textbf{BLEU-1 to 4} & 55.4          & 61.27         \\ \hline
+    \textbf{BLEU-1 to 3} & 62.75         & 67.77         \\ \hline
+    \textbf{BLEU-1 to 2} & 70.6          & 74.3          \\ \hline
+    \textbf{BLEU-1}      & 79.33         & 80.99         \\ \hline
+    \end{tabular}
+    \caption[BLEU scores for automatic translations based on the course plans grammars]{BLEU scores obtained by comparing one candidate automatic translation per sentence to a reference translation obtained by making the necessary corrections to the automatically generated ones. Both the initial English sentences and their automatic translations were generated using the two course plans grammars.}
+    \label{tbleu}
+    \end{table}
+
+These synthetic figures are useful to give an idea of the general quality of the translations: overall, although with relatively low scores, English-to-Swedish translation works significantly better than English-to-Italian. 
+Looking back at the results obtained for CE (cf. Section \ref{eval2}), this is not excessively surprising, since both precision and recall for English-Swedish are consistently higher than they are for English-Italian. 
+When it comes to the results obtained for CE on the course plans corpora in particular (cf. Table \ref{tcereal}), however, the difference in precision between the two language pairs is negligible.
+This makes the reason for the substantial difference observed in the BLEU scores obtained for the two different corpora unclear, at least at a first glance.\smallskip
+
+Looking at sentence-level scores is, however, sometimes more interesting. 
+Regardless the corpus, scores assigned to individual segments range from the minimum possible value of 0 to the perfect score of 100, which indicates a perfect correspondence between the automatic and the reference translation. \smallskip
+
+Examples of sentences that were assigned a perfect BLEU-1 to 4 score are ``\textit{the library provides useful textbooks}'' (translated to Italian as ``\textit{la biblioteca fornisce libri utili}'') in the DMI corpus and ``\textit{this lab is more difficult than the exam}'' (whose Swedish translation is ``\textit{den här laborationen är svårare än tentamen}'') in the CSE corpus. \smallskip
+
+On the other hand, it is easy for shorter sentences to be assigned the minimum BLEU-1 to 4 score even when they only contain a single grammatical or semantic error. 
+This is the case, for instance, of the sentence ``\textit{the test is oral}'', whose last word, ``\textit{oral}'' is translated as ``\textit{dura}'' (``\textit{hard}'') instead of ``\textit{orale}'' due to an alignment error. 
+Nonetheless, it is worth noticing that this is one of the many cases in which, even though the fact that only the first translation candidate is taken into account hides it, the correct alignment $\langle$``\textit{oral}'',``\textit{orale}''$\rangle$ is also found by the CE module. 
+Moreover, the such valid correspondence has a higher number of occurrences and matches stronger alignment criteria than the wrong one $\langle$``\textit{oral}'',``\textit{duro}''$\rangle$. 
+This suggest that, in contexts where higher precision is necessary, there are obvious improvements that can be done either in the choice of the alignment criteria or at a later stage, when relevant alignments are selected. \smallskip
+
+\subsubsection{Error analysis}
+A problem with using the BLEU score as the only evaluation metric is the fact that it makes no distinction between content and function words, thus not allowing an evaluation focused specifically on the extracted concepts. 
+The small size of the corpus, however, allows for some error analysis. 
+While postprocessing the automatic translations, the participants were asked to indicate what kind of errors they encountered in each sentence (grammatical, semantical or both). Their observations are summarized in Table \ref{thuman}. \smallskip
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{}                                                                   \textbf{type of errors}                 & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
+    \begin{tabular}[c]{@{}l@{}}semantical\end{tabular}               & 23 (46\%)    & 23 (46\%)    \\ \hline
+    \begin{tabular}[c]{@{}l@{}}grammatical\end{tabular}             & 10 (20\%)      & 3 (6\%)      \\ \hline
+    \begin{tabular}[c]{@{}l@{}}semantical and \\ grammatical\end{tabular} & 3 (6\%)      & 4 (8\%)      \\ \hline
+    \end{tabular}
+    \caption[Types of errors encountered in the automatically translated sentences]{Number of automatically translated sentences containing only semantical, only grammatical and both semantical and grammatical errors in the two synthetic course plans corpora.}
+    \label{thuman}
+\end{table}
+
+Interestingly, while most errors are due to wrong alignments, the main difference between two corpora lies in the number of translations that only contain grammatical errors. 
+This explains the significant difference observed in the BLEU scores.
+
+In Italian, grammar errors often involve contractions such as ``\textit{del}'' (``\textit{di}'' + ``\textit{il}'', in English ``\textit{of the}''), some of which are systematically rendered as two separate words.
+Another common case is that of wrong (or at least very confusing) adjective collocation, such as in the translation ``\textit{il libro presenta una tecnica con miglioramenti vari utile}'' (``\textit{the textbook presents a useful technique with various improvements}''), where the adjective ``\textit{utile}'' (``\textit{useful}''), referred to ``\textit{technique}'' (``\textit{tecnica}'') is placed far from such noun, making the sentence hard to interpret\footnote{the manually postprocessed translation is ``\textit{il libro presenta una utile tecnica con miglioramenti vari}''.}.
+Grammatical errors in Swedish are less common and, apart from long adjectives never being turned to the comparative degree periphrastically (e.g. ``\textit{relevant\underline{are}}'' instead of ``\textit{mer relevant}''), less systematic. 
+Only in one case, for instance, (``\textit{programbibliotek\underline{en}}''), gender is incorrect. \smallskip
+
+Some alignment errors are also interesting to analyze.
+In English-Swedish, while several compounds, such as $\langle$\textit{computer science, datavetenskap}$\rangle$, are aligned correctly, there are cases in which a single-root noun is translated as a compound (e.g. $\langle$ \textit{theory, automatateori} $\rangle$). This is not necessarily an actual alignment error, as it might rather be that the English version of the text was being less specific than its Swedish counterpart, thus producing an alignment that, during evaluation, would have been marked as correct but not generally reusable (\texttt{=}). \smallskip
+
+``Reasonable'' alignment errors appear in the DMI corpus sentences too. 
+The English for ``\textit{attendance of lessons}'', for instance, becomes simply ``\textit{frequenza}'' in the Italian translation. 
+Such word is in fact often used alone to replace longer expressions such as ``\textit{frequenza delle lezioni}'', just like in English `\textit{of lessons}'' can be omitted when what must be attended is evident from the context.
+Another interesting example is the alignment $\langle$ \textit{class, classe} $\rangle$, which causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.

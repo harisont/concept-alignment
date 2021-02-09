@@ -1,0 +1,10 @@
+# newdoc
+# newpar
+# sent_id = 1
+# text = parse this sentence with care
+1	parse	parse	VERB	V	Mood=Imp|Person=3|Tense=Pres|VerbForm=Fin	0	root	_	_
+2	this	this	DET	DD	Number=Sing|PronType=Dem	3	det	_	_
+3	sentence	sentence	NOUN	S	Number=Sing	1	obj	_	_
+4	with	with	ADP	E	_	5	case	_	_
+5	care	care	NOUN	S	Number=Sing	1	obl	_	SpacesAfter=\n
+

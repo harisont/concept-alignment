@@ -1,0 +1,539 @@
+Kursspecifika förkunskaper
+Datorsystemteknik som introducerar de fundamentala begreppen inom datorarkitektur såsom pipelining och cacheminne motsvarande Chalmerskursen EDA332/EDA331.
+
+Syfte
+Datorer utgör en viktig komponent i nästan alla tekniska system idag på grund av deras funktionella flexibilitet och förmåga att utföra beräkningar snabbt och energieffektivt. 
+I själva verket har beräkningshastigheten för datorer fördubblats ca var 18 månad under de senaste decennierna. 
+Ett viktigt skäl är framsteg inom datorarkitektur - ingenjörsvetenskapen kring datorkonstruktion.Inom datorarkitektur studerar vi principer för uppbyggnad av beräkningsstrukturer som idag typiskt använder en miljard ultrasnabba datorer för att snabbt utföra de beräkningar som uttrycks i programmeringsspråk genom att utnyttja den inneboende parallellismen. 
+Kursen täcker fundamentala principer för hur man konstruerar datorer som erbjuder hög beräkningshastighet för programvaran.
+
+Lärandemål 
+(efter fullgjord kurs ska studenten kunna)
+redogöra för begrepp och strukturer i moderna datorarkitekturer för att kunna följa forskningsframsteg inom detta område,
+redogöra för principerna bakom en modern mikroprocessor; speciellt avancerade tekniker baserade på pipelining som typiskt utför flera instruktioner samtidigt
+redogöra för principerna bakom moderna minneshierarkier
+redogöra för och kunna tillämpa kvantitativ analys av hur konstruktionsbeslut påverkar beräkningshastighet genom utnyttjande av moderna verktyg som används i datorindustrin.
+
+Innehåll
+Kursen omfattar arkitekturella tekniker nödvändiga för att uppnå hög prestanda för exekverande program. 
+Detta omfattar även simuleringsbaserade analysmetoder för kvantitativ analys av konsekvenserna av ett konstruktionsbeslut på prestanda och strömförbrukning.
+Kursinnehållet är indelat i följande delar:
+Den första delen omfattar trender som påverkar utvecklingen av datorteknik inklusive Moores lag, mått på beräkningshastighet (responstid och kapacitet), strömförbrukning, benchmarking, Amdahls lag samt referenslokalitet. 
+Den täcker också hur simuleringsbaserade tekniker kan användas för att kvantitativt utvärdera effekten av konstruktionsbeslut på beräkningshastigheten. 
+Den andra delen omfattar olika tekniker för utnyttjande av parallellism på instruktionsnivå (ILP) genom att definiera nyckelbegrepp ILP och vad som begränsar det. 
+De tekniker som omfattas delas in i två huvudkategorier: dynamiska och statiska tekniker. 
+De viktigaste dynamiska tekniker som omfattas är Tomasulos algoritm, branch prediction och spekulation. 
+De viktigaste statiska tekniker är loop unrolling, software pipelining, trace scheduling samt predicated execution.
+Den tredje delen handlar om minneshierarkier. 
+Denna del omfattar tekniker för att angripa olika prestandaflaskhalsar i minneshierarkin såsom tekniker för att minska antalet cache missar, samt minska tiden att hantera en cache träff/miss. 
+Exempel på tekniker som behandlas är inklusiva/exkusiva hierarkier, lockup-free cachar och prefetching. 
+Virtuellt minne behandlas också.
+Den fjärde delen behandlar flerkärniga/flertrådade processorarkitekturer (multicores). 
+På systemnivå behandlas programmeringsmodeller och hur processorkärnor på ett chip kan kommunicera med varandra via ett gemensamt adressrum. 
+På mikroarkitekturnivå behandlas olika metoder för hur flera trådar kan dela arkitekturella resurser: fine-grain/coarse-grain och simultaneous multithreading.
+
+Organisation
+Kursen är organiserad i föreläsningar, övningar, fallstudier, laborationer och ett miniprojekt. 
+Föreläsningarna behandlar grundläggande begrepp och strukturer. 
+Övningarna ger djupgående analys av begrepp och strukturer och fokuserar på problemlösning. 
+Fallstudierna är baserade på moderna kommersiella datorer som är dokumenterade i den vetenskapliga litteraturen. 
+Studenter genomför fallstudier och presenterar dem i plenum för kurskamrater och instruktörer. 
+Slutligen får studenterna bekanta sig med och använda simuleringsmetoder och verktyg som används inom industrin för att analysera effekterna av konstruktionsbeslut på beräkningshastigheten. 
+Detta moment understöds av en sekvens av laborationer och i en projektuppgift. 
+
+Kursspecifika förkunskaper
+Datorarkitektur (DAT105) eller motsvarande rekommenderas starkt. Studenterna måste förstå funktionen hos en processors pipeline och cachar och måste kunna läsa assemblerkod.
+ 
+Syfte
+Syftet med kursen är att göra eleverna medvetna om vikten av hållbarhet inom databehandling och att visa tekniker för att uppnå det på de olika nivåerna i ett datorsystem.
+    
+Lärandemål 
+(efter fullgjord kurs ska studenten kunna)
+Kunskap och förståelse:
+beskriva varför hållbar databehandling är ett viktigt aktuellt ämne
+beskriva de elektriska mekanismerna som orsakar strömavbrott
+beskriva kretstekniker för att minska strömförlust och påverkan på prestanda
+beskriva datorarkitektur, minne och sekundära lagringstekniker för att minska energiförbrukningenbeskriva tekniker för operativsystem, runtime-system och applikationer för att minska energiförbrukningen
+redogöra för vad som påverkar energiförbrukning i datorsystem vad beträffar datorns arkitektur
+Färdighet och förmåga:
+använda specifika enheter för att direkt mäta energiförbrukningen i hela systemet
+använda inbyggt stöd för monitorering av prestanda för att mäta energiförbrukningen för vissa komponenter i systemet
+använda simuleringsverktyg för att uppskatta energiförbrukningen för olika systemkonfigurationer
+Värderingsförmåga och förhållningssätt
+identifiera styrkor och svagheter hos olika klasser av datorsystemkomponenter (t ex processor, minne) med avseende på energieffektivitet
+utvärdera och jämföra olika arkitektur- och systemtekniker med avseende på energieffektivitet
+redogöra för metoder för utvärdering och rapportering av energiförbrukning i datorsystem och hur dessa kan användas för att finna optimeringar
+värdera energiförbrukning utifrån samhälleliga och etiska aspekter
+tolka omvärldens krav på datorarkitekturers utformning, för att möta samhälleliga behov av hållbarhet
+ 
+Innehåll
+Kursen syftar till att ge en överblick över energieffektivitetsaspekterna i datorsystem och databehandling, allt från elektroniska kretsar till applikationer för system som sträcker sig från små IoT-enheter till stora datacenter. 
+Exempelvis kommer eleverna att lära sig metoder för att mäta och uppskatta energiförbrukningen för olika arkitekturella komponenter, samt arkitektur- och mjukvarutekniker för att spara energi i systemet.
+           
+Organisation
+Kursen består av en föreläsningsserie, hemuppgifter, muntliga och laborationer inklusive ett projekt utfört i grupp. 
+Studenterna kommer att bli ombedda att presentera resultaten av sina hemuppgifter genom korta muntliga presentationer för att demonstrera sin förståelse och underlätta diskussionen. 
+Diskussionerna kommer inte bara att fokusera på teknik, men också på hur tekniken dels påverkar världens koldioxidutsläpp just nu och dels på hur den sannolikt kommer att inverka på samhället i kommande generationer.
+ 
+Litteratur
+Stefanos Kaxiras and Margaret Martonosi. 
+2008. 
+Computer Architecture Techniques for Power-Efficiency (1st ed.). 
+Morgan and Claypool Publishers.Magnus Själander, Margaret Martonosi, Stefanos Kaxiras. 
+2014. 
+Power-efficient Computer Architectures: Recent Advances. 
+Morgan and Claypool Publishers.
+Artiklar från forskningslitteratur och facktidskrifter.
+  
+Examination inklusive obligatoriska moment
+Kursen examineras genom en individuell skriftlig salstentamen samt godkända laborationer. 
+Laborationerna utförs i grupper om normalt 2-3 studenter.
+
+Betyg
+Den slutliga betyget baseras på resultatet av den skriftliga tentamen.
+
+Kursspecifika förkunskaper
+Kursen DAT017 - Machine oriented programming eller liknande kurs är ett krav
+Kursen TDA384 - Principer för parallell programmering är rekommenderad
+
+
+Syfte
+Kursen behandlar parallella programmeringsmodeller, effektiva programmeringsmetoder och verktyg för prestandaoptimering med målet att utveckla högeffektiva parallella program
+
+
+Lärandemål 
+(efter fullgjord kurs ska studenten kunna)
+Lista de olika typerna av parallella datorarkitekturer, programmeringsmodeller och paradigm, samt olika system för synkronisering och kommunikation
+Lista de typiska stegen för att parallellisera en sekventiell algoritm
+Ange olika metoder för analysmetoder av parallella programsystem
+Använda metoder för prestandaanalys för att bestämma flaskhalsarna vid exekverandet av ett parallellt program
+Bestämma den övre gränsen för prestanda för ett parallellt program
+För en specifik programvara, specificera de resultat flaskhalsar som begränsar effektiviteten hos parallellkoden och välj lämpliga strategier för att övervinna dessa 
+Utforma energibesparande parallelliseringsstrategier baserade på en specifik algoritm struktur och datorsystemsorganisation
+Argumentera för vilka metoder för prestandaanalys som är viktiga, givet en specifik kontext
+
+Innehåll
+Kursen består av ett antal föreläsningar och laborationer
+Föreläsningarna börjar med en översikt över parallella datorarkitekturer och parallella programmeringsmodeller och paradigmer
+En viktig del av diskussionen är mekanismer för synkronisering och datautbyte
+Därefter behandlas prestandaanalys av parallella program
+Kursen fortsätter med en diskussion om verktyg och tekniker för att utveckla parallella program enligt modellen för ett delat adressutrymme
+Detta avsnitt behandlar populära programmeringsmiljöer som pthreads och OpenMP
+Därefter diskuterar kursen parallella program för distribuerat adressutrymme
+Fokus i denna del ligger på Message Passing Interface (MPI)
+Slutligen diskuterar vi programmeringsmetoder för att exekvera applikationer på acceleratorer såsom GPUer
+Den här delen introducerar programmeringsmiljön CUDA (Compute Unified Device Architecture)
+
+Föreläsningarna kompletteras med en uppsättning laborationer där deltagarna fördjupar sig i ämnesområden som har tagits upp under föreläsningar
+Under laborationerna parallelliserar deltagarna exempelprogram över en rad parallella arkitekturer, och använder verktyg för prestandaanalys för att upptäcka och ta bort flaskhalsar i parallella implementeringar av programmen
+
+Organisation
+Undervisningen består av teoriinriktade föreläsningar och laborationer där deltagarna utvecklar kod för olika typer av parallella datorsystem
+
+Litteratur
+Parallel Programming for Multicore and Cluster Systems, Thomas Rauber, Gudula Rünger (2nd edition, 2013)
+
+Examination inklusive obligatoriska moment
+Kursen examineras genom individuell skriftligt tentamen som kommer att hållas i en tentamen sal samt ett skriftlig laboration rapport som skall lämnas in i grupper av två
+
+Kursspecifika förkunskaper
+Studenten skall ha god förståelse av en dators konstruktion och grundläggande kunskaper i maskinnära programmering samt ha kännedom om begrepp som assembler och avbrott etc, dvs innehållet i någon kurs i maskinorienterad programmering
+Studenten behöver också ha kunskaper om datastrukturer t ex träd, länkade listor, hashtabeller, dvs innehållet i en kurs i datastrukturer samt programmeringskunskaper (minst 7,5 kurspoäng i dataprogrammering)
+Kunskap om grundläggande sannolikhetslära kan vara en fördel, men kan också inhämtas parallellt med denna kurs
+
+Syfte
+Operativsystem finns överallt där datorsystem finns; inte bara i stationära datorer och servrar utan också i fordon, telefoner och inbyggda industriella system
+Kursen ger en introduktion till design och implementering av operativsystem
+I synnerhet är syftet: att förklara strukturen och funktionen i ett operativsystem och dess samarbete med datorsystem det stöder; att belysa viktiga operativsystemaspekter och algoritmer i operativsystemets implementationer; att åtfölja med konkreta exempel och att förbereda studenterna för kommande kurser
+
+Lärandemål 
+(efter fullgjord kurs ska studenten kunna)
+Efter kursen skall studenterna kunna visa att de har kunskaper om och förståelse för:
+Grundläggande funktioner i moderna operativsystem
+Grundläggande begrepp och algoritmer rörande operativsystems implementering
+Implementeringen av enklare delar av ett operativsystem 
+Studenterna skall också kunna: 
+uppskatta design utrymme och kompromisser involverade i genomförandet av ett operativsystem
+Skriva C-program som anropar operativsystemet på systemanropsnivå
+Implementera någon enklare rutin i ett operativsystem i programspråket C
+en del programmering med konstruktioner multitrådsprogrammering synkronisering
+
+Innehåll
+Kursen ger en introduktion till design och implementering av operativsystem
+Exempel på avsnitt som behandlas är: Processbegreppet, Parallella processer, resurshantering, hantering av låsningssituationer (deadlock), hantering av primärminne, virtuellt minne, CPU schemaläggning, skivminnen, filsystem, distribuerade filsystem och mikrokärnor, virtual machines, säkerhet- och skyddsmekanismer
+Kursen presenterar viktiga komponenter i operativsystem, och kompletterar denna diskussion med hur deras slutliga utformning och implementering utvecklades från historiska till moderna mobila OS
+De olika begreppen illustreras med exempel från Unix, Linux, Windows och operativsystem for mobila apparater
+
+Organisation
+Undervisningen bedrivs i from av föreläsningar, lektionsövningar och laborationer
+I labmomentet kommer systemet Pintos att användas. Detta är ett pedagogiskt operativsystem som stöder trådar, laddning och körning av användarprogram och ett filsystem
+Pintos är internationellt renommerat som en väletablerad plattform av högsta kvalité för praktiskt labbande för operativsystem
+
+Kursspecifika förkunskaper
+Förberedande kurser i parallellprogrammering och operativsystem
+Kunskaper motsvarande en kurs i maskinorienterad programmering i högnivåspråket C.
+
+Syfte
+Ett inbyggt system är ett datorsystem som är konstruerat för att utföra en eller ett fåtal specifika funktioner
+Det är inbyggt i den mening att det är en del av en komplett enhet, ofta omfattande elektrisk hårdvara och mekaniska delar
+Av säkerhets- och användbarhetsskäl har vissa inbyggda system strikta krav på icke-funktionella beteenden såsom fördröjning och periodicitet hos datorberäkningarna
+Sådana datorsystem kallas realtidssystem.
+Exempel på realtidssystem är styrsystem för bilar, flygplan och rymdfarkoster, samt datorspel och multimediatillämpningar
+Denna kurs syftar till att ge grundläggande kunskaper om metoder för konstruktion och analys av realtidssystem.
+
+Lärandemål 
+(efter fullgjord kurs ska studenten kunna)
+Efter kursen skall studenten kunna:
+Formulera krav för inbyggda datorsystem med strikta önskemål på fördröjning och periodicitet hos datorberäkningarna.
+Konstruera parallellt exekverande processer (programvarumoduler) för realtidstillämpningar med gränssnitt mot hårdvaruenheter (sensorer/ställdon).
+Beskriva de principer och mekanismer som används för att konstruera run-time system och kommunikationsnätverk för realtidstillämpningar.
+Tillämpa de grundläggande analysmetoder som används för att verifiera den tidsmässiga korrektheten hos en uppsättning processer.
+
+Innehåll
+På grund av de extremt höga kostnader som följer av en sen upptäckt av problem i inbyggda system är det viktigt att god designmetodik används under utvecklingen av mjuk- och hårdvaran
+En sådan metod är att använda en systemarkitektur som tillhandahåller bra abstraktioner av mjukvarukomponenter och som understödjer enkel sammankoppling av sådana komponenter
+Filosofin bakom systemarkitekturer dikterar att mjukvaran i ett inbyggt system organiseras i multipla parallellt exekverande processer, där varje process (eller grupp av processer) implementerar en specifik funktionalitet i systemet
+Uppdelningen i processer gör det möjligt att på ett naturligt sätt bryta ner ett komplext system i mindre delar som är enkla att förstå, implementera och underhålla
+I kursen används programspråket C, utökat med ett mjukvarubibliotek som tillhandahåller stöd för programmering av parallella processer med tidskrav
+Ett viktigt syfte med kursen är att demonstrera hur det utökade programspråket C används för att realisera kommunikation och synkronisering mellan processer, resurshantering och ömsesidig uteslutning
+Eftersom andra programspråk använder monitorer och semaforer för att realisera dessa funktioner, innehåller kursen också en genomgång av sådana tekniker
+Dessutom demonstreras det i kursen hur man använder lågnivåprogrammering i C för att realisera avbrottsstyrd interaktion med hårdvaruenheter
+För att demonstrera de generella principerna bakom programmering av realtidssystem ger kursen också exempel på hur dessa principer realiseras i andra programspråk, som Ada och Java
+För att möjliggöra exekvering av ett program som innehåller parallella processer används ett runtime-system (realtidskärna) som fördelar den totala tillgängliga beräkningskapaciteten hos systemets mikroprocessor(er) mellan processerna
+Kursen beskriver hur ett enkelt runtime-system är organiserat
+Exekveringsordningen mellan processerna bestämmer runtime-systemet med hjälp av en schemaläggningsalgoritm
+Kursen presenterar tekniker baserat på såväl cykliska tidtabeller som statiska eller dynamiska processprioriteter
+Dessutom presenteras protokoll för hantering av delade hård- och mjukvaruresurser
+Eftersom många av dagens realtidstillämpningar är distribuerade över multipla datornoder innehåller kursen också en introduktion till topologier och mediumaccesstekniker för några vanligt använda kommunikationsnätverk
+I realtidssystem, där processer har strikta tidskrav, är det nödvändigt att göra a priori analys av systemets schemaläggningsbarhet
+Kursen presenterar tre olika analysmetoder för system som schemalägger processer med statiska eller dynamiska prioriteter: utnyttjandegradsbaserad analys, svarstidsanalys och beräkningsbehovsanalys
+I samband med detta ges också en insikt i hur det maximala resursbehovet (värsta-fallets exekveringstid) för en process beräknas.
+
+Organisation
+Kursen utgörs av en föreläsningsserie samt ett antal salsövningar där programmeringmetoder och teorier från föreläsningarna praktiseras
+Kursen examineras medelst en skriftlig tentamen
+Dessutom ingår en obligatorisk laborationsuppgift som syftar till att eleverna skall ta fram programvara för en inbyggd realtidstillämpning som exekveras på ett hårdvarusystem bestående av multipla datornoder som kommunicerar via ett bussnätverk
+Uppgiften omfattar, förutom programmering av samverkande parallella processer, även maskinnära programmering av hårdvaruenheter som realtidsklockor och nätverkskontrollers.
+
+Kursspecifika förkunskaper
+
+Syfte
+Kursen behandlar optimeringsproblem i diskreta strukturer såväl i teori som praktik. Det finns starka kopplingar till optimeringsteori (linjär optimering), datavetenskap (algoritmer och komplexitet), och operationsanalys
+Optimeringsproblem uppstår i många olika sammanhang, exempelvis transportlogistik, telekommunikation, industriell planering, ekonomi, bioinformatik, hårdvarudesign och kryptologi
+En karaktäristisk egenskap hos sådana problem är att de är svåra att lösa
+Kursen syftar till att utveckla förmågan att modellera verkliga problem och att använda matematiska och algoritmiska verktyg för att lösa dem, optimalt eller heuristiskt.
+
+Lärandemål
+(efter fullgjord kurs ska studenten kunna)
+Identifiera optimeringsproblem inom olika tillämpningsområden
+Formulera dem i exakta matematiska modeller som representerar det väsentliga av de verkliga problemen, men fortfarande hanterbarbara genom beräkningsmetoder,
+Bedöma vilka problemklass ett givet problem tillhör,
+Tillämpa linjär optimering, relaterade generiska metoder, och ytterligare heuristik, till beräkningsproblem,
+Förklara geometriska egenskaper av linjär optimering,
+Duala optimeringsproblem och användning av duala former för att bestämma gränser,
+Arbeta med den vetenskapliga litteraturen inom området.
+
+Innehåll
+Modellering, (heltal) linjär optimering och deras geometriska egenskaper, dualitet i optimering, branch-and-bound och annan heuristik, några speciella grafalgoritmer
+
+Organisation
+Föreläsningar och inlämningsuppgifter.
+
+Litteratur
+Se separat litteraturlista.
+
+Behörighet
+Grundläggande behörighet för grundnivå
+Särskild behörighet
+Samma behörighet som det kursägande programmet.
+
+Syfte
+#Dataprogrammering är en grundläggande färdighet som är av nytta i såväl framtida studier som arbetsliv.
+Kursen ger de grundläggande färdigheterna så att deltagarna både kan utföra programmeringsuppgifter som är typiska för vetenskapliga och tekniska uppgifter och förstå de grundläggande principerna för datorer och programmering.
+Lärandemål
+efter fullgjord kurs ska studenten kunna
+Kunskap och förståelse
+Uttrycka matematiska formler som uttryck och algoritmer
+Strukturera stora program i hanterbara och återanvändbara enheter med hjälp av begrepp som moduler, klasser och funktioner
+Söka och hitta relevanta programbibliotek och använda dem på lämpligt sätt
+Förklara förhållandet mellan hårdvara, operativsystem och användarprogram
+Använda programmering för grundläggande dataanalys av stora filer
+
+Kompetens och färdigheter
+Skriva program som manipulerar numerisk och textuell data för att utföra vanliga programmeringsuppgifter
+Bygga interaktiva program med både textbaserade och grafiska användargränssnitt
+Skriva program som läser, ändrar och skapar filer i filsystemet
+Använda standardbibliotek och följa god praxis i programmering
+Testa program med metoder såsom enhets-, regressions- och egenskapsbaserad testning
+Använda programmeringsverktyg såsom textredigerare och versionshanteringssystem
+
+Bedömning och tillvägagångssätt
+Utvärdera svårigheter och resurser som krävs för typiska programmeringsuppgifter
+Analysera kod skriven av andra och hitta fel och möjligheter till förbättring
+
+Innehåll
+Kursen är en första introduktion till programmering med hjälp av ett allmänt programmeringsspråk
+Den ger studenten omfattande kunskaper i språket, vilket gör det möjligt för eleven att skriva kod för en mängd olika uppgifter och att läsa och återanvända kod skriven av andra programmerare.
+Parallellt med att lära sig språket kommer studenten att introduceras till grundläggande begrepp inom datorer och programmering.
+Dessa begrepp inkluderar:
+Datatyper och deras binära representationer i datorns minne
+Förhållandet mellan källkod, kompilator och maskin
+Den syntaktiska strukturen för uttryck, uttalanden, funktioner, klasser, moduler osv.
+Grunderna i algoritmdesign såsom iteration, rekursion, nedbrytning till funktioner och top-down vs. bottom-up.
+Grunderna i programvarudesign såsom funktioner, klasser och moduler.
+
+Organisation
+Kursen består av föreläsningar och övningar.
+Det finns också ett antal programmeringsuppgifter för att träna studenternas praktiska färdigheter.
+
+Litteratur
+Information om litteratur ges på kursens hemsida innan kursstart.
+
+Examination inklusive obligatoriska moment
+Båda kursmomenten innefattar obligatoriska programmeringsuppgifter.
+Helkursbetyg sätts utifrån en skriftlig tentamen, förutsatt att alla obligatoriska uppgifter är godkända.
+
+Objektorienterad programmering
+
+Om utbildningen
+Programmering (eller utveckling eller kodning) handlar om att lösa beräknings- eller andra datorproblem med hjälp av ett programmeringsspråk. 
+Det omfattar design, implementering, testning, felsökning och underhåll av programkod i ett programmeringsspråk, ovanpå någon programmeringsplattform, med hjälp av en utvecklingsmiljö.
+Kursen introducerar ett modernt objektorienterat programmeringsspråk med tillhörande plattformar och miljöer, med tonvikt på grundläggande programmeringsbegrepp, objektorienterade begrepp och elementära datastrukturer.
+Kursen introducerar också begreppet kodkvalitet, och nutida metoder för att upprätthålla hög kodkvalitet.
+Dessutom introducerar kursen mer avancerade programmeringsbegrepp som rekursion och undantagshantering.
+
+Beräkningsbarhet
+
+Om utbildningen
+
+Kursen handlar om beräkningar: hur de kan modelleras, och vad som kan beräknas. 
+För att undvika onödiga komplikationer väljer man ofta att studera beräkningar via förenklade, men kraftfulla, modeller. 
+De här modellerna kan till exempel vara enkla programmeringsspråk (som -kalkyl), eller idealiserade datorer (som Turingmaskiner). Kursen behandlar flera sådana modeller, både "imperativa" och "funktionella".
+En eller flera modeller kommer att användas för att utforska gränserna för vad som kan beräknas: problem som inte kan lösas (inom en viss modells ramar), och program som kan köra godtyckliga program (modellerade på ett visst sätt).
+Kursen innehåller också en diskussion av Church-Turings hypotes, en förmodan om att en funktion är beräkningsbar på ett visst intuitivt sätt endast om den kan definieras i en av flera beräkningsmodeller.
+
+Algoritmer
+Om utbildningen
+I den här kursen kommer studenten att lära sig att känna igen att icke-triviala beräkningsproblem som måste lösas med algoritmer och även att formalisera dem.
+Modellera problem med binära relationer som grafproblem och lösa dem, med hjälp av de grundläggande grafalgoritmerna.
+I enkla fall utföra hela utvecklingscykel för algoritmer: problemanalys, modifiera och kombinera lämpliga tekniker och datastrukturer, analys av korrekthet och komplexitet, fylla i implementeringsdetaljer, leta efter möjliga förbättringar, etc.
+
+Algoritmer, fortsättningskurs 
+
+Om utbildningen
+
+Kursen innehåller följande moment:
+
+approximativa algoritmer och scheman för NP-fullständiga problem, och deras analys
+användning av linjär programmering, i synnerhet för approximation
+nätverksflöde med vissa komplexa applikationer
+randomiserade algoritmer och deras analys med avseende på lämpliga stokastiska variabler
+användbara indatastrukturer som trädstrukturer och inparametrar.
+
+Datastrukturer och Algoritmer
+
+Om utbildningen
+Kurser introducerar studenten till rollen som datastrukturer och algoritmiska begrepp spelar i detaljerad design och implementation av program.
+Kursen har två generella teman:
+(1) rollen för algoritmer vid design och utveckling av program
+(2) rollen fördatatstrukturer vid implementation av algoritmer
+
+Maskininlärning 
+
+Kort om kursen
+
+Kursens syfte är att ge en bred introduktion till ämnet maskininlärning, framför allt med fokus på dess tillämpningar inom språkbehandling och datalingvistik.
+
+Om utbildningen
+
+Kursens syfte är att ge en bred introduktion till ämnet maskininlärning, framför allt med fokus på dess tillämpningar inom språkbehandling och datalingvistik.
+
+Kursen behandlar ett urval av ämnen, exempelvis:
+
+Övervakad inlärning
+Automatiska regelinduktionsmetoder
+Inlärning med mindre övervakning
+Inlärningsteori
+Inlärning för strukturerade problem
+Utformning av särdrag för språkteknologiska tillämpningar
+
+Tillämpad maskininlärning 
+
+Om utbildningen
+Kursen ger en inledning till tekniker och teorier inom maskininlärning, med ett fokus på dess praktiska tillämpningar.
+Under kursens gång kommer ett urval av ämnen att genomgås inom övervakad (supervised) inlärning, exempelvis linjär klassificering och regression, eller olinjära modeller som neurala nätverk, samt inom oövervakad (unsupervised) inlärning, till exempel klustringsmetoder.
+De typiska användningsfallen och begränsningarna hos dessa algoritmer kommer att diskuteras, och deras implementation kommer att undersökas med hjälp av programmeringsuppgifter.
+Metodologiska frågor som rör utvärdering av maskininlärningsbaserade system kommer också att diskuteras, samt några av de etiska frågor som kan dyka upp när man tillämpar den typen av teknologier.
+Det kommer att vara ett starkt fokus på de användningsområden i verkligheten där maskininlärning kan tillämpas. 
+Användningen av maskininlärningskomponenter i praktiska tillämpningar kommer att exemplifieras, och realistiska scenarion kommer att studeras i områden som t.ex. e-kommers, business intelligence, textanalys, bildanalys, eller bioinformatik. 
+Vikten av konstruktion och urval av särdrag, samt deras pålitlighet, kommer att diskuteras.
+
+Algoritmer för maskininlärning och slutledning
+
+Om utbildningen
+I kursen diskuteras teori och tillämpning av algoritmer för maskininlärning och slutledning, utifrån ett AI perspektiv. 
+I detta sammanhang betraktar vi "lärande" som slutledning från givna data eller erfarenheter som resulterar i en viss modell som generaliserar dessa uppgifter. 
+Slutledning är att bestämma de önskade svaren eller åtgärder baserade på modellen.
+
+Algoritmer av detta slag används vanligen i till exempel klassificeringsuppgifter (t.ex. teckenigenkänning, eller att förutsäga om en ny kund är kreditvärdig) och i expertsystem (t.ex., för medicinsk diagnostik). 
+Ett nytt och kommersiellt viktig område är data mining, där algoritmer används för att automatiskt identifiera speciellt intressant information och speciella relationer i stora kommersiella eller vetenskapliga databaser.
+
+Kursen avser att ge en god förståelse för detta tvärvetenskapliga område, med tillräckligt djup för att använda och utvärdera tillgängliga metoder, och för att kunna följa aktuell vetenskaplig litteratur inom området. 
+Under kursens gång kan vi diskutera eventuella problem med maskininlärningsmetoder, till exempel bias i träningsdata och säkerhet för autonoma agenter.
+
+Följande begrepp behandlas i kursen:
+
+Bayesiansk inlärning: likelihood, prior, posterior
+Övervakad inlärning: Bayes-klassificerare, Logisti cregression, Deep Learning, supportvektormaskiner
+Oövervakad inlärning: Algoritmer för klustring, EM-algoritmen, mixture-modeller, kernel-metoder
+Dolda Markov-modeller, MCMC
+Reinforcement learning
+
+Maskininlärning för statistisk datalingvistik: inledning
+
+Om utbildningen
+
+Syftet med denna kurs är att ge en introduktion till probabilistisk modellering och statistiska maskininlärningstekniker, med fokus på tillämpningar inom det språkteknologiska området. 
+Vi går igenom grundläggande matematiska begrepp och tillämpar dem på tekniker och tillämpningar inom statistisk NLP. 
+Vi tillägnar oss också praktiska färdigheter inom programmering, pipelines för textbehandling och analytiska verktyg.
+
+Högre differentialkalkyl 
+
+Om utbildningen
+
+I kursen går vi igenom grundläggande begrepp i differential- och integralkalkyl på differentiabla mångfalder och ger tillämpningar av teorin på topologi och geometri. 
+Ett huvudsyfte med kursen är att du ska bli förtrogen med differentialformer och deras stora användbarhet i olika delar av matematiken. 
+Kursen är en av de inledande kurserna inom forskarutbildningen i matematik.
+
+Behörigheter och urval
+Förkunskapskrav
+
+Utöver grundläggande behörighet krävs kunskaper motsvarande 90 hp i matematik, inklusive minst 7,5 hp på avancerad nivå.
+Urval
+
+Lokaler
+
+Matematiska vetenskaper är en gemensam institution Chalmers/Göteborgs universitet. 
+Din undervisning sker i Matematiska vetenskapers rymliga och ljusa lokaler på Chalmers campus Johanneberg, där det
+finns föreläsningssalar, datorsalar och grupprum. 
+Här finns också studentlunchrum och läsesal, liksom studievägledare och studieexpedition.
+
+Matematisk logik för datavetenskap
+
+Om utbildningen
+
+Kraftfulla verktyg för verifikation av programvaru- och hårdvarusystem utvecklats. 
+Dessa verktyg förlitar sig på ett avgörande sätt i logiska tekniker.
+Denna kurs ger en sund grund i logik och en kort introduktion till några logiska ramverk som används för att modellera, specificera och verifiera datorsystem. 
+Grundläggande kunskaper i logik är en god grund för kurser i programverifiering, formella metoder och artificiell intelligens.
+Kursen täcker sats- och predikatkalkyl och modellkontroll (model checking).
+Mer konkret ger kursen en grundlig introduktion till grundläggande begrep inom logik såsom naturlig deduktion, semantik för både sats- och predikatkalkyl, sundhet och fullständighet, konjunktiva normalformer, Hornklausuler, oavgörbart och uttrycksfullhet av predikatlogik, plus en introduktion till modellkontroll (modelchecking): linjär temporallogik (LTL) och branching-tid temporallogik (CTL).
+
+Behörigheter och urval
+Förkunskapskrav
+För att vara behörig till kursen ska studenten ha avklarat kurser för 105 hp inom datavetenskap eller matematik. 
+Inklusive 7,5 hp i diskret matematik (till exempel DIT980 Diskret matematik för datavetare, Inledande algrebra delen av MMG200 Matematik 1, eller motsvarande). 
+Följande kunskapsnivå i Engelska krävs; Engelska 6/Engelska B eller motsvarande från ett erkänt internationellt test, t.ex. TOELF, IELTS.
+
+Introduktion till Data science och AI
+Om utbildningen
+Under kursens gång kommer ett brett urval av metoder för Data Science och AI att presenteras.
+Kursen delas in i tre delar:
+Introduktion till data science
+
+Implementation av data science-lösningar med hjälp av Python, grundläggande data-analys och visualisering.
+Introduktion av data science-processen, och lämplig metodik.
+Exempel på kärnmetoder inom data science med fallstudier såsom inom klustring, klassificering och regression.
+Data science satt i sitt sammanhang med avseende på etik, gällande bestämmelser och begränsningar.
+
+Statistiska metoder för data science och AI
+
+Introduktion till några vanliga stokastiska modeller med exempel på tillämpningar inom data science och AI (t ex naive Bayes klassiciering, ämnesmodeller (topic models) av text, och dolda Markovmodeller för sekvensdata)
+
+Artificiell Intelligens   
+
+Introduktion till klassisk AI och maskininlärning, inklusive förhållandet till relaterade områden såsom algoritmer och optimering, och AI-filosofi.  
+Exempel på metoder och tillämpningar inom såväl klassisk AI (t ex kunskapsrepresentation och heuristisk sökning) som ML (t ex neurala nätverk,beslutsträd, reinforcement learning)   
+Diskussion kring etik och samhällspåverkan av AI.
+
+Forskningsmetoder för Data Science 
+
+Om utbildningen
+
+Kursen täcker följande ämnen:
+
+tekniskt skrivande inom området data science, vilket praktiseras på ett fritt valt ämnesområde och på ett forskningsförslag
+strukturering av en vetenskaplig text
+kommunicering av ett ämnesområde till olika målgrupper
+teorier om etik, med exempel från området data science
+identifiering och analys av etiska och samhälleliga frågeställningar inom data science
+etisk- och god praxis i forskning och publicering
+
+Datakommunikation
+
+Om utbildningen
+
+Vid studierna av protokoll, börjar vi med protokoll i applikationsnivå som gör det möjligt för studenterna att börja med mer välbekanta paradigm i de applikationerna som vi ofta använder. 
+Att flytta till lägre lager senare under kursen, vi får möjligheten att successivt upptäcka nätverkstjänsterna, deras funktionalitet och enkelheten/svårigheten i att uppnå de.
+
+Ämnena som behandlas omfattar:
+
+Nätverksapplikationer och protokoll; HTTP, SMT och DNS.
+Transportprotokollen TCP och UDP.
+System för distriburering av innehåll.
+Prestanda och stockningskontroll.
+Internets protokoll IPv4 och adressering, Routing påInternet, mobil IPv4.
+Lokala nätverk LANs.
+Protokoll för access till mediet; MAC-protokollen (IEEE 802.X och andra).
+Ethernet, switchar och VLANs.
+Trådlöst LAN i synnerhet Wifi, accesspunkter, bryggor och fysiska media.
+Upptäckande och rättande av bitfel.
+Multimedia-applikationer och nätverkssäkerhet.
+
+Grundläggande språkteknologi 
+
+Kort om kursen
+
+Kursen ger en teoretisk bakgrund till de huvudsakliga problemen som dyker upp inom Natural Language Processing och några av deras standardlösningar.
+
+Om utbildningen
+
+Kursen är uppdelad i fyra block: ett tar upp grundläggande begrepp och de andra täcker delområden inom NLP– ord, syntax och semantik/pragmatik.
+1. Grudläggande begrepp:
+grundbegrepp inom NLP
+grundläggande automatateori och matematisk lingvistik
+grundläggande sannolikhetsteori och maskininlärning
+evalueringsmått, inkluderande korrekthet, precision och täckning
+2. Ord:
+korpora och korpusannotering
+finite-state-metoder för segmentering och morfologisk analys
+statistisk språkmodellering med n-gram markovmodeller
+3. Syntax:
+ordklasstaggning och chunkning/partiell parsning, med användande av maskininlärning och/eller finite-state-metoder
+vanliga grammatikformalismer, särskilt kontextfria, särdrags- och probabilistiska grammatiker
+syntaktiska parsningsalgoritmer
+4.Semantik och pragmatik:
+lexikal semantik, inkluderande lexika, Wordnet och FrameNet
+ordbetydelsedisambiguering med maskininlärning
+textklassificering med maskininlärning
+
+Funktionell programmering 
+
+Om utbildningen
+
+Den här kursen introducerar ett funktionellt programmeringsspråk och relaterade koncept för studenter som redan har en del kunskap inom programmering. 
+Det främsta målet är att göra det möjligt för studenterna att tillämpa funktionell programmering och skriva realistiska (små till mellanstora) program, och överföra allmänna programmeringskunskaper till en funktionellt domän.
+
+Specifika ämnen som behandlas i kursen är;
+funktioner som första klassens värden
+sammansatta datastrukturer (listor, tupler,användardefinierade typer)
+rekursion och rekursiva datatyper
+användning av abstraktionsmekanismer för att undvikarepetitiv programmering
+algebraiska datatyper
+polymorfi och typklasser
+tidskomplexitet: effektiva och ineffektiva funktionella program
+rena funktioner vs input-output
+moduler och abstrakta datatyper
+testning av funktionella program
+lat evaluering och oändliga objekt
+monader
