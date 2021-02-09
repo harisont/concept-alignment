@@ -1,0 +1,35 @@
+\chapter{Dependency configurations} \label{c}
+This appendix provides the complete list of the abstract dependency configurations used for the UD-to-GF conversion of the alignments extracted by the CA module.
+
+\section{Category annotation}
+Category annotations describe a mapping between GF categories and UD \texttt{UPOS} tags (cf. Appendix \ref{a_pos}). \smallskip
+
+\begin{verbatim}
+    #cat A        ADJ primary
+    #cat Adv      ADV primary
+    #cat Det      DET primary
+    #cat N        NOUN primary
+    #cat PN       PROPN primary
+    #cat Prep     ADP primary
+    #cat Pron     PRON primary
+    #cat V        VERB primary
+    #cat Conj     CCONJ primary
+\end{verbatim}
+
+\section{Function annotations}
+Function annotations, on the other hand, put GF functions in relation with UD \texttt{DEPREL}s (cf. Appendix \ref{a_lab}). 
+The following list also serves the purpose of enumerating the types of concepts GF lexica automatically generated as described in Chapter \ref{ch5} consist of. \smallskip
+
+\begin{verbatim}
+    #fun AdjCN       amod head
+    #fun AdvVP       head advmod
+    #fun ComplV      head obj
+    #fun DetCN       det head
+    #fun AdvCN       head advmod
+    #fun PredVP      nsubj head
+    #fun PrepNP      case head
+    #fun PrepCN      head nmod
+    #fun FlatPN      head flat -- PN -> PN -> PN
+    #fun CompoundN   compound head
+    #fun PrepPP      head obl
+\end{verbatim}

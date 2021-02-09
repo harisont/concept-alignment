@@ -18,6 +18,22 @@ Obtaining a multilingual GF grammar from a set of aligned UD trees, however, is 
 \subsection{UD-to-GF conversion}
 The output of both CE and CP is, unless when linearized for evaluation purposes, a set of aligned UD trees in CoNNL-U format. In order to be used for GF-based translation, such trees need to be first converted into GF ASTs, which are then used to generate a set of grammar rules constiuting the above mentioned multilingual GF lexicon. \smallskip
 
+Conversion is based on annotations defining the relation between UD trees and GF ASTs, which we refer to as \textit{dependency configurations}. 
+While going into all the notational details is beyond the scope of this project\footnote{a comprehensive description of \texttt{gf-ud}'s annotation scheme is available at \url{github.com/GrammaticalFramework/gf-ud/blob/master/doc/annotations.md}.}, an example of one such configuration is 
+
+\begin{verbatim}
+    #fun PredVP	nsubj head
+\end{verbatim}
+
+which specifies that a \texttt{PredVP} (predicative Verb Phrase), defined in the RGL as a function of type
+
+\begin{verbatim}
+    PredVP : NP -> VP -> Cl
+\end{verbatim}
+
+i.e. a function taking two arguments, an \texttt{NP} (Noun Phrase) and a \texttt{VP} (Verb Phrase) and returning a \texttt{Cl} (clause), corresponds to a UD tree whose head, the VP, has a \texttt{nsubj} attached to it. Appendix \ref{c} lists the dependency configurations used for UD-to-GF conversion in the context of this project.
+\smallskip
+
 As discussed in Section \ref{udrelgf}, the UD-to-GF conversion, while being more complex than its reverse, can be performed by \texttt{gf-ud}, a program offering several functionalities useful to work with GF and UD simultaneously.
 Such program, however, cannot be fed the alignments obtained via CE and CP directly. This is due to the fact that the members of most of the relevant alignments are subtrees (or heads of subtrees) and not complete UD trees. 
 While this makes no difference in terms of the Haskell data type we represent them with (cf. Figure \ref{types}), trying to print them to files in the corresponding CoNNL-U notation with no postprocessing leads to malformed UD sentences. \smallskip
@@ -57,7 +73,7 @@ This is due to the fact that conversion in this direction is a nondeterministic 
 For this reason, it can be useful to limit the size\footnote{in this context, the size of an alignment is defined as the number of nodes of its largest member.} of the alignments that are actually kept after the extraction (or propagation) procedure. Since our CA component works at all levels of abstraction, thus also aligning full clauses, this turned out to be essential and became one of the command-line parameters of the final executables, as mentioned in Appendix \ref{b}. \smallskip
 
 \subsection{Grammar generation} \label{grgn}
-The result of this UD-to-GF conversion is still a series of tree alignments, but their resulting format makes a substantial difference, since GF ASTs can be used to obtain the rules of a generative grammar. \texttt{gf-ud} also provides a way to do this, given an \textit{extraction grammar} and a \textit{morphological dictionaries} of the languages of the alignments. \smallskip
+The result of this UD-to-GF conversion is still a series of tree alignments, but their resulting format makes a substantial difference, since GF ASTs can be used to obtain the rules of a generative grammar. \texttt{gf-ud} also provides a way to do this, given an \textit{extraction grammar} and a \textit{morphological dictionary} of the languages of the alignments. \smallskip
 
 What we refer to as an \textit{extraction grammar} is of course a GF grammar, whose objective is to define the set of basic categories and syntactic rules the entries of the automatically generated GF lexicon is going to be based on. \smallskip
 
