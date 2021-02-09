@@ -8,8 +8,7 @@ data UDWord = UDWord {
   udHEAD   :: Int,
   udDEPREL :: String,
   udDEPS   :: String,
-  udMISC   :: [String]
-  } 
+  udMISC   :: [String] } 
 
 data RTree n = RTree n [RTree n] 
 

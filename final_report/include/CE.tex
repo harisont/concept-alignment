@@ -8,53 +8,61 @@ The task of dealing with UD trees is facilitated by the existence of a series of
 
 In this context, as shown in Figure \ref{types}, dependency trees are represented as rose trees, i.e. tree data structures with an unbounded, variable number of branches per node.
 
-\begin{figure}[H]
- \centering
- \scriptsize
- \begin{verbatim}
-1 another another DET _ _ 3 det _ _
-2 dependency dependency NOUN _ _ 3 compound _ _
-3 tree tree NOUN _ _ 0 root _ _
-
- \end{verbatim}
- \begin{verbatim}
-  
-RTree {
- root = UDWord {
-  udID = 3, udFORM = "tree", udLEMMA = "tree", udUPOS = "NOUN", (...), udHEAD = 0,
-  udDEPREL = "root", (...)}, 
- subtrees = [
-  RTree {
-  root = UDWord {
-   udID = 1, udFORM = "another", udLEMMA = "another", udUPOS = "DET", (...),
-   udHEAD = 3, udDEPREL = "det", (...)}, 
-  subtrees = []},
-  RTree {
-  root = UDWord {
-   udID = 2, udFORM = "dependency", udLEMMA = "dependency", udUPOS = "NOUN", (...), 
-   udHEAD = 3, udDEPREL = "compound", (...)}, 
-  subtrees = []}]}
-
- \end{verbatim}
-
- \begin{verbatim}
-  
-3 tree tree NOUN _ _ 0 root _ _
- 1 another another DET _ _ 3 det _ _
- 2 dependency dependency NOUN _ _ 3 compound _ _
- \end{verbatim}
- \caption[The CoNLL-U and rose tree representations of a dependency tree]{The CoNLL-U and rose tree representation of a dependency tree. In the rose tree in the middle, fields left black in the CoNLL-U representation are omitted for compactness. The third representation, easier to read, resembles CoNNL-U notation while graphically showing the structure of the tree. This notation will be used for the other examples of this chapter.}
- \label{deptree}
-\end{figure}
+\begin{figure}[H] 
+  \centering
+  \lstinputlisting{pseudocode/BasicTypes.hs}
+  \caption[Fundamental data typesfor dependency trees]{Fundamental data types used for representing dependency trees in the CA module.}
+  \label{types}
+ \end{figure}
 
 As shown in Figure \ref{types}, the type of the nodes of such trees, \texttt{UDWord}, is a record type whose fields mirror those of a CoNLL-U file (cf. \ref{conll}). Alignments are, as for Definition \ref{algndef}, simply pairs of UD trees.
 
-\begin{figure}[H] 
- \centering
- \lstinputlisting{pseudocode/BasicTypes.hs}
- \caption[Fundamental data typesfor dependency trees]{Fundamental data types used for representing dependency trees in the CA module.}
- \label{types}
-\end{figure}
+\begin{figure}[H]
+  \centering
+  \scriptsize
+  \begin{verbatim}
+ 1 another another DET _ _ 3 det _ _
+ 2 dependency dependency NOUN _ _ 3 compound _ _
+ 3 tree tree NOUN _ _ 0 root _ _
+ 
+  \end{verbatim}
+  \begin{verbatim}
+   
+ RTree {
+  root = UDWord {
+   udID = 3, udFORM = "tree", udLEMMA = "tree", udUPOS = "NOUN", (...), udHEAD = 0,
+   udDEPREL = "root", (...)}, 
+  udDEPREL = "root", (...)}, 
+   udDEPREL = "root", (...)}, 
+  subtrees = [
+   RTree {
+   root = UDWord {
+    udID = 1, udFORM = "another", udLEMMA = "another", udUPOS = "DET", (...),
+    udHEAD = 3, udDEPREL = "det", (...)}, 
+   udHEAD = 3, udDEPREL = "det", (...)}, 
+    udHEAD = 3, udDEPREL = "det", (...)}, 
+   subtrees = []},
+   RTree {
+   root = UDWord {
+    udID = 2, udFORM = "dependency", udLEMMA = "dependency", udUPOS = "NOUN", (...), 
+   udID = 2, udFORM = "dependency", udLEMMA = "dependency", udUPOS = "NOUN", (...), 
+    udID = 2, udFORM = "dependency", udLEMMA = "dependency", udUPOS = "NOUN", (...), 
+    udHEAD = 3, udDEPREL = "compound", (...)}, 
+   udHEAD = 3, udDEPREL = "compound", (...)}, 
+    udHEAD = 3, udDEPREL = "compound", (...)}, 
+   subtrees = []}]}
+ 
+  \end{verbatim}
+ 
+  \begin{verbatim}
+   
+ 3 tree tree NOUN _ _ 0 root _ _
+  1 another another DET _ _ 3 det _ _
+  2 dependency dependency NOUN _ _ 3 compound _ _
+  \end{verbatim}
+  \caption[The CoNLL-U and rose tree representations of a dependency tree]{The CoNLL-U and rose tree representation of a dependency tree. In the rose tree in the middle, fields left black in the CoNLL-U representation are omitted for compactness. The third representation, easier to read, resembles CoNNL-U notation while graphically showing the structure of the tree. This notation will be used for the other examples of this chapter.}
+  \label{deptree}
+ \end{figure}
 
 \subsection{Baseline} \label{baseline}
 The original CE algorithm, dating back to the above mentioned CA experiments, has two stages, sketched respectively in Figure \ref{basea} and \ref{baseb}. The first consists in, given two trees corresponding to a sentence and its translation, aligning the entire trees by recursively sorting and padding their lists of subtrees. In particular: \smallskip
@@ -83,8 +91,6 @@ Once two sentence trees are aligned, extracting pairs of aligned subtrees is jus
 \end{figure}
 
 After extracting subtree alignments, it is possible and generally useful to remove the dummy subtrees added during alignment they contain.
-
-Obviously, the ``full-sentence'' tree pair is itself an alignment, even though a trivial one, as it represents a sentence-level correspondence in a case where, due to the approach being syntactic comparison, the inputs are assumed to be sentences that correspond to each other\footnote{contrary to what it may seem, however, sentence-level alignment is in general not at a trivial task, as it is often the case, especially in certain language pairs, that one \textit{orthographic} sentence, i.e. a sentence defined based on the presence of a full stop, maps to more than one orthographic sentences in the translated text, or vice versa.}.
 
 \begin{figure}[H]
  \centering
@@ -211,16 +217,17 @@ Obviously, the ``full-sentence'' tree pair is itself an alignment, even though a
  \smallskip
  \smallskip
  \begin{itemize}
- \item $\langle$\textit{we are perfectly aligned, siamo perfettamente allineati}$\rangle$
- \item $\langle$\textit{aligned,allineati}$\rangle$ (head alignment)
- \item $\langle$\textit{are}$\rangle$
- \item $\langle$\textit{siamo}$\rangle$
- \item $\langle$\textit{perfectly,perfettamente}$\rangle$
- \item $\langle$\textit{aligned,allineati}$\rangle$
+ \item $\langle$\textit{``we are perfectly aligned'', ``siamo perfettamente allineati''}$\rangle$
+ \item $\langle$\textit{``aligned'', ``allineati''}$\rangle$ (head alignment)
+ \item $\langle$\textit{``are'', ``siamo''}$\rangle$
+ \item $\langle$\textit{``perfectly'', ``perfettamente}$\rangle$
+ \item $\langle$\textit{``aligned'', ``allineati}$\rangle$
  \end{itemize}
  \caption[Steps of the baseline CE algorithm.]{Steps of the baseline CE algorithm. First, the rose tree representations of two yet-to-align dependency trees. Just below, the two rose trees after sorting and padding. Finally, the graphical representations of the resulting perfectly aligned trees and the linearizations of the aligned subtrees extracted from them. Since, in Italian, the subject is implicit, a dummy node, marked as \textbf{D}, is added to the corresponding tree during the padding step.}
  \label{prefal}
 \end{figure}
+
+Obviously, the ``full-sentence'' tree pair is itself an alignment, even though a trivial one, as it represents a sentence-level correspondence in a case where, due to the approach being syntactic comparison, the inputs are assumed to be sentences that correspond to each other\footnote{contrary to what it may seem, however, sentence-level alignment is in general not at a trivial task, as it is often the case, especially in certain language pairs, that one \textit{orthographic} sentence, i.e. a sentence defined based on the presence of a full stop, maps to more than one orthographic sentences in the translated text, or vice versa.}.
 
 As we will see in the following sections, such algorithm is useful both as a baseline and as a source of inspiration for our improved CE program.
 
@@ -292,7 +299,7 @@ There are indeed other divergences of this kind that can occur in a parallel tex
 \begin{example}
  ``Claudio is \underline{hungry}'' VS ``Claudio ha \underline{fame}''
 \end{example}
-where, in the original sentence, the complement of the copula \textit{am}, \textit{hungry}, would be labelled as its \texttt{root} but, in Italian, the noun \textit{fame} is the object of the root verb \textit{ha}. 
+where, in the original sentence, the complement of the copula ``\textit{am}'', ``\textit{hungry}'', would be labelled as its \texttt{root} but, in Italian, the noun ``\textit{fame}'' is the object of the root verb ``\textit{ha}''. 
 It proved hard to detect cases like this via purely syntactic rules without causing the program to extract a lot of incorrect alignments as well, but if necessary it is easy to modify the program by removing or adding rules of this kind, potentially even language-specific.
 
 \subparagraph*{Conflational divergence} \label{confl}
@@ -304,7 +311,7 @@ but there are also other cases, like
 \begin{example} 
  ``I'll come and \underline{say hello} to Bruno and Andrea'' VS ``Verrò a \underline{salutare} Bruno e Andrea''
 \end{example} 
-where the single word \textit{salutare} is not a compound but expresses the same meaning as ``say'' and ``hi'' together. \smallskip
+where the single word ``\textit{salutare}'' is not a compound but expresses the same meaning as ``\textit{say}'' and ``\textit{hi}'' together. \smallskip
 Divergences like the one described in the latter example are usually captured by Criterion \ref{udmatch}, while compounds often need to be taken care of explicitly. For reasons that will become clear later, these cases are discussed in Section \ref{heads}.
 
 \subparagraph*{Structural divergence}
@@ -312,7 +319,7 @@ Structural divergences happen when the subject, object or indirect object of a s
 \begin{example}
  ``I called \underline{Francesco}'' VS ``Ho telefonato \underline{a Francesco}''
 \end{example}
-what is the direct object in English (\textit{Francesco}) becomes a prepositional phrase (\textit{a Francesco}) in Italian. 
+what is the direct object in English (``\textit{Francesco}'') becomes a prepositional phrase (``\textit{a Francesco}'') in Italian. 
 Even though in many cases these divergences can be captured by POS-equivalence, in order to ensure higher precision, the CE module handles all of them explicitly via rules that combine it with UD label checking and whose priority is higher than that of the basic Criterion \ref{poseq}.
 
 \subparagraph*{Head swapping divergences}
@@ -320,7 +327,7 @@ Head swapping divergences always involve a head verb and a logical modifier and 
 \begin{example}
  ``Anna \underline{usually} goes for walks'' VS ``Anna \underline{brukar} promenera''
 \end{example} 
-in Swedish, the logical modifier \textit{usually} is implicitly expressed by the verb \textit{brukar} itself, i.e. placed ``higher up''. \smallskip
+in Swedish, the logical modifier ``\textit{usually}'' is implicitly expressed by the verb ``\textit{brukar}'' itself, i.e. placed ``higher up''. \smallskip
 
 These divergences are, while not uncommon, hard to handle without access to a lexicon where entries for verbs are complete with a list of arguments and modifiers\footnote{on the other hand, developing the CA module further could be a way to construct such a ``rich'' lexicon, as will be discussed in Chapter \ref{ch6}.}.
 
@@ -336,7 +343,7 @@ Similar to this are the cases where a passive sentence in the source language is
  ``\underline{The game} had only been tried \underline{by Andrea}'' VS ``Solo \underline{Andrea} aveva provato \underline{il gioco}''
 \end{example} \smallskip
 
-One could object that divergences like the above (and some other) could - and maybe \textit{should} - be avoided when translating a text. We will not dwell upon this, since what matters for the purpose of CA is not what is desirable in natural language translation but rather what divergences do occur in the human-translated parallel texts available for analysis. \smallskip
+One could object that divergences like the above (and some other) could - and maybe should - be avoided when translating a text. We will not dwell upon this, since what matters for the purpose of CA is not what is desirable in natural language translation but rather what divergences do occur in the human-translated parallel texts available for analysis. \smallskip
 
 Given that UD provides a subtype \texttt{pass} for \texttt{nsubj}s and auxiliary verbs, it is easier to explicitly handle cases such that of Example \ref{pass}, while those that resemble Example \ref{them} are left, for the moment, unhandled.
 
@@ -351,13 +358,13 @@ The decision to use different alignment criteria simultaneously, together with t
 \end{figure}
 
 \paragraph{Pruning alignments} \label{pruning} 
-In its most basic version, this algorithm does nothing to avoid subtrees in the source language to be aligned with multiple subtrees in the target language and vice versa. As a consequence, it systematically \textit{overgenerates} alignments. \smallskip
+In its most basic version, this algorithm does nothing to avoid subtrees in the source language to be aligned with multiple subtrees in the target language and vice versa. As a consequence, it systematically overgenerates alignments. \smallskip
 
 To avoid overgeneration, or rather to counter it, we need a way to select, in the very common case that the algorithm detects several alignments alternative to each other within the same sentence, the one that is more likely to be correct. A way to do this is to sort such alignments based on their ``reliability'' and only keeping the first alternative. The question becomes, then, how to sort the alignments. \smallskip
 
 To answer this, it must be first of all said that the criteria described in Section \ref{criteria} are not to be considered equally reliable nor describe equally frequent situations. For this reason, a way to obtain a series of alignments that are, in part, implicitly sorted is to apply criteria (or particular combinations of criteria) in a specific order that can be determined empirically and is easily modifiable thanks to the fact that, in its current implementation, the algorithm outlined above takes a list of criteria assumed to be in order of priority as one of its parameters. \smallskip
 
-It can happen, however, that two trees match \textit{more than one} of the criteria. For instance, two trees might have their roots sharing the same UD label (cf. Criterion \ref{udmatch}) \textit{and} be POS-equivalent. In such cases, it intuitively makes sense to consider them more likely to be exact, as there are literally more reasons to align them. This makes the implicit ordering that the solution just described produces ``for free'' insufficient and leads to the necessity to keep track of the set of reasons why an alignment has been extracted and only then sort the alternative alignments. From the implementative point of view, each alignment is simply associated with a \texttt{Set} of labels, whose type is in fact named \texttt{Reason} and has an ordering defined over. The final sorting is based on:\smallskip
+It can happen, however, that two trees match more than one of the criteria. For instance, two trees might have their roots sharing the same UD label (cf. Criterion \ref{udmatch}) and be POS-equivalent. In such cases, it intuitively makes sense to consider them more likely to be exact, as there are literally more reasons to align them. This makes the implicit ordering that the solution just described produces ``for free'' insufficient and leads to the necessity to keep track of the set of reasons why an alignment has been extracted and only then sort the alternative alignments. From the implementative point of view, each alignment is simply associated with a \texttt{Set} of labels, whose type is in fact named \texttt{Reason} and has an ordering defined over. The final sorting is based on:\smallskip
 
 \begin{enumerate}
  \item the number of reasons for alignment
@@ -427,19 +434,19 @@ As mentioned in Section \ref{baseline}, the original version of the algorithm cr
  
  Without head alignments, the output of the algorithm described so far would be:
  \begin{itemize}
- \item $\langle$Enrico eats a banana, Enrico mangia una banana$\rangle$
- \item $\langle$Enrico, Enrico$\rangle$
- \item $\langle$a banana, una banana$\rangle$
- \item $\langle$a, una$\rangle$
+ \item $\langle$``Enrico eats a banana'', ``Enrico mangia una banana''$\rangle$
+ \item $\langle$``Enrico'', ``Enrico''$\rangle$
+ \item $\langle$``a banana'', ``una banana''$\rangle$
+ \item $\langle$``a'', ``una''$\rangle$
  \end{itemize} 
  while introducing head alignment leads to detecting two additional, equally relevant one-word correspondences\footnote{note how, even with head alignments, not all potentially interesting alignments are found. In this example, for instance, it could be useful to align the verb phrase ``\textit{eats a banana}'' with its Italian counterpart ``\textit{mangia una banana}'', whose members are also not, strictly speaking, subtrees of the original sentences. The approach we use for head alignment, as we will discuss in Chapter \ref{ch6}, could be generalized to cases like this.}:
  \begin{itemize}
- \item $\langle$eats, mangia$\rangle$
- \item $\langle$banana, banana$\rangle$
+ \item $\langle$``eats'', ``mangia''$\rangle$
+ \item $\langle$``banana'', ``banana''$\rangle$
  \end{itemize} 
 \end{example}
 
-While it is of extreme importance not to miss alignments like the last two in the example above, aligning heads is not always appropriate, especially when, as in the present case, common translation divergence patterns are one of the criteria. For instance, when two trees are aligned because of a categorial divergence such as that of Example \ref{herb}, where \textit{doctoral} corresponds to \textit{di dottorato}, it is at least questionable to also align \textit{doctoral} with \textit{dottorato}. Consequently, in the current implementation of the algorithm, each alignment criterion is associated with a flag telling whether heads should also be aligned whenever a new alignment is extracted because of that criterion. \smallskip
+While it is of extreme importance not to miss alignments like the last two in the example above, aligning heads is not always appropriate, especially when, as in the present case, common translation divergence patterns are one of the criteria. For instance, when two trees are aligned because of a categorial divergence such as that of Example \ref{herb}, where ``\textit{doctoral}'' corresponds to ``\textit{di dottorato}'', it is at least questionable to also align ``\textit{doctoral}'' with ``\textit{dottorato}''. Consequently, in the current implementation of the algorithm, each alignment criterion is associated with a flag telling whether heads should also be aligned whenever a new alignment is extracted because of that criterion. \smallskip
 
 In a way, even though it is handled differently from the others discussed so far, that of aligning heads could also be seen as another alignment criterion: \smallskip
 
@@ -459,7 +466,7 @@ Achieving this is relatively straightforward: before aligning a pair of head ver
 \subparagraph*{Compounds}
 We mentioned compounds as a type of conflational divergence (cf. Section \ref{confl}). Given the variety of ways in which the translation equivalent of a compound can be expressed and the subsequent variety of related UD labels (a compound can be rendered as another compound, as a \texttt{compound} (space-separated) expression, as a noun modified by an adjective and/or another noun, as a \texttt{flat} multiword expression, as a combination of these things...), compounds are slightly harder to align than main verb + auxiliaries constructions in practice, but the solution is conceptually the same: before aligning two heads, we check whether the list of their immediate dependents contains anything labelled \texttt{compound}, \texttt{flat}, \texttt{amod} or \texttt{nmod}. If that's the case in, for instance, only the sentence in the source language, then it is likely that the head of the tree in the target language is in fact a compound. If so, it is aligned not just with the head of the tree in the source language, but with the tree composed of the head and the list of subtrees labelled as \texttt{compound}, \texttt{flat}, \texttt{amod} or \texttt{nmod}. In this way, our program is generally able to find the counterparts of a compound even when they are very complex, such as in the following case:
 \begin{example} 
- ``I took a course on \underline{Machine Learning techniques}'' VS ``Jag deltog i en kurs om \underline{maskininlärningstekniker}''
+ ``Giorgio took a course on \underline{Machine Learning techniques}'' VS ``Giorgio deltog i en kurs om \underline{maskininlärningstekniker}''
 \end{example}
 
 \paragraph{Counting and reusing alignments}
@@ -505,7 +512,7 @@ Determining whether an alignment is correct is not, however, a completely trivia
  ``He missed the \underline{boat}'' VS ``Ha perso il \underline{treno}''
 \end{example} \smallskip
 
-it is hard to deny that \textit{boat} has been ``translated'' as \textit{treno}, ``train'', so our CE module would - and should - be able to detect it, but in most situations it is by no means desirable that such correspondence at the word level is made use of, for instance by storing it in an bilingual lexicon!
+it is hard to deny that ``\textit{boat}'' has been ``translated'' as ``\textit{treno}'', ``\textit{train}'', so our CE module would - and should - be able to detect it, but in most situations it is by no means desirable that such correspondence at the word level is made use of, for instance by storing it in an bilingual lexicon!
 As a consequence, each alignment can be marked as:
 \begin{itemize}
  \item correct and useful for translation (\texttt{+})\footnote{at least to some extent: we observe that perfect translation equivalents that can be replaced with each other in all contexts are extremely rare, just like perfect synonyms.}
@@ -536,10 +543,10 @@ In order to be able to perform the type of evaluation described in the above Sec
 where \texttt{[R1,R2,...,Rn]} is the list of criteria the members of the alignment match and \texttt{N} is the number of occurrences of the alignment in the corpus. \smallskip
 
 With alignments in this format available, a simple way to evaluate a specific version of the CE module is to manually assess the correctness of each of the correspondences the program identifies and compute some statistics about them. 
-A separate Haskell module, \texttt{EvAlign}, was written to parse files in the above format and compute a series of useful statistics: \smallskip
+A separate Haskell module, whose usage is described in Appendix \ref{b}, was written to parse files in the above format and compute a series of useful statistics: \smallskip
 \begin{itemize}
  \item the total number of alignments found
- \item the number of \textit{distinct} alignments, i.e. the number of alignments with distinct linearizations
+ \item the number of distinct alignments, i.e. the number of alignments with distinct linearizations
  \item the percentage of correct alignments
  \item the percentage of correct alignments that are also useful for translation
  \item the percentage of alignments found due to each combination of criteria, and how many of them are correct.
@@ -553,9 +560,9 @@ Table \ref{tbase} compares the results obtained with the baseline with those obt
 % Please add the following required packages to your document preamble:
 % \usepackage[normalem]{ulem}
 % \useunder{\uline}{\ul}{}
-\begin{table}[H]
+\begin{table}[h]
  \centering
- \small
+ \footnotesize
  \begin{tabular}{|l|l|l|l|l|}
  \hline
    & \multicolumn{2}{l|}{\textbf{baseline}} & \multicolumn{2}{l|}{\textbf{improved version}} \\ \hline
@@ -581,7 +588,7 @@ The small size of the corpus cause Criterion \ref{known} to remain extremely mar
 Cross-language pair differences are, in this case, minimal, confirming that the criteria used and their priority order are not specifically tailored for the language pair used for under-development experiments. \smallskip
 
 \begin{table}[H]
- \small
+ \footnotesize
  \centering
  \begin{tabular}{|l|l|l|l|l|}
  \hline
@@ -607,7 +614,7 @@ Of course, it is also interesting to compare the performance of the CE module on
 % \usepackage[normalem]{ulem}
 % \useunder{\uline}{\ul}{}
 \begin{table}[H]
- \small
+ \footnotesize
  \centering 
  \begin{tabular}{|l|l|l|}
  \hline
@@ -626,12 +633,13 @@ The difference between the two pairs seems instead to be in the total number of 
 \subsection{Comparison with methods from Statistical MT}
 Another kind of evaluation that can be performed before the aligned dependency subtrees are converted to GF ASTs to be fed to the last stage of the pipeline is to compare them with those obtained by means of application of existing statistical algorithms. Among the well known solutions mentioned in Section \ref{statmt}, we have chosen to focus on \texttt{fast\_align} \cite{fast} because of its ease of use and installation. \smallskip
 
-A Haskell script converts the CoNNL-U files that are fed to \texttt{AlignTrees} into the input format required by \texttt{fast\_align}, so that the exact same tokenization is used. \smallskip
+A Haskell script converts the CoNNL-U files that are fed to our CE module into the input format required by \texttt{fast\_align}, so that the exact same tokenization is used. \smallskip
 
 A second script converting its output into that used by \texttt{EvAlign} allows to reuse all of the evaluation infrastructure described in Section \ref{metrics}.
 Finally, Table \ref{tfast} summarizes the results of a comparison between the improved CE module and \texttt{fast\_align} run with 10 iterations in EM training and symmetrizing the alignments found by running the program in both directions. \smallskip 
 
-Because \texttt{fast\_align} is a purely statistical approach, we trained it not only on the same 100-sentence subset of PUD used for evaluating \texttt{AlignTrees} against the baseline, but also on the full 1000-sentences dataset. In the latter experiment, the alignments obtained for the last 900 sentences were discarded before evaluating the results.
+Because \texttt{fast\_align} is a purely statistical approach, we trained it not only on the same 100-sentence subset of PUD used for evaluating our proposed improved CA module against the baseline, but also on the full 1000-sentences dataset. 
+In the latter experiment, the alignments obtained for the last 900 sentences were discarded before evaluating the results.
 Due to the time required to manually annotate the numerous alignments extracted by \texttt{fast\_align}, this evaluation has been conducted only for the most challenging language pair, English-Italian. 
 For a fairer comparison, since \texttt{fast\_align} works at the word level, only the one-to-one, one-to-many and many-to-one word alignments produced by the CE module were kept.
 
@@ -640,7 +648,7 @@ For a fairer comparison, since \texttt{fast\_align} works at the word level, onl
  \small
  \begin{tabular}{|l|l|l|l|}
  \hline
-  & \textbf{\texttt{AlignTrees}} & \textbf{\texttt{fast\_align} 100} & \textbf{\texttt{fast\_align} 1000}\\ \hline
+  & \textbf{our system} & \textbf{\texttt{fast\_align} 100} & \textbf{\texttt{fast\_align} 1000}\\ \hline
   \textbf{distinct alignments} & 716 & 1440 & 1435 \\ \hline
   \textbf{correct} & 536 (74.86\%) & 410 (28.47\%) & 656 (45.71\%)\\ \hline
   \textbf{correct and useful} & 491 (68.57\%) & 371 (25.76\%) & 590 (41.11\%)\\ \hline
