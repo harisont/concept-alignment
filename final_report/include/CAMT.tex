@@ -11,12 +11,15 @@ As well as describing the morphological and syntactical features of the language
 Automating CA can be seen, then, as a first step for automatically generating such lexicon. 
 An important point is that our approach, as opposed to word alignment techniques, identifies concepts at different levels of abstraction.
 This allows us to construct lexical entries not only for the grammatical categories that typically correspond to single words (such as nouns, adjectives and adverbs), but also for phrases (with the term ``phrase'' now intended grammatically, as opposed to its meaning in SMT).
-Doing so enables GF translation, designed to preserve grammatically, to also render idiomatic expressions found in the data used for generating the lexicon correctly. \smallskip
+Doing so enables GF translation, designed to preserve grammaticality, to also render idiomatic expressions found in the data used for generating the lexicon correctly. \smallskip
 
-Obtaining a multilingual GF grammar from a set of aligned UD trees, however, is not immediate. In the following three sections, we illustrate the different steps of this process. We then introduce the simple GF-based MT module used for the experiments discussed in Section \ref{eval5} and describe the adjustments made to the CA component in order to optimize it for the task at hand. 
+Obtaining a multilingual GF grammar from a set of aligned UD trees, however, is not immediate. 
+In the following three sections, we illustrate the different steps of this process. 
+We then introduce the simple GF-based MT module used for the experiments discussed in Section \ref{eval5} and describe the adjustments made to the CA component in order to optimize it for the task at hand. 
 
 \subsection{UD-to-GF conversion}
-The output of both CE and CP is, unless when linearized for evaluation purposes, a set of aligned UD trees in CoNNL-U format. In order to be used for GF-based translation, such trees need to be first converted into GF ASTs, which are then used to generate a set of grammar rules constiuting the above mentioned multilingual GF lexicon. \smallskip
+The output of both CE and CP is, excepts when linearized for evaluation purposes, a set of aligned UD trees in CoNNL-U format. 
+In order to be used for GF-based translation, such trees need to be first converted into GF ASTs, which are then used to generate a set of grammar rules constiuting the above mentioned multilingual GF lexicon. \smallskip
 
 Conversion is based on annotations defining the relation between UD trees and GF ASTs, which we refer to as \textit{dependency configurations}. 
 While going into all the notational details is beyond the scope of this project\footnote{a comprehensive description of \texttt{gf-ud}'s annotation scheme is available at \url{github.com/GrammaticalFramework/gf-ud/blob/master/doc/annotations.md}.}, an example of one such configuration is 
@@ -25,7 +28,7 @@ While going into all the notational details is beyond the scope of this project\
     #fun PredVP	nsubj head
 \end{verbatim}
 
-which specifies that a \texttt{PredVP} (predicative Verb Phrase), defined in the RGL as a function of type
+which specifies that a \texttt{PredVP} (predicative Verb Phrase), defined in the RGL as of type
 
 \begin{verbatim}
     PredVP : NP -> VP -> Cl
@@ -35,11 +38,13 @@ i.e. a function taking two arguments, an \texttt{NP} (Noun Phrase) and a \texttt
 \smallskip
 
 As discussed in Section \ref{udrelgf}, the UD-to-GF conversion, while being more complex than its reverse, can be performed by \texttt{gf-ud}, a program offering several functionalities useful to work with GF and UD simultaneously.
-Such program, however, cannot be fed the alignments obtained via CE and CP directly. This is due to the fact that the members of most of the relevant alignments are subtrees (or heads of subtrees) and not complete UD trees. 
+Such program, however, cannot be fed the alignments obtained via CE and CP directly. 
+This is due to the fact that the members of most of the relevant alignments are subtrees (or heads of subtrees) and not complete UD trees. 
 While this makes no difference in terms of the Haskell data type we represent them with (cf. Figure \ref{types}), trying to print them to files in the corresponding CoNNL-U notation with no postprocessing leads to malformed UD sentences. \smallskip
 
 The problem, which is due to the lack of a root labelled as such and illegal \texttt{ID} and \texttt{HEAD} values, was solved by implementing a simple normalization procedure, now part of the CA library. 
-Called every time a UD subtree has to be converted to CoNNL-U, it first replaces the UD label (\texttt{udDEPREL}) of its root node with \texttt{root} and assigns the special value 0 to its \texttt{udHEAD} field. After that, it proceeds to ``rescale'' the \texttt{udID} and \texttt{udHEAD} fields of all other nodes so that they end up into the range $[1,n]$, where $n$ is the number of nodes of the extracted subtrees\footnote{see Section \ref{conll} and Figure \ref{types} for definitions of all the fields of UD trees and their CoNNL-U representations.}. \smallskip
+Called every time a UD subtree has to be converted to CoNNL-U, it first replaces the UD label (\texttt{udDEPREL}) of its root node with \texttt{root} and assigns the special value 0 to its \texttt{udHEAD} field. 
+After that, it proceeds to ``rescale'' the \texttt{udID} and \texttt{udHEAD} fields of all other nodes so that they end up into the range $[1,n]$, where $n$ is the number of nodes of the extracted subtrees\footnote{see Section \ref{conll} and Figure \ref{types} for definitions of all the fields of UD trees and their CoNNL-U representations.}. \smallskip
 
 \begin{figure}[H]
 \small
@@ -70,16 +75,21 @@ $\Downarrow$
 
 Another practical problem that arises when trying to transform a CoNNL-U tree into a GF AST is that \texttt{gf-ud} easily becomes remarkably resource-intensive when dealing with ambiguous, large trees. 
 This is due to the fact that conversion in this direction is a nondeterministic search problem \cite{udgf}. 
-For this reason, it can be useful to limit the size\footnote{in this context, the size of an alignment is defined as the number of nodes of its largest member.} of the alignments that are actually kept after the extraction (or propagation) procedure. Since our CA component works at all levels of abstraction, thus also aligning full clauses, this turned out to be essential and became one of the command-line parameters of the final executables, as mentioned in Appendix \ref{b}. \smallskip
+For this reason, it can be useful to limit the size\footnote{in this context, the size of an alignment is defined as the number of nodes of its largest member.} of the alignments that are actually kept after the extraction (or propagation) procedure. 
+Since our CA component works at all levels of abstraction, thus also aligning full clauses, this turned out to be essential and became one of the command-line parameters of the final executables, as mentioned in Appendix \ref{b}. \smallskip
 
 \subsection{Grammar generation} \label{grgn}
-The result of this UD-to-GF conversion is still a series of tree alignments, but their resulting format makes a substantial difference, since GF ASTs can be used to obtain the rules of a generative grammar. \texttt{gf-ud} also provides a way to do this, given an \textit{extraction grammar} and a \textit{morphological dictionary} of the languages of the alignments. \smallskip
+The result of this UD-to-GF conversion is still a series of tree alignments, but their resulting format makes a substantial difference, since GF ASTs can be used to obtain the rules of a generative grammar. 
+\texttt{gf-ud} also provides a way to do this, given an \textit{extraction grammar} and a \textit{morphological dictionary} of the languages of the alignments. \smallskip
 
 What we refer to as an \textit{extraction grammar} is of course a GF grammar, whose objective is to define the set of basic categories and syntactic rules the entries of the automatically generated GF lexicon is going to be based on. \smallskip
 
-A \textit{morphological dictionary}, on the other hand, contains correspondences between a large number of lemmas and various word forms. In this case, the morphological dictionaries themselves are implemented in GF. \smallskip
+A \textit{morphological dictionary}, on the other hand, contains correspondences between a large number of lemmas and various word forms. 
+In this case, the morphological dictionaries themselves are implemented in GF, as part of the RGL. \smallskip
 
-The program responsible for generating the GF lexicon given these components has been written in parallel with - but not as part of - this thesis project and is still under development. As a consequence, some programming work was required to automate the few parts of the process that still had to be performed manually and some (minimal) postprocessing is sometimes required before the automatically generated grammars can be compiled. This happens for instance when Italian words are incorrectly POS-tagged as verbs and, not having a word ending typical of such category, produce pattern matching errors when the corresponding strings are passed to the constructor generating all the verb forms. \smallskip
+The program responsible for generating the GF lexicon given these components has been written in parallel with - but not as part of - this thesis project and is still under development. 
+As a consequence, some programming work was required to automate the few parts of the process that still had to be performed manually and some (minimal) postprocessing is sometimes required before the automatically generated grammars can be compiled. 
+This happens for instance when Italian words are incorrectly POS-tagged as verbs and, not having a word ending typical of such category, produce pattern matching errors when the corresponding strings are passed to the constructor generating all the verb forms. \smallskip
 
 \subsubsection{Extending the extracted grammar} \label{extend}
 The extraction grammar is designed for the grammar generation module to produce grammar rules corresponding to small concepts: basic categories, noun phrases, verb phrases etc. 
@@ -89,9 +99,11 @@ As a consequence, if used directly, grammars resulting from the above described 
     ``this sentence is simple''
 \end{example}
 
-Of course, some limited variation is still possible. For instance, the determiner can change or disappear, number can vary, the complement of the copula can become a noun and an adjectival modifiers and prepositional phrases can be added to each noun phrase. For instance:
+Of course, some limited variation is still possible. 
+For instance, the determiner can change or disappear, number can vary, the complement of the copula can become a noun and an adjectival modifiers and prepositional phrases can be added to each noun phrase. 
+Here are some examples:
 
-\begin{example} \ 
+\begin{example} \ \smallskip
     \begin{itemize}
         \item ``the sentence is simple''
         \item ``a sentence is simple''
@@ -103,9 +115,11 @@ Of course, some limited variation is still possible. For instance, the determine
     \end{itemize}
 \end{example}
 
-For languages that are covered by the RGL, however, it is also extremely easy to extend such grammars with preexisting syntax rules so to make it possible to generate more complex clauses and sentences and add useful function words. The grammars used for the experiments that will be described in Section \ref{eval5}, for example, have been extended also to cover negative and interrogative forms, the past and future tense of verbs in the indicative mood and comparative adjectives. This allows for plenty of variations, such as:
+For languages that are covered by the RGL, however, it is also extremely easy to extend such grammars with preexisting syntax rules so to make it possible to generate more complex clauses and sentences and add useful function words.
+The grammars used for the experiments that will be described in Section \ref{eval5}, for example, have been extended also to cover negative and interrogative forms, the past and future tense of verbs in the indicative mood and comparative adjectives. 
+This allows for plenty of variations, such as:
 
-\begin{example} \
+\begin{example} \ \smallskip
     \begin{itemize}
         \item ``this sentence isn't simple''
         \item ``is this sentence simple?''
@@ -124,12 +138,13 @@ Of course, variations can be combined, so that the grammar can produce sentences
 This is accomplished by making the automatically generated grammars extend not only the extraction grammar itself, but also a module that simply imports the necessary standard RGL categories and functions.
 
 \subsection{Translation} \label{mt}
-Maybe counterintuitively, the MT module itself is by far the simplest component of the entire system. Built using PGF, the API meant to be used for embedding GF grammars in Haskell programs, it simply makes use of GF parsing and linearization.
+Maybe counterintuitively, the MT module itself is by far the simplest component of the entire system. 
+Built using PGF, the API meant to be used for embedding GF grammars in Haskell programs, it simply makes use of GF parsing and linearization.
 The only difference between translating inside the GF shell and using this ad-hoc program, apart from the increased ease of use of the latter, are that: \smallskip
 
 \begin{itemize}
     \item while GF can parse the SL string in a variety of ways and, as a consequence, return multiple TL linearizations, our program only outputs the first candidate translation, preliminarily discarding trees containing terminal nodes that have no linearization in the TL\footnote{a linearization can be missing, for instance, if a concrete syntax is postprocessed by simply getting rid of an ``illegal'' verb causing compilation problems (cf. Section \ref{grgn})} 
-    \item to facilitate the experiments, our standalone program can translate several newline-separated sentences at once.
+    \item to facilitate the experiments, our standalone has been written so that it can translate several newline-separated sentences at once.
 \end{itemize}
 
 \subsection{Adjustments to the CA component} \label{tuning}
@@ -143,7 +158,10 @@ In the following section, we discuss two ways to mitigate the impact of the anno
 Section \ref{select}, going in a sense in the opposite direction, describes the strategies we apply to filter out irrelevant alignments.
 
 \subsubsection{Dealing with parse errors}
-As discussed in Sections \ref{eval2} and \ref{eval3}, both our CE and CP modules give promising results on manually annotated data. However, when run on UDPipe-generated dependency trees, performance, and recall in particular, is significantly affected by errors happening at the parsing stage. Because parsing itself is a process consisting of several stages, errors differ based on when they happen. In particular, UDPipe goes through the following steps, each potentially causing one ore more particular kinds of errors: \smallskip
+As discussed in Sections \ref{eval2} and \ref{eval3}, both our CE and CP modules give promising results on manually annotated data. 
+However, when run on UDPipe-generated dependency trees, performance, and recall in particular, is significantly affected by errors happening at the parsing stage. 
+Because parsing itself is a process consisting of several stages, errors differ based on when they happen. 
+In particular, UDPipe goes through the following steps, each potentially causing one ore more particular kinds of errors: \smallskip
 
 \begin{enumerate} 
     \item \textit{\textbf{tokenization}}, which can, although it is unlikely for the languages considered in this work, lead to errors in identifying word boundaries
@@ -151,7 +169,8 @@ As discussed in Sections \ref{eval2} and \ref{eval3}, both our CE and CP modules
     \item actual \textit{\textbf{dependency parsing}}, the potential cause of attachment and labelling errors
 \end{enumerate} \smallskip
 
-In this context, we focus on the syntax-level errors: attachment and labelling. Of course, lemmatization and POS-tagging errors can be the first cause of one such error. In particular, the fact that a word is lemmatized incorrectly can make it so that it is also attributed the wrong POS tag and, as a consequence, assigned the wrong dependency label and/or attached to the wrong node. \smallskip
+In this context, we focus on the syntax-level errors: attachment and labelling. Of course, lemmatization and POS-tagging errors can be the first cause of one such error. 
+In particular, the fact that a word is lemmatized incorrectly can make it so that it is also attributed the wrong POS tag and, as a consequence, assigned the wrong dependency label and/or attached to the wrong node. \smallskip
 
 \begin{example}
     Consider the Italian sentence ``quel fa è diesis'' (``that F is sharp'').
@@ -200,10 +219,12 @@ In this context, we focus on the syntax-level errors: attachment and labelling. 
 Nontheless, because we do not want to intervene on the parser directly (nor to modify its results), we ignore the causes and focus on the syntax-level errors directly. \smallskip
 
 \paragraph{Working at the clause level} \label{clauses}
-At the highest level of abstraction, the parser often fails to correctly identify the clauses a sentence is composed of. This happens in a variety of ways: at times, clauses are simply not identified as such or, on the contrary, non-clauses are labelled as clauses. 
+At the highest level of abstraction, the parser often fails to correctly identify the clauses a sentence is composed of. 
+This happens in a variety of ways: at times, clauses are simply not identified as such or, on the contrary, non-clauses are labelled as clauses. 
 Most often, however, clauses are simply not attached to the right node and/or given a label that, while still identifying them as clauses, does not give correct information about their type. \smallskip
 
-To address this problem, the CE module has been modified so that it can try to align individual clauses instead of sentences. The idea is to obtain, from each pair of sentence trees to align, a pair of lists of subtrees whose heads are labelled \texttt{root}, \texttt{csubj}, \texttt{ccomp}, \texttt{xcomp}, \texttt{advcl} or  \texttt{acl}\footnote{all these clausal labels are defined in Appendix \ref{a_lab}}.
+To address this problem, the CE module has been modified so that it can try to align individual clauses instead of sentences. 
+The idea is to obtain, from each pair of sentence trees to align, a pair of lists of subtrees whose heads are labelled \texttt{root}, \texttt{csubj}, \texttt{ccomp}, \texttt{xcomp}, \texttt{advcl} or  \texttt{acl}\footnote{all these clausal labels are defined in Appendix \ref{a_lab}}.
 
 \begin{figure}[h]
 \footnotesize
@@ -354,7 +375,7 @@ This is useful in cases such as that illustrated in Figure \ref{rest}, as well a
   \put(20.0,80.0){{\tiny root}}
 \end{picture}
     \end{subfigure}
-    \caption[A case where alignment ``by exclusion'' is beneficial]{A case where alignment ``by exclusion'' is beneficial. In this case, while the two sentences should appear to be structured identically to a human reader, the Italian parse tree contains a (reasonable) attachment error. As a consequence, vanilla CE would not be able to align the prepositional phase ``\textit{with care}'', attached to the main verb ``\textit{parse}'', to its Italian exact counterpart ``\textit{con cura}'', incorrectly linked to the noun ``\textit{frase}'' as an \texttt{nmod}. A second CE pass trying to put unaligned subtrees in relation with each other, however, is able to detect the POS-equivalence between the two phrases, thus producing three new correct alignments: $\langle$\textit{with care, con cura}$\rangle$, $\langle$\textit{care, cura}$\rangle$ and $\langle$\textit{with, con}$\rangle$.}
+    \caption[A case where alignment ``by exclusion'' is beneficial]{A case where alignment ``by exclusion'' is beneficial. In this case, while the two sentences should appear to be structured identically to a human reader, the Italian parse tree contains a (reasonable) attachment error. As a consequence, vanilla CE would not be able to align the prepositional phase ``\textit{with care}'', attached to the main verb ``\textit{parse}'', to its Italian exact counterpart ``\textit{con cura}'', incorrectly linked to the noun ``\textit{frase}'' as an \texttt{nmod}. A second CE pass trying to put unaligned subtrees in relation with each other, however, is able to detect the POS-equivalence between the two phrases, thus producing three new correct alignments: $\langle$\textit{with care, con cura}$\rangle$, $\langle$\textit{``care'', ``cura''}$\rangle$ and $\langle$\textit{``with'', ``con''}$\rangle$.}
     \label{rest}
 \end{figure}
 
@@ -365,22 +386,22 @@ The pruning procedure described in Section \ref{pruning} is aimed at filtering o
 
 On the one hand, most alignments that do not contain any content word are not useful for the generation of a domain-specific grammar, as many common function words are already covered by the GF RGL\footnote{small alignments containing both function and content words, such as prepositional phrases, are on the other hand extremely useful, as they show which specific function word should be used in a particular context.}. \smallskip 
 
-On the other hand, the concepts represented in the GF grammar should intuitively, in most cases, be ``as small as possible''. If we reconsider the example in Figure \ref{cake} (sentences \textit{``finding useful correspondences is not exactly a piece of cake''} and \textit{``trovare corrispondenze utili non è proprio scontato''}), for instance, while the multi-word correspondence $\langle$\textit{a piece of cake, scontato}$\rangle$ is indeed useful there is usually no point in keeping correspondences such as $\langle$\textit{useful correspondences, corrispondenze utili}$\rangle$, even if they are correct, when it it also possible to extract the alignments $\langle$\textit{useful, utili}$\rangle$ and $\langle$\textit{correspondences, corrispondenze}$\rangle$: one-word and, in general, shorter alignments are more easily reusable in different contexts, especially since there are language-specific RGL rules capable of handling word order properly. 
+On the other hand, the concepts represented in the GF grammar should intuitively, in most cases, be ``as small as possible''. If we reconsider the example in Figure \ref{cake} (sentences \textit{``finding useful correspondences is not exactly a piece of cake''} and \textit{``trovare corrispondenze utili non è proprio scontato''}), for instance, while the multi-word correspondence $\langle$\textit{``a piece of cake'', ``scontato''}$\rangle$ is indeed useful there is usually no point in keeping correspondences such as $\langle$\textit{``useful correspondences'', ``corrispondenze utili''}$\rangle$, even if they are correct, when it it also possible to extract the alignments $\langle$\textit{``useful'', ``utili''}$\rangle$ and $\langle$\textit{``correspondences'', ``corrispondenze''}$\rangle$: one-word and, in general, shorter alignments are more easily reusable in different contexts, especially since there are language-specific RGL rules capable of handling word order properly. 
 As a consequence, for the purposes of grammar generation, the CA modules should in this case only return the following set of alignments: \smallskip
 
 \begin{enumerate}
-    \item $\langle$\textit{finding, trovare}$\rangle$
-    \item $\langle$\textit{useful, utili}$\rangle$
-    \item $\langle$\textit{correspondences, corrispondenze}$\rangle$
-    \item $\langle$\textit{is, è}$\rangle$
-    \item $\langle$\textit{not, non}$\rangle$
-    \item $\langle$\textit{exactly, proprio}$\rangle$
-    \item $\langle$\textit{a piece of cake, scontato}$\rangle$.
+    \item $\langle$\textit{``finding'', ``trovare''}$\rangle$
+    \item $\langle$\textit{``useful'', ``utili''}$\rangle$
+    \item $\langle$\textit{``correspondences'', ``corrispondenze''}$\rangle$
+    \item $\langle$\textit{``is'', ``è''}$\rangle$
+    \item $\langle$\textit{``not'', ``non''}$\rangle$
+    \item $\langle$\textit{``exactly'', ``proprio''}$\rangle$
+    \item $\langle$\textit{``a piece of cake'', ``scontato''}$\rangle$.
 \end{enumerate} \smallskip
 
 If we consider that the RGL can already handle most function words correctly, we can even discard all alignments that do not contain any content word (in this case, alignments 4 and 5, which leaves us with only 5 alignment useful to GF). \smallskip
 
-In some situations, however, larger alignments (such as $\langle$\textit{useful correspondences, corrispondenze utili}$\rangle$) are considered to be relevant since they help understand which words can be safely used in conjunction with each other. For instance, while the Italian adjective ``\textit{brutto}'' (most often translated as ``\textit{ugly}'') is often used in conjunction with the word ``\textit{notizia}'' (``\textit{news}'') in expressions such as ``\textit{brutte notizie}'', in English the adjective ``\textit{bad}'' (as in ``\textit{bad news}'') is definitely more appropriate. Discarding a potential $\langle\textit{bad news}, \textit{brutte notizie}\rangle$ alignment is then not always the right choice, since in a context in which there are many alternative translation equivalents for the word ``\textit{brutto}'' it provides useful information about what adjective to use to refer to the noun ``\textit{news}''. \smallskip
+In some situations, however, larger alignments (such as $\langle$\textit{``useful correspondences'', ``corrispondenze utili''}$\rangle$) are considered to be relevant since they help understand which words can be safely used in conjunction with each other. For instance, while the Italian adjective ``\textit{brutto}'' (most often translated as ``\textit{ugly}'') is often used in conjunction with the word ``\textit{notizia}'' (``\textit{news}'') in expressions such as ``\textit{brutte notizie}'', in English the adjective ``\textit{bad}'' (as in ``\textit{bad news}'') is definitely more appropriate. Discarding a potential $\langle$\textit{``bad news''}, \textit{``brutte notizie''}$\rangle$ alignment is then not always the right choice, since in a context in which there are many alternative translation equivalents for the word ``\textit{brutto}'' it provides useful information about what adjective to use to refer to the noun ``\textit{news}''. \smallskip
 
 Because of this, and since CE could have applications other than MT, selection in this sense is performed - optionally - after the extraction phase itself and implemented as an independent function. It works as follows: first, alignments that do not present any content word are filtered out. Then, among the remaining ones, \textit{superficially} perfect alignments \textit{containing} other extracted alignments are also discarded.\smallskip
 
@@ -555,7 +576,9 @@ Another concept introduced by this algorithm is that of alignments \textit{conta
     An alignment $A = \langle e_1,...,e_n \rangle$ contains an alignment $B = \langle f_1,...,f_n \rangle$ if, for each of $B$'s members, $f_i$ is a subtree of $e_i$. 
 \end{definition}\smallskip
 
-Thus, the algorithm is safe - in the sense that it does not get rid of any potentially meaningful alignment - in that it gets rid of superficially perfect alignments whose subtrees are also members of smaller alignments. This means that when sentences vary widely syntax-wise, as it happens in cases where translation is not literal or in the presence of parse errors, the resulting extracted concepts can still contain a large number of nodes.
+Thus, the algorithm is ``safe'' in the sense that it does not get rid of any potentially meaningful alignment. 
+In fact, it only gets rid of superficially perfect alignments whose subtrees are also members of smaller alignments. 
+This means that when sentences vary widely syntax-wise, as it happens in cases where translation is not literal or in the presence of parse errors, the resulting extracted concepts can still contain a large number of nodes.
 
 \section{Evaluation} \label{eval5}
 To evaluate the effectiveness of the translation method described in the previous section, a first, small-scale experiment was designed. The main idea is to automatically translate a set of English sentences to Italian and Swedish, make native speakers of the TLs correct the output sentences, so to obtain a set of reference, both grammatically and semantically correct translations, and compare them to the original machine-generated ones. \smallskip
@@ -601,9 +624,9 @@ The way in which the reference translations were obtained is strongly connected 
 Without going into all the details, it is in fact important to know that the BLEU score is computed by counting matching $n$-grams in the candidate translation to $n$-grams in the reference text. 
 This means that, if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading. \smallskip
 
-In a preliminary experiment conducted in this way, for instance, the Italian translation ``\textit{il docente discute la Didattica}'' of the English sentence ``\textit{the teacher discusses the didactics}'', was given the minimum score despite being completely correct and even idiomatic\footnote{typically, the adjective ``didattica'' is not use in its plural form ``didattiche'' when nominalized. The capital D is often used, for this particular term, in official university documents.}. 
-Looking at the two reference translations used at the time, it appears clear that such a low score is due to the capitalization of the word ``Didattica'' and the arbitrary (but equally correct) lexical choices made by the human translators, who rendered the sentence as ``il professore discute i metodi didattici'' and ``l' insegnante discute la didattica''\footnote{The terms ``docente'', ``professore'' and ``insegnante'' are almost perfect synonyms, even though ``docente'' is mostly used in formal documents to refer to university lecturers, ``professore'' is more common in secondary school and colloquial speech, and ``insegnante'' is the most generic. As such, it can also refer to elementary school teachers and in some cases even sport coaches. The expression ``metodi didattici'' is a perfectly sensible replacement for ``didattica''.}. 
-Coincidentally (but not unlikely for a language like Italian), this is a case in which these lexical differences affect the choice of the determiners used in the various translations (cf. ``\underline{l'}insegnante'' vs. ``\underline{il} professore'' and ``\underline{la} didattica'' vs. ``\underline{i} metodi didattici''), producing a BLEU-1 to 4 score of 0. \smallskip
+In a preliminary experiment conducted in this way, for instance, the Italian translation ``\textit{il docente discute la Didattica}'' of the English sentence ``\textit{the teacher discusses the didactics}'', was given the minimum score despite being completely correct and even idiomatic\footnote{typically, the adjective ``\textit{didattica}'' is not used in its plural form ``\textit{didattiche}'' when nominalized. The capital D is often used, for this particular term, in official university documents.}. 
+Looking at the two reference translations used at the time, it appears clear that such a low score is due to the capitalization of the word ``\textit{Didattica}'' and the arbitrary (but equally correct) lexical choices made by the human translators, who rendered the sentence as ``\textit{il professore discute i metodi didattici}'' and ``\textit{l' insegnante discute la didattica}''\footnote{The terms ``\textit{docente}'', ``\textit{professore}'' and ``\textit{insegnante}'' are almost perfect synonyms, even though ``\textit{docente}'' is mostly used in formal documents to refer to university lecturers, ``\textit{professore}'' is more common in secondary school and colloquial speech, and ``\textit{insegnante}'' is the most generic. As such, it can also refer to elementary school teachers and in some cases even sport coaches. The expression ``\textit{metodi didattici}'' is a perfectly sensible replacement for ``\textit{didattica}''.}. 
+Coincidentally (but not unlikely for a language like Italian), this is a case in which these lexical differences affect the choice of the determiners used in the various translations (cf. ``\textit{\underline{l'}insegnante}'' vs. ``\textit{\underline{il} professore}'' and ``\textit{\underline{la} didattica}'' vs. ``\textit{\underline{i} metodi didattici}''), producing a BLEU-1 to 4 score of 0. \smallskip
 
 \subsection{Experimental results} \label{res5}
 Corpus-level BLEU scores for the automatic translations of the 50+50 sentences of the testing corpora generated as described in Section \ref{eng} are summarized in Table \ref{tbleu}.
@@ -625,7 +648,7 @@ Corpus-level BLEU scores for the automatic translations of the 50+50 sentences o
 These synthetic figures are useful to give an idea of the general quality of the translations: overall, although with relatively low scores, English-to-Swedish translation works significantly better than English-to-Italian. 
 Looking back at the results obtained for CE (cf. Section \ref{eval2}), this is not excessively surprising, since both precision and recall for English-Swedish are consistently higher than they are for English-Italian. 
 When it comes to the results obtained for CE on the course plans corpora in particular (cf. Table \ref{tcereal}), however, the difference in precision between the two language pairs is negligible.
-This makes the reason for the substantial difference observed in the BLEU scores obtained for the two different corpora unclear, at least at a first glance.\smallskip
+This makes the reason for the substantial difference in the BLEU scores obtained for the two different corpora unclear, at least at a first glance.\smallskip
 
 Looking at sentence-level scores is, however, sometimes more interesting. 
 Regardless the corpus, scores assigned to individual segments range from the minimum possible value of 0 to the perfect score of 100, which indicates a perfect correspondence between the automatic and the reference translation. \smallskip
@@ -634,8 +657,9 @@ Examples of sentences that were assigned a perfect BLEU-1 to 4 score are ``\text
 
 On the other hand, it is easy for shorter sentences to be assigned the minimum BLEU-1 to 4 score even when they only contain a single grammatical or semantic error. 
 This is the case, for instance, of the sentence ``\textit{the test is oral}'', whose last word, ``\textit{oral}'' is translated as ``\textit{dura}'' (``\textit{hard}'') instead of ``\textit{orale}'' due to an alignment error. 
-Nonetheless, it is worth noticing that this is one of the many cases in which, even though the fact that only the first translation candidate is taken into account hides it, the correct alignment $\langle$``\textit{oral}'',``\textit{orale}''$\rangle$ is also found by the CE module. 
-Moreover, the such valid correspondence has a higher number of occurrences and matches stronger alignment criteria than the wrong one $\langle$``\textit{oral}'',``\textit{duro}''$\rangle$. 
+Nonetheless, it is worth noticing that this is one of the many cases in which the correct alignment $\langle$``\textit{oral}'',``\textit{orale}''$\rangle$ is also found by the CE module. 
+This is hidden by the fact that, for simplicity, only the first translation candidate is taken into account.
+Moreover, such valid correspondence has a higher number of occurrences and matches stronger alignment criteria than the wrong one $\langle$``\textit{oral}'',``\textit{duro}''$\rangle$. 
 This suggest that, in contexts where higher precision is necessary, there are obvious improvements that can be done either in the choice of the alignment criteria or at a later stage, when relevant alignments are selected. \smallskip
 
 \subsubsection{Error analysis}
@@ -662,12 +686,12 @@ This explains the significant difference observed in the BLEU scores.
 In Italian, grammar errors often involve contractions such as ``\textit{del}'' (``\textit{di}'' + ``\textit{il}'', in English ``\textit{of the}''), some of which are systematically rendered as two separate words.
 Another common case is that of wrong (or at least very confusing) adjective collocation, such as in the translation ``\textit{il libro presenta una tecnica con miglioramenti vari utile}'' (``\textit{the textbook presents a useful technique with various improvements}''), where the adjective ``\textit{utile}'' (``\textit{useful}''), referred to ``\textit{technique}'' (``\textit{tecnica}'') is placed far from such noun, making the sentence hard to interpret\footnote{the manually postprocessed translation is ``\textit{il libro presenta una utile tecnica con miglioramenti vari}''.}.
 Grammatical errors in Swedish are less common and, apart from long adjectives never being turned to the comparative degree periphrastically (e.g. ``\textit{relevant\underline{are}}'' instead of ``\textit{mer relevant}''), less systematic. 
-Only in one case, for instance, (``\textit{programbibliotek\underline{en}}''), gender is incorrect. \smallskip
+Only in one case, for instance, gender is incorrect (``\textit{programbibliotek\underline{en}}''). \smallskip
 
-Some alignment errors are also interesting to analyze.
-In English-Swedish, while several compounds, such as $\langle$\textit{computer science, datavetenskap}$\rangle$, are aligned correctly, there are cases in which a single-root noun is translated as a compound (e.g. $\langle$ \textit{theory, automatateori} $\rangle$). This is not necessarily an actual alignment error, as it might rather be that the English version of the text was being less specific than its Swedish counterpart, thus producing an alignment that, during evaluation, would have been marked as correct but not generally reusable (\texttt{=}). \smallskip
+Some errorsregarding the extracted concepts are also interesting to analyze.
+In English-Swedish, while several compounds, such as $\langle$\textit{``computer science'', ``datavetenskap''}$\rangle$, are aligned correctly, there are cases in which a single-root noun is translated as a compound (e.g. $\langle$ \textit{``theory'', ``automatateori''} $\rangle$). This is not necessarily an actual alignment error, as it might rather be that the English version of the text was being less specific than its Swedish counterpart, thus producing an alignment that, during evaluation, would have been marked as ``correct but not reusable'' (\texttt{=}). \smallskip
 
 ``Reasonable'' alignment errors appear in the DMI corpus sentences too. 
-The English for ``\textit{attendance of lessons}'', for instance, becomes simply ``\textit{frequenza}'' in the Italian translation. 
-Such word is in fact often used alone to replace longer expressions such as ``\textit{frequenza delle lezioni}'', just like in English `\textit{of lessons}'' can be omitted when what must be attended is evident from the context.
-Another interesting example is the alignment $\langle$ \textit{class, classe} $\rangle$, which causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.
+The English phrase ``\textit{attendance of lessons}'', for instance, becomes simply ``\textit{frequenza}'' in the Italian translation. 
+Such word is in fact often used alone to replace longer expressions such as ``\textit{frequenza delle lezioni}'', just like in English ``\textit{of lessons}'' can be omitted when what must be attended is evident from the context.
+Another interesting example is the alignment $\langle$\textit{``class'', ``classe''}$\rangle$, which causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.
