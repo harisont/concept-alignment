@@ -61,7 +61,6 @@ As shown in Figure \ref{types}, the type of the nodes of such trees, \texttt{UDW
   2 dependency dependency NOUN _ _ 3 compound _ _
   \end{verbatim}
   \caption[The CoNLL-U and rose tree representations of a dependency tree]{The CoNLL-U and rose tree representation of a dependency tree. In the rose tree in the middle, fields left black in the CoNLL-U representation are omitted for compactness. The third representation, easier to read, resembles CoNNL-U notation while graphically showing the structure of the tree. This notation will be used for the other examples of this chapter.}
-  \label{deptree}
  \end{figure}
 
 \subsection{Baseline} \label{baseline}
@@ -257,7 +256,7 @@ As a consequence, a useful relation to define between dependency trees is that o
 
 The definition specifies that the two multisets should not contain the POS tags of all the words in the sentence but rather only those of the \textit{meaning-carrying} ones, referring to words belonging to a particular set of classes. 
 Words that should generally be taken into account, in fact, correspond roughly to content words (cf. Section \ref{upos}), but this term was deliberately avoided in Definition \ref{poseq} due to the fact that it can be useful also to include some function words, for instance pronouns and some kinds of determiners.
-In particular, the current implementation considers as meaning-carrying all words that belong to an open class - defined as in the UD documentation \cite{openpos} - and numerals, but this set of tags has been obtained empirically working with English-Italian and might not be ideal for all language pairs.
+In particular, the current implementation considers as meaning-carrying all words that belong to an open class - defined as in the UD documentation \cite{uddocs} - and numerals, but this set of tags has been obtained empirically working with English-Italian and might not be ideal for all language pairs.
 On the other hand, words belonging to other classes, such as auxiliary verbs, adpositions and conjunctions can and should be in most cases ignored as they are often omitted or rendered with words with different POS tags when the sentence is translated to another language, especially if the two languages in the pair at hand differ significantly. \smallskip
 
 Applied alone, this criterion can be used to capture correspondences that would otherwise be missed, thus increasing recall, but a decrease in precision is also to be expected. Perhaps more interestingly, however, another way to apply this criterion is in conjunction with other ones, and in particular together with UD label matching (cf. Criterion \ref{udmatch}), in context where high precision is more important than recall. We will get back to combining criteria in Section \ref{ceres}.
