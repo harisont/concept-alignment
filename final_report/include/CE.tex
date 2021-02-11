@@ -349,7 +349,7 @@ Given that UD provides a subtype \texttt{pass} for \texttt{nsubj}s and auxiliary
 \subsubsection{New extraction algorithm} \label{extralg}
 The decision to use different alignment criteria simultaneously, together with the nature of the criteria described in the above themselves, implies that perfect alignment must be given up: the new algorithm is such that aligned subtrees are not extracted from a pair of sorted and padded sentence trees but rather obtained by direct comparison between the original trees. Aligning a pair of sentences means, then, checking if the corresponding UD trees $t$, $u$ match any of the criteria at hand and, if they do, considering them as the members of an alignment, adding the alignment to a collection and recursively repeating the same procedures for all possible pairs $t'$, $u'$, where $t'$ is a subtree of $t$ and $u'$ is a subtree of $u$.
 
-\begin{figure}[H]
+\begin{figure}[h]
  \centering
  \lstinputlisting{pseudocode/Extract.hs}
  \caption[Basic version of the improved CE algorithm]{Basic version of the improved CE algorithm. Instead of aligning full sentence trees and only then extract concepts comparing the structure of the trees and their UD labels only, it recursively extracts pairs of aligned subtrees directly. To do so, for each pair of subtrees occurring in the same context, it tries to apply multiple criteria, implemented as boolean functions telling whether two trees should become the members of an alignment.}
@@ -586,7 +586,7 @@ This data also give an empirical confirmation of the observation made in Section
 The small size of the corpus cause Criterion \ref{known} to remain extremely marginal.
 Cross-language pair differences are, in this case, minimal, confirming that the criteria used and their priority order are not specifically tailored for the language pair used for under-development experiments. \smallskip
 
-\begin{table}[H]
+\begin{table}[h]
  \footnotesize
  \centering
  \begin{tabular}{|l|l|l|l|l|}
