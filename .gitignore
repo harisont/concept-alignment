@@ -47,3 +47,6 @@ data/pud_treebanks/
 *.html
 
 Test.hs
+
+# my beamer theme
+presentation/beamerthememhthm.sty
