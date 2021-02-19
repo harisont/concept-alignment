@@ -282,7 +282,16 @@ Combining variations:
 
 ## Conclusions
 - developed a syntax-based CA module
-  - Haskell library + easy to use and configure executables + evaluation scripts
+  - Haskell library + easy to use and configure executables + evaluation and translation scripts
 - evaluation
   - against a baseline algorithm and a standard statistical tool
   - in a simple rule-based MT system 
+
+## Future work
+- integration with statistical alignment techniques
+- verb phrases alignment
+- iterative CA
+- optimization of CP for multilingual corpora (scenario 1)
+- generalization of CE to $n$ languages
+- stricter and language pair-specific criteria
+- better alignment selection
