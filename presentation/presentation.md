@@ -1,6 +1,6 @@
 ---
 title: Syntax-based Concept Alignment for Machine Translation
-subtitle: Master's thesis, A.Y. 2020-2021
+subtitle: 23.02.2021
 author: Arianna Masciolini
 theme: mhthm
 ---
@@ -55,7 +55,7 @@ Issues: \pause
 > - need large amounts of raw data
 
 ## Syntax-based approaches
-Alternative: tree-to-tree alignment, generally based on constituency grammars. 
+Alternative: tree-to-tree alignment 
 
 ![](figures/parsetrees.png)
 
@@ -116,8 +116,8 @@ Alternative: tree-to-tree alignment, generally based on constituency grammars.
 2. pad the trees $\to$ perfectly aligned trees
    ![padding](figures/padded_rtrees.png) \pause
 3. extract alignments: \pause
-   - subtrees: $\langle$_she missed the boat, ha perso il treno_$\rangle$, $\langle$_the boat, il treno_$\rangle$, $\langle$_the,il_$\rangle$ \pause
-   - heads:$\langle$_missed,perso_$\rangle$, $\langle$_boat,treno_$\rangle$
+   - subtrees: $\langle$_she missed the boat, ha perso il treno_$\rangle$, $\langle$_the boat, il treno_$\rangle$, $\langle$_the, il_$\rangle$ \pause
+   - heads:$\langle$_missed, perso_$\rangle$, $\langle$_boat, treno_$\rangle$
 
 ## Multiple criteria
 - __label matching__ (original criterion): trees in matching context are aligned if they have the same UD label  \pause
@@ -141,24 +141,45 @@ __Divergence__: systematic cross-linguistic distinction. \pause
 - thematic
   - _**Yana** likes **books**_ VS _**A Yana** piacciono **i libri**_
 
-## Head alignment
-- extremely useful when alignment is perfect, like $\langle$_Claudio eats a banana,Claudio mangia una banana_$\rangle$
-    - $\langle$_eats,mangia_$\rangle$
-    - $\langle$_banana,banana_$\rangle$ \pause
+## Enhanced head alignment
+- aligning head is extremely useful when alignment is perfect, like $\langle$_Claudio eats a banana,Claudio mangia una banana_$\rangle$
+    - $\langle$_eats, mangia_$\rangle$
+    - $\langle$_banana, banana_$\rangle$ \pause
 - many problematic cases
   - some types of divergences $\to$ do not always align heads \pause
   - compounds & head verbs with auxiliaries $\to$ enhanced head alignment
-    - $\langle$_many decisions were taken by Tommaso,många viktiga beslut togs av Tommaso$\rangle$ $\to$ $\langle$were taken,togs_$\rangle$
-    - $\langle$_Giorgio took a course on machine learning techniques,Giorgio deltog i en kurs om maskininlärningstekniker_$\rangle$ $\to$ $\langle$_machine learning techniques,maskininlärningstekinker_$\rangle$
+    - $\langle$_many decisions were taken by Tommaso, många viktiga beslut togs av Tommaso$\rangle$ $\to$ $\langle$were taken, togs_$\rangle$
+    - $\langle$_Giorgio took a course on machine learning techniques, Giorgio deltog i en kurs om maskininlärningstekniker_$\rangle$ $\to$ $\langle$_machine learning techniques, maskininlärningstekinker_$\rangle$
 
 ## Evaluation on PUD treebanks
 __Against the baseline__
-![](figures/e1.png)
+\begin{table}[h]
+ \centering
+ \scriptsize
+ \begin{tabular}{|l|l|l|l|l|}
+ \hline
+   & \multicolumn{2}{l|}{\textbf{baseline}} & \multicolumn{2}{l|}{\textbf{improved version}} \\ \hline
+ \textbf{}   & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}  & \textbf{en-sv} \\ \hline
+ \textbf{distinct} & 1097  & 1257 & 1198   & 1314  \\ \hline
+ \textbf{correct} & 830 (58.12\%) & 995 (79.15\%)  & 964 (80.46\%) & 1105 (84.03\%) \\ \hline
+ \textbf{useful} & 776 (54.34\%) & 976 (77.64\%)  & 896 (74.79\%) & 1082 (82.28\%) \\ \hline
+ \end{tabular}
+ \end{table}
 
 \pause
 
-__Against `fast_align`__
-![](figures/e2.png)
+__Against `fast_align`__ (en-it)
+\begin{table}[H]
+ \centering
+ \scriptsize
+ \begin{tabular}{|l|l|l|l|}
+ \hline
+  & \textbf{improved version} & \textbf{\texttt{fast\_align} (100)} & \textbf{\texttt{fast\_align} (1000)}\\ \hline
+  \textbf{distinct} & 716 & 1440 & 1435 \\ \hline
+  \textbf{correct} & 536 (74.86\%) & 410 (28.47\%) & 656 (45.71\%)\\ \hline
+  \textbf{useful} & 491 (68.57\%) & 371 (25.76\%) & 590 (41.11\%)\\ \hline
+ \end{tabular}
+\end{table}
 
 ## Evaluation on "raw" data
 Data: sentence-aligned Computer Science course plans
@@ -166,7 +187,17 @@ Data: sentence-aligned Computer Science course plans
 - CSE (GU/Chalmers)
 - DMI (UniPG)
   
-![](figures/e3.png)
+\begin{table}[H]
+ \scriptsize
+ \centering 
+ \begin{tabular}{|l|l|l|}
+ \hline
+ \textbf{}   & \textbf{DMI (en-it, 798 sentences)} & \textbf{CSE (en-sv, 498 sentences)} \\ \hline
+ \textbf{distinct} & 352  & 529  \\ \hline
+ \textbf{correct} & 243 (69.03\%) & 368 (69.56\%) \\ \hline
+ \textbf{useful} & 229 (65.05\%) & 351 (66.35\%) \\ \hline
+ \end{tabular}
+\end{table}
 
 # Concept Propagation
 
@@ -191,7 +222,17 @@ For each $L_1$-$L_2$ alignment: \pause
 > - head alignments require special treatment as they are not composed of subtrees
 
 ## Evaluation: scenario 1
-![](figures/e4.png)
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{}              & \textbf{en-sv} & \textbf{it-sv} \\ \hline
+    \textbf{propagated}             & 1019 (85.05\%) & 979 (84.64\%) \\ \hline
+    \textbf{tot. errors}            & 133 (13.05\%)  & 187 (19.1\%)  \\ \hline
+    \textbf{CP-introduced}          & 75 (56.39\%)   & 84 (44.91\%)   \\ \hline
+    \end{tabular}
+\end{table}
 
 - PUD treebanks
 - the vast majority of concepts is propagated
@@ -199,14 +240,37 @@ For each $L_1$-$L_2$ alignment: \pause
 ## Evaluation: scenario 2
 
 __Texts in different domains__ (subsets of PUD treebanks)
-![](figures/e5.png)
+\begin{table}[H]
+    \centering
+    \tiny
+    \begin{tabular}{|l|l|l|l|l|l|l|}
+    \hline
+    \textbf{}                     & \textbf{en-it-sv} & \textbf{it-en-sv} & \textbf{en-sv-it} & \textbf{sv-en-it} & \textbf{it-sv-en} & \textbf{sv-it-en} \\ \hline
+    \textbf{extracted}   & 638               & 638               & 687               & 687               & 608               & 608               \\ \hline
+    \textbf{propagated}                    & 92 (14.42\%)      & 92 (14.42\%)      & 98 (14.26\%)      & 84 (12.22\%)      & 101 (16.61\%)     & 87 (14.37\%)      \\ \hline
+    \textbf{tot. errors}                   & 46 (50\%)         & 21 (22.82\%)      & 42 (42.85\%)      & 24 (28.57\%)      & 21 (20.79\%)      & 28 (32.18\%)      \\ \hline
+    \textbf{CP-introduced}                 & 33 (71.73\%)      & 11 (52.38\%)      & 21 (50\%)         & 12 (50\%)         & 12 (57.14\%)      & 21 (75\%)         \\ \hline
+    \end{tabular}
+    \end{table}
 
 - mostly function words and very common function words 
 
 ## Evaluation: scenario 2
 
 __Texts in the same domain__ (course plans corpora)
-![](figures/e6.png)
+
+\begin{table}[H]
+    \centering
+    \scriptsize
+    \begin{tabular}{|l|l|l|}
+    \hline
+                           & \textbf{sv-en-it} & \textbf{it-en-sv} \\ \hline
+    \textbf{extracted}     & 1950              & 1823              \\ \hline
+    \textbf{propagated}             & 205 (10.51\%)     & 200 (10.97\%)     \\ \hline
+    \textbf{tot. errors}            & 66 (32.19\%)      & 61 (30.5\%)       \\ \hline
+    \textbf{CP-introduced} & 33 (50\%)        & 33 (54.09\%)      \\ \hline
+    \end{tabular}
+    \end{table}
 
 - domain-specific concepts \pause
   - $\langle$_skills, färdigheter, capacità_$\rangle$, $\langle$_exam, tentamen, prova_$\rangle$... \pause
@@ -263,7 +327,18 @@ Combining variations:
   - avoid low scores due to different but equally valid lexical choices
 
 ## Evaluation: results
-![](figures/e7.png)
+\begin{table}[h]
+    \centering
+    \scriptsize
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{}            & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
+    \textbf{BLEU-1 to 4} & 55.4          & 61.27         \\ \hline
+    \textbf{BLEU-1 to 3} & 62.75         & 67.77         \\ \hline
+    \textbf{BLEU-1 to 2} & 70.6          & 74.3          \\ \hline
+    \textbf{BLEU-1}      & 79.33         & 80.99         \\ \hline
+    \end{tabular}
+\end{table}
 
 - max score:
   - $\langle$_the library provides useful textbooks, la biblioteca fornisce libri utili_$\rangle$
