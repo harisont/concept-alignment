@@ -5,8 +5,6 @@ author: Arianna Masciolini
 theme: mhthm
 ---
 
-# Concept Alignment
-
 ## A first definition
 __Concept Alignment__: the task of finding semantical correspondences between parts of multilingual parallel texts.
 
@@ -29,7 +27,7 @@ Phrase alignment:
 ## CA in translation
 A human translator \pause
 
-1. recognizes concepts in the text to translate
+1. recognizes concepts in the text to translate \pause
 2. looks for ways to render them in the target language
 
 \pause
@@ -102,16 +100,12 @@ Alternative: tree-to-tree alignment, generally based on constituency grammars.
 ![](figures/ud_formats.png)
 
 - CoNNL-U is the standard format for UD trees \pause
-- internally to the CA module, they are represented as rose trees \pause
+- internally to the CA module, they are represented as rose trees
   ```
   data RTree n = RTree n [RTree n]
   type UDTree = RTree UDWord
   type Alignment = (UDTree,UDTree)
-  ```
-    - `UDWord` represents a line of a CoNNL-u file 
-  - `UDWord` represents a line of a CoNNL-u file 
-    - `UDWord` represents a line of a CoNNL-u file 
-  - `UDWord` represents a line of a CoNNL-u file 
+  ``` 
     - `UDWord` represents a line of a CoNNL-u file 
     - alignments are pairs of ud trees
 
@@ -177,7 +171,9 @@ Data: sentence-aligned Computer Science course plans
 # Concept Propagation
 
 ## Two scenarios
-![](figures/scenarios.png)
+![](figures/scenarios.png) 
+
+\pause
 
 > 1. 3+ lingual parallel text
 > 2. 2 bilingual parallel texts with one language in common
@@ -197,10 +193,8 @@ For each $L_1$-$L_2$ alignment: \pause
 ## Evaluation: scenario 1
 ![](figures/e4.png)
 
-> - PUD treebanks
-> - the vast majority of concepts is propagated
-
-
+- PUD treebanks
+- the vast majority of concepts is propagated
 
 ## Evaluation: scenario 2
 
@@ -208,7 +202,6 @@ __Texts in different domains__ (subsets of PUD treebanks)
 ![](figures/e5.png)
 
 - mostly function words and very common function words 
-  - $\langle$_always,alltid,sempre_$\rangle$
 
 ## Evaluation: scenario 2
 
@@ -226,8 +219,8 @@ __Texts in the same domain__ (course plans corpora)
 ![](figures/proposed_highlight.png)
 
 ## From UD to GF alignments
-- UD alignment postprocessing:
-  - normalization
+- UD alignment postprocessing: \pause
+  - normalization \pause
   - selection based on size and usefulness \pause
 - conversion of UD trees into GF ASTs via `gf-ud`
   - dependency configurations
@@ -249,13 +242,13 @@ __Texts in the same domain__ (course plans corpora)
 ## Extending the grammar
 Easy to add RGL categories and functions to allow more variation:
 
-> - _this sentence isn't simple_
-> - _is this sentence simple?_
-> - _this sentence was simple_
-> - _this sentence will be simple_
-> - _this sentence is simpler than that sentence_
-
 \pause
+
+- _this sentence isn't simple_ \pause
+- _is this sentence simple?_ \pause
+- _this sentence was simple_ \pause
+- _this sentence will be simple_ \pause
+- _this sentence is simpler than that sentence_ \pause
 
 Combining variations:
 
