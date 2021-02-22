@@ -217,9 +217,9 @@ For each $L_1$-$L_2$ alignment: \pause
 > 3. if multiple candidate alignments are found, select the one with the closest depths
 
 ## Caveats
-> - in step 1, irrelevant details of UD trees are to be ignored
-  > - only consider word form, lemma, POS tag and dependency relation
-> - head alignments require special treatment as they are not composed of subtrees
+- in step 1, irrelevant details of UD trees are to be ignored
+  - only consider word form, lemma, POS tag and dependency relation \pause
+- head alignments require special treatment as they are not composed of subtrees
 
 ## Evaluation: scenario 1
 \begin{table}[H]
@@ -253,7 +253,7 @@ __Texts in different domains__ (subsets of PUD treebanks)
     \end{tabular}
     \end{table}
 
-- mostly function words and very common function words 
+- mostly function words and very common content words 
 
 ## Evaluation: scenario 2
 
