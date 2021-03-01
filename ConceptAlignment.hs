@@ -125,6 +125,7 @@ data Reason = DIV   -- known interlingual divergence
             | CL    -- due to clause segmentation and alignment
             | REST  -- due to "alignment by exclusion"
             | HEAD  -- composed of the heads of another alignment (alignHeads)
+            | MATCH -- obtained via a replacement pattern
             | PREV  -- already found in another sentence 
             | FAST  -- found by fast_align
   deriving (Eq, Show, Read, Ord, Enum, Bounded)
@@ -156,35 +157,37 @@ cl = C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
 {- Alignment functions -}
 
 -- | Align a list of pairs of / corresponding / dependency trees   
-align :: [LinAlignment]     -- ^ a list of known linearized alignments
-      -> [Criterion]        -- ^ a list of criteria (sorted by priority)
-      -> Bool               -- ^ a flag indicating whether clause 
-                            -- segmentation should be performed  
-      -> Bool               -- ^ a flag indicating whether alignment "by 
-                            -- exclusion" should also be performed 
-      -> [(UDTree,UDTree)]  -- ^ the list of pairs of dependency trees
-      -> Alignments         -- ^ a Map of alignments
+align :: [LinAlignment]       -- ^ a list of known linearized alignments
+      -> [Criterion]          -- ^ a list of criteria (sorted by priority)
+      -> Maybe UDReplacement  -- ^ a replacement pattern
+      -> Bool                 -- ^ a flag indicating whether clause 
+                              -- segmentation should be performed  
+      -> Bool                 -- ^ a flag indicating whether alignment "by 
+                              -- exclusion" should also be performed 
+      -> [(UDTree,UDTree)]    -- ^ the list of pairs of dependency trees
+      -> Alignments           -- ^ a Map of alignments
 align = align' M.empty
   where
-    align' as _ _ _ _ [] = as
-    align' as las cs segment byExcl (tu:tus) =
+    align' as _ _ _ _ _ [] = as
+    align' as las cs r segment byExcl (tu:tus) =
       align' (
         M.unionWith combineVals as (
-          alignSent as las cs segment byExcl tu
+          alignSent as las cs r segment byExcl tu
         )
-      ) las cs segment byExcl tus
+      ) las cs r segment byExcl tus
 
 -- | Sentence-level alignment function
-alignSent :: Alignments       -- ^ a map of known alignments
-          -> [LinAlignment]   -- ^ a list of known linearized alignments
-          -> [Criterion]      -- ^ a list of criteria (sorted by priority)
-          -> Bool             -- ^ a flag indicating whether clause 
-                              -- segmentation should be performed 
-          -> Bool             -- ^ a flag indicating whether alignment "by 
-                              -- exclusion" should also be performed 
-          -> (UDTree,UDTree)  -- ^ a pair of dependency trees 
-          -> Alignments       -- ^ a Map of alignments
-alignSent as las cs segment byExcl (t,u) = 
+alignSent :: Alignments           -- ^ a map of known alignments
+          -> [LinAlignment]       -- ^ a list of known linearized alignments
+          -> [Criterion]          -- ^ a list of criteria (sorted by priority)
+          -> Maybe UDReplacement  -- ^ a replacement pattern
+          -> Bool                 -- ^ a flag indicating whether clause 
+                                  -- segmentation should be performed 
+          -> Bool                 -- ^ a flag indicating whether alignment "by 
+                                  -- exclusion" should also be performed 
+          -> (UDTree,UDTree)      -- ^ a pair of dependency trees 
+          -> Alignments           -- ^ a Map of alignments
+alignSent as las cs r segment byExcl (t,u) = 
   M.fromListWith combineVals (as' ++ as'')
   where
     -- "basic" alignment based on sentence/clause recursive alignment
@@ -211,9 +214,17 @@ alignSent as las cs segment byExcl (t,u) =
           cs' = map snd (filter fst (zip [f t u | f <- map func cs] cs))
           c = head cs' -- the first determines reasons & if heads are aligned
           -- new alignments, subtrees included
-          as' = if headAlign c then h:tu:sas else tu:sas
+          as' = case (headAlign c,isJust mtup) of
+            (True,True) -> h:tu:tup:sas
+            (True,False) -> h:tu:sas
+            (False,True) -> tu:tup:sas
+            (False,False) -> tu:sas
             where 
               tu = (A (t,u),(reas c,1)) -- (t,u)
+              mtup = if isJust r 
+                then alignPattern (fromJust r) (fst tu) 
+                else Nothing
+              tup = (fromJust mtup,(S.insert MATCH (reas c), 1))
               h = (alignHeads $ fst tu,(S.insert HEAD (reas c), 1)) -- heads 
               -- subtree alignments
               sas = concatMap (alignSent' as cs) [(t,u) | t <- ts', u <- us']
@@ -274,6 +285,7 @@ prune = nubBy areAlt . sortByFertility . sortByReasons
 alignPattern :: UDReplacement -> Alignment -> Maybe Alignment
 alignPattern r (A (t,u)) = 
   case (ch1,ch2) of
+    -- only return an alignment if the pattern applies to both members
     (True,True) -> Just (A (t',u'))
     _ -> Nothing
   where 
@@ -339,7 +351,7 @@ propagate :: [Criterion]            -- ^ a list of criteria
 propagate cs segment byExcl ([],_) _ = Nothing 
 propagate cs segment byExcl (t:ts,u:us) c =
   let 
-    as = M.toList $ alignSent M.empty [] cs segment byExcl (t,u)
+    as = M.toList $ alignSent M.empty [] cs Nothing segment byExcl (t,u)
     as' = case (c `isSubUDTree'` t, c `isHeadSubUDTree` t) of
       (True,_) -> sortOnDepth as
       (_,True) -> sortOnDepth (filter (\(_,(rs,_)) -> HEAD `elem` rs) as)

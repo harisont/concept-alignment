@@ -8,6 +8,7 @@ import System.Exit
 data Flag = Pharaoh String
           | Path String
           | MaxSize String
+          | PatternReplace String
           | All
           | Clauses 
           | Rest

@@ -8,6 +8,7 @@ import System.Environment (getArgs)
 import System.Console.GetOpt
 import System.Exit
 import UDConcepts
+import UDPatterns
 import ConceptAlignment
 import FastAlignUtils
 import Criteria 
@@ -28,7 +29,8 @@ main = do
         let byExcl = Rest `elem` flags
         let fp = listToMaybe [path | Path path <- flags] 
         let fp' = fromJust fp
-        let as = M.toList $ align smtAs criteria segment byExcl tus
+        r <- getReplacementPattern flags
+        let as = M.toList $ align smtAs criteria r segment byExcl tus
         let m = listToMaybe [read mmax :: Int | MaxSize mmax <- flags]
         let as' = if All `elem` flags then as else selectForMT m as
         let as'' = sortByConfidence as'
@@ -60,6 +62,14 @@ main = do
         print $ ltrees $ phToLas bitext indices !! 5
         return $ phToLas bitext indices
       _ -> undefined
+    getReplacementPattern :: [Flag] -> IO (Maybe UDReplacement)
+    getReplacementPattern flags = do
+          let rp = listToMaybe [p | PatternReplace p <- flags] 
+          if isJust rp 
+            then do
+              patternText <- readFile (fromJust rp)
+              return $ Just (read patternText :: UDReplacement)
+            else return Nothing
 
 -- | Sort alignments by how likely theyare to be correct (kinda). 
 sortByConfidence :: [(Alignment,Info)] -> [(Alignment,Info)]
@@ -75,14 +85,15 @@ sortByConfidence = sortOn (\(a,(r,o)) ->
 
 options :: [OptDescr Flag]
 options =
- [ Option []    ["pharaoh"]         (ReqArg Pharaoh "FILE")   "use alignment in pharaoh format as backup"
- , Option ['f'] ["file"]            (ReqArg Path "FILE")      "write the output to a file (two separate CoNLL-u files if the alignments are not linearized)" 
- , Option ['m'] ["maxsize", "max"]  (ReqArg MaxSize "INT")    "set a max size for the extracted alignments"
- , Option ['a'] ["all"]             (NoArg All)               "do not filter out any alignments, regardless what other flags say"
- , Option []    ["clauses"]         (NoArg Clauses)           "align clause-by-clause"
- , Option []    ["rest"]            (NoArg Rest)              "try to align all nominals and modifiers"
- , Option ['l'] ["linearize"]       (NoArg Linearize)         "print out alignments in .ca format instead of trees"
- , Option ['h'] ["help"]            (NoArg Help)              "show this help message"
+ [ Option []    ["pharaoh"]         (ReqArg Pharaoh "FILE")         "use alignment in pharaoh format as backup"
+ , Option ['f'] ["file"]            (ReqArg Path "FILE")            "write the output to a file (two separate CoNLL-u files if the alignments are not linearized)" 
+ , Option ['m'] ["maxsize", "max"]  (ReqArg MaxSize "INT")          "set a max size for the extracted alignments"
+ , Option ['r'] ["pattern-replace"] (ReqArg PatternReplace "FILE")  "extract specific patterns (e.g. VPs and their argument structure)"
+ , Option ['a'] ["all"]             (NoArg All)                     "do not filter out any alignments, regardless what other flags say"
+ , Option []    ["clauses"]         (NoArg Clauses)                 "align clause-by-clause"
+ , Option []    ["rest"]            (NoArg Rest)                    "try to align all nominals and modifiers"
+ , Option ['l'] ["linearize"]       (NoArg Linearize)               "print out alignments in .ca format instead of trees"
+ , Option ['h'] ["help"]            (NoArg Help)                    "show this help message"
  ]
 
 help :: String
