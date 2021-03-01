@@ -33,7 +33,7 @@
 *stack.yaml.lock
 *.stack-work/
 
-# ud trees
+# graphical ud trees
 *.svg
 
 # folder-specific things
@@ -50,3 +50,6 @@ Test.hs
 
 # my beamer theme
 presentation/beamerthememhthm.sty
+
+# tmp files
+*.tmp
