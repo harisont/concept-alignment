@@ -457,7 +457,7 @@ subtree2Sentence :: UDTree -> UDSentence
 subtree2Sentence = adjustIds . markRoot
   where 
     markRoot (RTree n ts) = RTree (n { 
-      udDEPREL = "root",-- :" ++ udDEPREL n, -- "root" only for grammar generation
+      udDEPREL = "root:" ++ udDEPREL n,
       udHEAD = udIdRoot
     }) ts
     adjustIds t = UDSentence cs (map (replaceIds ids) us)

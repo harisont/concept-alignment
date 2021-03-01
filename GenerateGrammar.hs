@@ -11,6 +11,7 @@ import PGF
 import BuildGFGrammar
 import UD2GF
 import UDAnnotations
+import RTree
 import UDConcepts
 import GFConcepts
 
@@ -87,7 +88,12 @@ uds2ast env uds = map (expandMacro env) (devtree2abstrees
                                     $ combineTrees env
                                     $ analyseWords env
                                     $ udtree2devtree
+                                    $ simpleRoot
                                     $ udSentence2tree uds)
+
+-- to ignore any kind of weird label/subtype in the output of CA
+simpleRoot :: UDTree -> UDTree
+simpleRoot (RTree n ts) = RTree (n { udDEPREL = "root"}) ts
 
 -- | Timed version of uds2ast
 uds2astTimed :: Int -> UDEnv -> UDSentence -> IO [AbsTree]
