@@ -110,7 +110,7 @@ Here is an example of using the program to translate a single sentence:
 echo "this sentence will be translated" | stack exec -- translate
 Extracted.pgf             
 ```
-## Configuration: modifying the alignment criteria {#cconf}
+## Configuration: modifying the alignment criteria
 
 Modifying the criteria CA makes use of requires
 little effort. All criteria are in fact defined in a separate Haskell
