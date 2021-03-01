@@ -8,11 +8,13 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import RTree
 import UDConcepts
+import UDPatterns
 
 {- Basic (mostly data types) definitions and instances for alignments etc. -}
 
 -- | An alignment is a pair of corresponding UD subtrees (not a type synonym
 -- because of custom Eq and Ord instances)
+-- TODO: type synonym instances and just a pair?
 newtype Alignment = A (UDTree,UDTree)
 
 -- | Left (SL) tree of an alignment
@@ -444,14 +446,14 @@ subtree2Sentence = adjustIds . markRoot
   where 
     markRoot (RTree n ts) = RTree (n { 
       udDEPREL = "root",-- :" ++ udDEPREL n, -- "root" only for grammar generation
-      udHEAD = UDIdRoot
+      udHEAD = udIdRoot
     }) ts
     adjustIds t = UDSentence cs (map (replaceIds ids) us)
       where 
         (UDSentence cs us) = udTree2sentence t
         ids = map udID us
         replaceIds ids w = case udHEAD w of 
-          UDIdRoot -> w {
+          udIdRoot -> w {
             udID = i' $ udID w
           }
           udIDInt -> w {
