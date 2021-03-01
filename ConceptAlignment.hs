@@ -266,6 +266,18 @@ prune = nubBy areAlt . sortByFertility . sortByReasons
     sortByFertility as = sortOn (\(a,_) -> - (length $ subas a)) as
       where subas a = filter (\a' -> a `contains` a') (map fst as)
 
+-- | Helper function for pattern alignment: given an alignment and a 
+-- replacement pattern, return the corresponding pattern-replaced one 
+-- (if applicable)
+alignPattern :: UDReplacement -> Alignment -> Maybe Alignment
+alignPattern r (A (t,u)) = 
+  case (ch1,ch2) of
+    (True,True) -> Just (A (t',u'))
+    _ -> Nothing
+  where 
+    (t',ch1) = replacementsWithUDPattern r t
+    (u',ch2) = replacementsWithUDPattern r u
+
 -- | Helper function for head alignment: given an alignment, return a new one  
 -- for their "heads", respecting any compounds and aux+verbs (and more?)
 alignHeads :: Alignment -> Alignment
