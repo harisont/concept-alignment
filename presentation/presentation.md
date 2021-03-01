@@ -213,7 +213,7 @@ Data: sentence-aligned Computer Science course plans
 For each $L_1$-$L_2$ alignment: \pause
 
 > 1. look for its $L_2$ member among all subtrees of the $L_2$ version of the text where it is to be propagated
-> 2. if it is present, align the sentence it belongs to with its _TL_ conterpart with the same procedure used for CE
+> 2. if it is present, align the sentence it belongs to with its _TL_ counterpart with the same procedure used for CE
 > 3. if multiple candidate alignments are found, select the one with the closest depths
 
 ## Caveats
