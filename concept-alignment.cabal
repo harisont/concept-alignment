@@ -23,13 +23,19 @@ executable extract-concepts
     -- from gf-ud (but modified)
     RTree,
     UDStandard,
-    UDConcepts
+    UDConcepts,
+    GFConcepts,
+    UDAnalysis,
+    UDAnnotations,
+    UDOptions,
+    UDPatterns
   build-depends:
     base,
     containers,
     gf,
     multiset,
-    split
+    split,
+    filepath
   ghc-options: -main-is ExtractConcepts
   default-language: Haskell2010
 
@@ -46,13 +52,19 @@ executable propagate-concepts
     -- from gf-ud
     RTree,
     UDStandard,
-    UDConcepts
+    UDConcepts,
+    GFConcepts,
+    UDAnalysis,
+    UDAnnotations,
+    UDOptions,
+    UDPatterns
   build-depends: 
     base,
     containers,
     gf,
     multiset,
-    split
+    split,
+    filepath
   ghc-options: -main-is PropagateConcepts
   default-language: Haskell2010
 
@@ -69,13 +81,19 @@ executable evalign
     -- from gf-ud
     RTree,
     UDStandard,
-    UDConcepts
+    UDConcepts,
+    GFConcepts,
+    UDAnalysis,
+    UDAnnotations,
+    UDOptions,
+    UDPatterns
   build-depends:
     base,
     containers,
     gf,
     multiset,
-    split
+    split,
+    filepath
   ghc-options: -main-is EvAlign
   default-language: Haskell2010
 
@@ -127,11 +145,17 @@ library
     RTree,
     UDStandard,
     UDConcepts
+    GFConcepts,
+    UDAnalysis,
+    UDAnnotations,
+    UDOptions,
+    UDPatterns
   build-depends:
     base,
     containers,
     gf,
     multiset,
-    split
+    split,
+    filepath
   ghc-options: -main-is EvAlign
   default-language: Haskell2010
