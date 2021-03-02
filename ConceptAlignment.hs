@@ -203,7 +203,7 @@ alignSent as las cs r segment byExcl (t,u) =
       | (not . null) cs' = prune as'
       | A (t,u) `M.member` as = [
           (A (t,u),(S.singleton PREV,1)), 
-          (alignHeads (A (t,u)),(S.fromList [HEAD, PREV], 1))
+          (alignHeads (A (t,u)),(S.fromList [HEAD,PREV], 1))
         ]
       | linearize (A (t,u)) `elem` map ltrees las = [
           (A (t,u),(S.singleton FAST,1))
@@ -272,7 +272,7 @@ prune = nubBy areAlt . sortByFertility . sortByReasons
     areAlt (A (t1,u1),_) (A (t2,u2),_) = t1 == t2 || u1 == u2
     -- sort alignments by number of reasons (decreasing order), then by first
     sortByReasons = sortOn (\(_,(rs,n)) -> 
-      let rs' = rs `S.difference` S.fromList [HEAD,PREV] 
+      let rs' = rs `S.difference` S.fromList [HEAD,PREV,MATCH] 
       in (-(length rs'), maximum $ S.elems rs))
     -- alt. fertility-based sorting strategy
     -- top alignments are the ones that lead to more sub-alignments
@@ -492,7 +492,7 @@ selectForMT mmax as = nubBy
                                 || (not . null) (contentTags u)
     as'' = case mmax of
       (Just m) -> 
-        filter (\((A (t,u)),_) -> sizeRTree t <= m || sizeRTree u <= m) as'
+        filter (\(A (t,u),_) -> sizeRTree t <= m || sizeRTree u <= m) as'
       Nothing -> as'
 
 -- | Check if an alignment is perfect, i.e. ig the structure of the two trees
