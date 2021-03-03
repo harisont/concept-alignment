@@ -464,13 +464,14 @@ subtree2Sentence = adjustIds . markRoot
         (UDSentence cs us) = udTree2sentence t
         ids = map udID us
         replaceIds ids w = case udHEAD w of 
-          udIdRoot -> w {
+          UDIdInt 0 -> w { -- root
             udID = i' $ udID w
           }
-          udIDInt -> w {
+          UDIdInt _ -> w {
             udID = i' $ udID w,
             udHEAD = i' $ udHEAD w
           }
+          _ -> error "don't know what to do when UDId are not integers"
           where i' i = UDIdInt $ 1 + fromJust (i `elemIndex` ids)
 
 
