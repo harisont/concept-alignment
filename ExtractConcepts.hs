@@ -4,6 +4,7 @@ import Data.List
 import qualified Data.Map as M
 import qualified Data.Set as S
 import Data.Maybe
+import System.FilePath.Posix
 import System.Environment (getArgs)
 import System.Console.GetOpt
 import System.Exit
@@ -43,14 +44,16 @@ main = do
             if isJust fp 
               then do
                 let numberedSentPairs = [1..] `zip` map (alignment2sentencePair . fst) as''
-                writeFile ("SL" ++ fp') (unlines [prUDSentence (fst x) (fst $ snd x) | x <- numberedSentPairs])
-                writeFile ("TL" ++ fp') (unlines [prUDSentence (fst x) (snd $ snd x) | x <- numberedSentPairs]) 
+                writeFile (insertLang fp' "SL") (unlines [prUDSentence (fst x) (fst $ snd x) | x <- numberedSentPairs])
+                writeFile (insertLang fp' "TL") (unlines [prUDSentence (fst x) (snd $ snd x) | x <- numberedSentPairs]) 
               else mapM_ (print . fst) as''
     _ -> do
       putStrLn "Wrong number of arguments."
       putStrLn help
       exitWith (ExitFailure 1)
   where 
+    insertLang :: FilePath -> String -> FilePath
+    insertLang fp l = dropExtension fp ++ l ++ takeExtension fp
     getSmtAlignments :: [Flag] -> FilePath -> FilePath -> IO [LinAlignment]
     getSmtAlignments flags src trg = case [path | Pharaoh path <- flags] of
       [] -> return []
