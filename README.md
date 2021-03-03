@@ -36,6 +36,8 @@ importantly:
     location, whose names are prefixed with `SL` and `TL` respectively
 -   `–linearize` specifies that concepts should be linearized
 -   `–maxsize=INT` sets the maximum size of the extracted alignments
+-   `-pattern=FILE` specifies the path to a `.hst` defining a specific
+    pattern the extracted alignments have to match. The syntax of `.hst` files is described [here](https://github.com/GrammaticalFramework/gf-ud/tree/fa1fe1977e80d435c7eaad8e230489a0306b3e4c#some-examples-of-use) (`pattern-match`)
 -   `–all` specifies that the selection step should be skipped
 -   `–clauses` enables clause segmentation
 -   `–rest` enables a second pass of alignment "by exclusion"
