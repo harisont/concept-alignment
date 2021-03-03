@@ -125,7 +125,7 @@ data Reason = DIV   -- known interlingual divergence
             | CL    -- due to clause segmentation and alignment
             | REST  -- due to "alignment by exclusion"
             | HEAD  -- composed of the heads of another alignment (alignHeads)
-            | MATCH -- obtained via a replacement pattern
+            | PM    -- obtained via pattern matching/replacement pattern
             | PREV  -- already found in another sentence 
             | FAST  -- found by fast_align
   deriving (Eq, Show, Read, Ord, Enum, Bounded)
@@ -224,7 +224,7 @@ alignSent as las cs r segment byExcl (t,u) =
               mtup = if isJust r 
                 then alignPattern (fromJust r) (fst tu) 
                 else Nothing
-              tup = (fromJust mtup,(S.insert MATCH (reas c), 1))
+              tup = (fromJust mtup,(S.insert PM (reas c), 1))
               h = (alignHeads $ fst tu,(S.insert HEAD (reas c), 1)) -- heads 
               -- subtree alignments
               sas = concatMap (alignSent' as cs) [(t,u) | t <- ts', u <- us']
@@ -272,7 +272,7 @@ prune = nubBy areAlt . sortByFertility . sortByReasons
     areAlt (A (t1,u1),_) (A (t2,u2),_) = t1 == t2 || u1 == u2
     -- sort alignments by number of reasons (decreasing order), then by first
     sortByReasons = sortOn (\(_,(rs,n)) -> 
-      let rs' = rs `S.difference` S.fromList [HEAD,PREV,MATCH] 
+      let rs' = rs `S.difference` S.fromList [HEAD,PREV,PM] 
       in (-(length rs'), maximum $ S.elems rs))
     -- alt. fertility-based sorting strategy
     -- top alignments are the ones that lead to more sub-alignments
