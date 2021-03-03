@@ -159,7 +159,7 @@ cl = C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
 -- | Align a list of pairs of / corresponding / dependency trees   
 align :: [LinAlignment]       -- ^ a list of known linearized alignments
       -> [Criterion]          -- ^ a list of criteria (sorted by priority)
-      -> Maybe UDReplacement  -- ^ a replacement pattern
+      -> Maybe UDPattern  -- ^ a replacement pattern
       -> Bool                 -- ^ a flag indicating whether clause 
                               -- segmentation should be performed  
       -> Bool                 -- ^ a flag indicating whether alignment "by 
@@ -180,7 +180,7 @@ align = align' M.empty
 alignSent :: Alignments           -- ^ a map of known alignments
           -> [LinAlignment]       -- ^ a list of known linearized alignments
           -> [Criterion]          -- ^ a list of criteria (sorted by priority)
-          -> Maybe UDReplacement  -- ^ a replacement pattern
+          -> Maybe UDPattern      -- ^ a pattern
           -> Bool                 -- ^ a flag indicating whether clause 
                                   -- segmentation should be performed 
           -> Bool                 -- ^ a flag indicating whether alignment "by 
@@ -284,15 +284,12 @@ prune = nubBy areAlt . sortByFertility . sortByReasons
 -- | Helper function for pattern alignment: given an alignment and a 
 -- replacement pattern, return the corresponding pattern-replaced one 
 -- (if applicable)
-alignPattern :: UDReplacement -> Alignment -> Maybe Alignment
-alignPattern r (A (t,u)) = 
-  case (ch1,ch2) of
+alignPattern :: UDPattern -> Alignment -> Maybe Alignment
+alignPattern r a@(A (t,u)) = 
+  case (ifMatchUDPattern r t,ifMatchUDPattern r u) of
     -- only return an alignment if the pattern applies to both members
-    (True,True) -> Just (A (t',u'))
+    (True,True) -> Just a
     _ -> Nothing
-  where 
-    (t',ch1) = replacementsWithUDPattern r t
-    (u',ch2) = replacementsWithUDPattern r u
 
 -- | Helper function for head alignment: given an alignment, return a new one  
 -- for their "heads", respecting any compounds and aux+verbs (and more?)
