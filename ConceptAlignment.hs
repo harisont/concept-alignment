@@ -214,11 +214,13 @@ alignSent as las cs r segment byExcl (t,u) =
           cs' = map snd (filter fst (zip [f t u | f <- map func cs] cs))
           c = head cs' -- the first determines reasons & if heads are aligned
           -- new alignments, subtrees included
-          as' = case (headAlign c,isJust mtup) of
-            (True,True) -> h:tu:tup:sas
-            (True,False) -> h:tu:sas
-            (False,True) -> tu:tup:sas
-            (False,False) -> tu:sas
+          as' = case (isJust r,headAlign c,isJust mtup) of
+            -- not using a pattern: add head if necessary
+            (False,True,_) -> h:tu:sas
+            (False,False,_) -> tu:sas
+            -- using a pattern: only add alignment if something has changed
+            (True,_,True) -> tup:sas
+            (True,_,False) -> sas
             where 
               tu = (A (t,u),(reas c,1)) -- (t,u)
               mtup = if isJust r 
