@@ -87,7 +87,7 @@ statistics are needed.
 The grammar generation module can be run as follows:
 
 ```
-stack exec -- generate-grammar path_to_extract_grammapaths_to_morphodicts paths_to_aligned_conllu_files
+stack exec -- generate-grammar path_to_extract_grammar paths_to_morphodicts paths_to_aligned_conllu_files
 ```
 
 Here, `path_to_extract_grammar` should point to the extraction grammar
