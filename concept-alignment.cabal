@@ -1,5 +1,9 @@
 name: concept-alignment
 version: 0
+synopsis: syntax-based Concept Alignment for MT
+description: syntax-based Concept Alignment for MT, based on Universal Dependencies and Grammatical Framework
+license:             BSD2
+license-file:        LICENSE
 author: Arianna Masciolini
 maintainer: arianna.masciolini@gmail.com
 category: Language
