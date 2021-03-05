@@ -7,32 +7,18 @@ build-type: Simple
 extra-source-files: README.md
 cabal-version: >= 1.10
 
-
 executable extract-concepts
-  hs-source-dirs:
-    .,
-    gfud
-    -- gf-ud
   main-is: ExtractConcepts.hs
   other-modules:
-    -- own
     ConceptAlignment,
     Criteria,
     FastAlignUtils,
-    ArgvParse,
-    -- from gf-ud (but modified)
-    RTree,
-    UDStandard,
-    UDConcepts,
-    GFConcepts,
-    UDAnalysis,
-    UDAnnotations,
-    UDOptions,
-    UDPatterns
+    ArgvParse
   build-depends:
     base,
     containers,
     gf,
+    gf-ud,
     multiset,
     split,
     filepath
@@ -40,28 +26,16 @@ executable extract-concepts
   default-language: Haskell2010
 
 executable propagate-concepts
-  hs-source-dirs:
-    .,
-    gfud
   main-is: PropagateConcepts.hs
   other-modules:
-    -- own
     ConceptAlignment,
     Criteria,
-    ArgvParse,
-    -- from gf-ud
-    RTree,
-    UDStandard,
-    UDConcepts,
-    GFConcepts,
-    UDAnalysis,
-    UDAnnotations,
-    UDOptions,
-    UDPatterns
+    ArgvParse
   build-depends: 
     base,
     containers,
     gf,
+    gf-ud,
     multiset,
     split,
     filepath
@@ -69,28 +43,16 @@ executable propagate-concepts
   default-language: Haskell2010
 
 executable evalign
-  hs-source-dirs:
-    .,
-    gfud
   main-is: EvAlign.hs
   other-modules:
-    -- own
     ConceptAlignment,
     Criteria,
-    ArgvParse,
-    -- from gf-ud
-    RTree,
-    UDStandard,
-    UDConcepts,
-    GFConcepts,
-    UDAnalysis,
-    UDAnnotations,
-    UDOptions,
-    UDPatterns
+    ArgvParse
   build-depends:
     base,
     containers,
     gf,
+    gf-ud,
     multiset,
     split,
     filepath
@@ -98,9 +60,6 @@ executable evalign
   default-language: Haskell2010
 
 executable translate
-  hs-source-dirs:
-    .,
-    gfud
   main-is: Translate.hs
   build-depends:
     base,
@@ -109,26 +68,11 @@ executable translate
   default-language: Haskell2010
 
 executable generate-grammar
-  hs-source-dirs:
-    .,
-    gfud
   main-is: GenerateGrammar.hs
-  other-modules:
-    -- from gf-ud
-    BuildGFGrammar,
-    GFConcepts
-    RTree,
-    UDConcepts,
-    UDStandard,
-    Backend,
-    DBNF,
-    UD2GF,
-    UDAnnotations,
-    UDOptions,
-    UDVisualization
   build-depends:
     base,
     gf,
+    gf-ud,
     filepath,
     containers,
     process,
@@ -137,23 +81,12 @@ executable generate-grammar
   default-language: Haskell2010
 
 library
-  hs-source-dirs:
-    .,
-    gfud
   exposed-modules: ConceptAlignment
-  other-modules:
-    RTree,
-    UDStandard,
-    UDConcepts
-    GFConcepts,
-    UDAnalysis,
-    UDAnnotations,
-    UDOptions,
-    UDPatterns
   build-depends:
     base,
     containers,
     gf,
+    gf-ud,
     multiset,
     split,
     filepath
