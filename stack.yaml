@@ -7,7 +7,8 @@ packages:
 local-bin-path: .
 
 extra-deps:
-- gf-3.10
+- git: https://github.com/GrammaticalFramework/gf-core
+  commit: b962bcd178a212f6b3cea6e2d74a2181005a4729
 - cgi-3001.3.0.3 # dependency of gf
 - multiset-0.3.4.3
 
