@@ -72,45 +72,43 @@ generateGrammar ap ep mp op = do
     -- (TODO: GF Options didn't seem to work, but they should)
     writePGF noOptions eg
     mapM_ (writePGF noOptions) mds 
-    renameFile (takeBaseName ep ++ ".pgf") (ep ++ ".pgf")
-    mapM_ (\l -> renameFile (takeBaseName mp ++ show l ++ "Abs.pgf") (mp ++ show l ++ ".pgf")) langs
+    renameFile (takeBaseName ep ++ ".pgf") egDest
+    mapM_ (\l -> 
+        renameFile (takeBaseName mp ++ show l ++ "Abs.pgf") (mdDest l)) langs
+    
+    -- TREE CONVERSIONS
+    -- 1. gf-ud's UD -> gf-ud's GF 
+    udEnvs <- mapM (flip (getEnv ep) "Utt" . show) langs
+    let as = zipWith (map . uds2ast) udEnvs us
+    let as' = rmBackups $ transpose as -- rm Backups
+    -- 2. gf-ud's GF to GF's GF
+    let es = map (map ast2expr) as'
 
+    -- RULES GENERATION
+    let les = map (zip langs) es :: [[(Language,Expr)]]
+    env <- getGrammarEnv egDest (map mdDest langs)
+    let rs = map (tree2rules env) (map (map (\(l,t) -> (show l,t))) les)
+
+    -- RULES POSTPROCESSING
     -- TODO: review after merge 
-    -- create UD environments (one per language)
-    envs <- mapM (flip (getEnv ep) "Utt" . show) langs
-    -- associate envs (langs) to lists of UD sentences
-    let ecs = envs `zip` us :: [(UDEnv, [UDSentence])]
-    -- transform UD sentences into ASTs, 
-    -- translation equivalents are on the same row
-    let as = map (\(e,ss) -> map (uds2ast e) ss) ecs
-    let langNotes = map (++ ": ") (map show langs)
-    let aas = map (zip langNotes) (transpose as)
-    -- cf. $paste out/gfts-en.tmp out/gfts-it.tmp but with additional formatting required by BuildGrammar
-    let stras = map (intercalate "\n" . map (\(a,t) -> a ++ prAbsTree t)) aas
-    -- cf. $grep -v Backup | sort -u 
-    let stras' = intersperse "\n" $ sort $ nub $ filter (not . isInfixOf "Backup") stras
-    -- putStrLn stras' -- just because "se non vedo non credo" 
-    -- filter out trees containing weird characters and numbers
-    let stras'' = filter (all isAlpha') stras' 
-
-    let abstr = ep ++ ".pgf"
-    let dicts = map (\l -> mp ++ l ++ ".pgf") (map show langs)
-    let als = unlines stras''
-    env <- getGrammarEnv abstr dicts
-    let aligns = readAlignments als
-    let ruless = map (tree2rules env) aligns
-    let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env ruless)
+    let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs)
     let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
     let absGrLines = a:"flags startcat = Utt ;":as -- lines of (abstract) Extracted.gf
     let langs = map fst (M.toList $ langenvs env)
     let langGrLines = map (\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) langs -- lines of (concrete) ExtractedLang.gf
     mapM_ 
-        (\(l,g) -> writeFile (dropFileName abstr ++ "Extracted" ++ l ++ ".gf") g) 
+        (\(l,g) -> writeFile (dropFileName egDest ++ "Extracted" ++ l ++ ".gf") g) 
         (("":langs) `zip` map unlines (absGrLines:langGrLines))
     where 
         isPron r = "Pron" `isInfixOf` r
+        egDest = ep ++ ".pgf"
+        mdDest l = mp ++ show l ++ ".pgf"
 
 isAlpha' c = or [isAlpha c, c == ' ', c == '\n', c == '_', c == ':', c == '(', c == ')']
+
+rmBackups :: [[AbsTree]] -> [[AbsTree]]
+rmBackups = filter (not . any hasBackup) 
+    where hasBackup a = any isBackupFunction (allNodesRTree a)
 
 -- | Check that a file is in CoNNL-U format (by its extension)
 isConllu :: FilePath -> Bool
