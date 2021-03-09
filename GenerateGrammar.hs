@@ -14,6 +14,7 @@ import System.Exit
 
 import Data.Functor
 import Data.List
+import qualified Data.Map as M
 import Data.Maybe
 import Data.Char
 
@@ -91,7 +92,23 @@ generateGrammar ap ep mp op = do
     -- putStrLn stras' -- just because "se non vedo non credo" 
     -- filter out trees containing weird characters and numbers
     let stras'' = filter (all isAlpha') stras' 
-    buildGFGrammar (ep ++ ".pgf") (map (\l -> mp ++ l ++ ".pgf") (map show langs)) (unlines stras'')
+
+    let abstr = ep ++ ".pgf"
+    let dicts = map (\l -> mp ++ l ++ ".pgf") (map show langs)
+    let als = unlines stras''
+    env <- getGrammarEnv abstr dicts
+    let aligns = readAlignments als
+    let ruless = map (tree2rules env) aligns
+    let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env ruless)
+    let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
+    let absGrLines = a:"flags startcat = Utt ;":as -- lines of (abstract) Extracted.gf
+    let langs = map fst (M.toList $ langenvs env)
+    let langGrLines = map (\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) langs -- lines of (concrete) ExtractedLang.gf
+    mapM_ 
+        (\(l,g) -> writeFile (dropFileName abstr ++ "Extracted" ++ l ++ ".gf") g) 
+        (("":langs) `zip` map unlines (absGrLines:langGrLines))
+    where 
+        isPron r = "Pron" `isInfixOf` r
 
 isAlpha' c = or [isAlpha c, c == ' ', c == '\n', c == '_', c == ':', c == '(', c == ')']
 
