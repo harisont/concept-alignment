@@ -24,6 +24,7 @@ import PGF
 
 -- gf-ud
 import RTree
+import GFConcepts
 import UDConcepts
 import UDAnnotations
 import UD2GF
@@ -74,7 +75,7 @@ generateGrammar ap ep mp op = do
     let ecs = envs `zip` us :: [(UDEnv, [UDSentence])]
     -- transform UD sentences into (LISTS OF, cf. uds2ast) ASTs, 
     -- translation equivalents are on the same row
-    as <- mapM (\(e,ss) -> mapM (uds2astTimed 1 e) ss) ecs
+    let as = map (\(e,ss) -> map (uds2ast e) ss) ecs
     let langNotes = map (++ ": ") (map show langs)
     let aas = map (zip langNotes) (transpose as)
     -- cf. $paste out/gfts-en.tmp out/gfts-it.tmp but with additional formatting required by BuildGrammar
@@ -185,17 +186,6 @@ uds2ast env uds = map (expandMacro env) (devtree2abstrees
 -- to ignore any kind of weird label/subtype in the output of CA
 simpleRoot :: UDTree -> UDTree
 simpleRoot (RTree n ts) = RTree (n { udDEPREL = "root"}) ts
-
--- | Timed version of uds2ast
-uds2astTimed :: Int -> UDEnv -> UDSentence -> IO [AbsTree]
-uds2astTimed ms env uds = do
-    r <- timeout ms (uds2ast' env uds)
-    case r of
-        Just as -> return as
-        Nothing -> return []
-    where 
-        uds2ast' :: UDEnv -> UDSentence -> IO [AbsTree]
-        uds2ast' env uds = return $ uds2ast env uds
 
 {- Argument parsing -} 
 
