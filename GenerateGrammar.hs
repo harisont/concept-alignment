@@ -79,13 +79,13 @@ generateGrammar ap ep mp op = do
     envs <- mapM (flip (getEnv ep) "Utt" . show) langs
     -- associate envs (langs) to lists of UD sentences
     let ecs = envs `zip` us :: [(UDEnv, [UDSentence])]
-    -- transform UD sentences into (LISTS OF, cf. uds2ast) ASTs, 
+    -- transform UD sentences into ASTs, 
     -- translation equivalents are on the same row
     let as = map (\(e,ss) -> map (uds2ast e) ss) ecs
     let langNotes = map (++ ": ") (map show langs)
     let aas = map (zip langNotes) (transpose as)
     -- cf. $paste out/gfts-en.tmp out/gfts-it.tmp but with additional formatting required by BuildGrammar
-    let stras = map (intercalate "\n" . map (\(a,ts) -> a ++ concatMap prAbsTree ts)) aas
+    let stras = map (intercalate "\n" . map (\(a,t) -> a ++ prAbsTree t)) aas
     -- cf. $grep -v Backup | sort -u 
     let stras' = intersperse "\n" $ sort $ nub $ filter (not . isInfixOf "Backup") stras
     -- putStrLn stras' -- just because "se non vedo non credo" 
@@ -168,18 +168,18 @@ sentId :: UDSentence -> Int
 -- PropagateConcepts and have not been modified
 sentId = read . drop 4 . last . words . head . udCommentLines
 
--- | Convert a UD sentence into the best corresponding GF ASTs via gfud 
+-- | Convert a UD sentence into the best corresponding GF AST via gfud 
 -- functions
-uds2ast :: UDEnv -> UDSentence -> [AbsTree] 
-uds2ast env uds = map (expandMacro env) (devtree2abstrees 
-                                    $ addBackups            
-                                    $ head                  
-                                    $ splitDevTree          
-                                    $ combineTrees env
-                                    $ analyseWords env
-                                    $ udtree2devtree
-                                    $ simpleRoot
-                                    $ udSentence2tree uds)
+uds2ast :: UDEnv -> UDSentence -> AbsTree 
+uds2ast env uds = head $ map (expandMacro env) (devtree2abstrees 
+                                                $ addBackups            
+                                                $ head                  
+                                                $ splitDevTree          
+                                                $ combineTrees env
+                                                $ analyseWords env
+                                                $ udtree2devtree
+                                                $ simpleRoot
+                                                $ udSentence2tree uds)
 
 -- to ignore any kind of weird label/subtype in the output of CA
 simpleRoot :: UDTree -> UDTree
