@@ -24,9 +24,9 @@ import PGF
 
 -- gf-ud
 import RTree
-import GFConcepts
 import UDConcepts
 import UDAnnotations
+import GFConcepts
 import UD2GF
 import BuildGFGrammar -- TODO: remove
 
@@ -38,7 +38,7 @@ main = do
         else do 
             case args of
                 [apref] -> do 
-                                                                                -- TODO: function
+                    -- TODO: functionalize
                     let epref = fromMaybe "grammars/Extract" (listToMaybe [e | ExtractionGrammar e <- flags])
                     let mpref = fromMaybe "MorphoDict" (listToMaybe [m | MorphoDicts m <- flags])
                     let opref = fromMaybe "grammars/Generated" (listToMaybe [o | Path o <- flags])
@@ -53,8 +53,8 @@ type ExtrPref = FilePath        -- extraction grammar prefix
 type OutPref = FilePath         -- generated grammar prefix (optional)
 type MDPref = FilePath          -- morphodicts prefix
 type AlignedPref = FilePath     -- aligned CoNNL-U files prefix
-
-                                                                                -- TODO: return an IO grammar, make main write files
+                                         
+-- TODO: return an IO grammar, make main write files
 generateGrammar :: AlignedPref -> ExtrPref -> MDPref -> OutPref -> IO ()
 generateGrammar ap ep mp op = do
 
@@ -64,13 +64,19 @@ generateGrammar ap ep mp op = do
     egps <- gfPaths ep langs -- paths to the modules of the extraction grammar
     mdps <- mdPaths mp langs -- (pairs of) paths to the morphodicts
     us <- mapM parseUDFile aps <&> getAlignments :: IO [[UDSentence]]
-    eg <- compileToPGF noOptions egps -- pgf extraction grammar                 -- TODO: maybe change opts (path)
-    mds <- mapM (compileToPGF noOptions . pair2list) mdps -- pgf morphodicts    -- TODO: maybe change opts (path + name)
+    eg <- compileToPGF noOptions egps
+    mds <- mapM (compileToPGF noOptions . (\(a,b) -> [a,b])) mdps
 
-    print aps
-    print langs
+    -- WRITING PGFs in the right place (extraction grammar and morphodicts)
+    -- (TODO: GF Options didn't seem to work, but they should)
+    writePGF noOptions eg
+    mapM_ (writePGF noOptions) mds 
+    renameFile (takeBaseName ep ++ ".pgf") (ep ++ ".pgf")
+    mapM_ (\l -> renameFile (takeBaseName mp ++ show l ++ "Abs.pgf") (mp ++ show l ++ ".pgf")) langs
+
+    -- TODO: review after merge 
     -- create UD environments (one per language)
-    envs <- mapM (flip (getEnv ep) "Utt") (map show langs)
+    envs <- mapM (flip (getEnv ep) "Utt" . show) langs
     -- associate envs (langs) to lists of UD sentences
     let ecs = envs `zip` us :: [(UDEnv, [UDSentence])]
     -- transform UD sentences into (LISTS OF, cf. uds2ast) ASTs, 
@@ -87,16 +93,11 @@ generateGrammar ap ep mp op = do
     let stras'' = filter (all isAlpha') stras' 
     buildGFGrammar (ep ++ ".pgf") (map (\l -> mp ++ l ++ ".pgf") (map show langs)) (unlines stras'')
 
-isPfg p = takeExtension p == ".pgf"
-
 isAlpha' c = or [isAlpha c, c == ' ', c == '\n', c == '_', c == ':', c == '(', c == ')']
 
 -- | Check that a file is in CoNNL-U format (by its extension)
 isConllu :: FilePath -> Bool
 isConllu p = takeExtension p == ".conllu"
-
-pair2list :: (a,a) -> [a]
-pair2list (a,b) = [a,b]
 
 -- | Given a prefix, return the paths to the aligned CoNNL-U files
 conlluPaths :: AlignedPref -> IO [FilePath]
@@ -152,14 +153,14 @@ conlluLangs conllus = do
 -- aligned by sent_id), only get the concepts found in all n langs (so that
 -- the lists in the resulting sentences are also aligned implicitly) 
 getAlignments :: [[UDSentence]] -> [[UDSentence]]
-getAlignments sss =  
-    transpose $ mapMaybe getAlignment [(offs + 1)..(offs + maximum (map length sss))]
+getAlignments ss =  
+    transpose $ mapMaybe getAlignment [(o + 1)..(o + maximum (map length ss))]
         where
             getAlignment :: Int -> Maybe [UDSentence]
             getAlignment i = 
-                let as = map (find (\s -> sentId s == i)) sss
+                let as = map (find (\s -> sentId s == i)) ss
                 in if all isJust as then Just $ map fromJust as else Nothing
-            offs = 1000000 -- numbering offset (cf. prUDSentence in UDConcepts)
+            o = 1000000 -- numbering offset (cf. prUDSentence in UDConcepts)
 
 -- | Return the id of a sentence, taken from the comment that precedes it
 sentId :: UDSentence -> Int
@@ -168,10 +169,7 @@ sentId :: UDSentence -> Int
 sentId = read . drop 4 . last . words . head . udCommentLines
 
 -- | Convert a UD sentence into the best corresponding GF ASTs via gfud 
--- functions (a more general function of this kind should REALLY belong to 
--- gfud!)
--- (NOTE: not used cause ud2gf tends to eat up all memory by getting stuck
--- on specific trees)
+-- functions
 uds2ast :: UDEnv -> UDSentence -> [AbsTree] 
 uds2ast env uds = map (expandMacro env) (devtree2abstrees 
                                     $ addBackups            
