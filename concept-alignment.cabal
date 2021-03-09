@@ -73,11 +73,13 @@ executable translate
 
 executable generate-grammar
   main-is: GenerateGrammar.hs
+  other-modules: ArgvParse
   build-depends:
     base,
     gf,
     gf-ud,
     filepath,
+    directory,
     containers,
     process,
     pretty
