@@ -1,25 +1,33 @@
 module GenerateGrammar where
 
+-- argument parsing
 import System.Environment (getArgs)
 import System.Console.GetOpt
-import System.Exit
-import System.Timeout
+import ArgvParse
+
+-- operations on file paths
 import System.FilePath.Posix
 import System.Directory
+
+-- other system stuff
+import System.Exit
+
 import Data.Functor
 import Data.List
 import Data.Maybe
 import Data.Char
+
+-- gf
 import GF hiding (isPrefixOf, main)
 import GF.Support
 import PGF
-import BuildGFGrammar
-import UD2GF
-import UDAnnotations
+
+-- gf-ud
 import RTree
 import UDConcepts
-import GFConcepts
-import ArgvParse
+import UDAnnotations
+import UD2GF
+import BuildGFGrammar -- TODO: remove
 
 main = do
     argv <- getArgs
