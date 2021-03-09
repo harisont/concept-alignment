@@ -181,6 +181,14 @@ uds2ast env uds = head $ map (expandMacro env) (devtree2abstrees
                                                 $ simpleRoot
                                                 $ udSentence2tree uds)
 
+
+-- TODO:  should be not based on print-read
+-- | Convert a gf-ud AbsTree into a GF Expr
+ast2expr :: AbsTree -> Expr
+ast2expr a = case readExpr (prAbsTree a) of
+    Just e -> e
+    _ -> error "invalid AbsTree"
+
 -- to ignore any kind of weird label/subtype in the output of CA
 simpleRoot :: UDTree -> UDTree
 simpleRoot (RTree n ts) = RTree (n { udDEPREL = "root"}) ts
