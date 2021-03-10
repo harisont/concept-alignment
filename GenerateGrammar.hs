@@ -86,7 +86,7 @@ generateGrammar ap ep mp op = do
 
   -- RULES GENERATION
   let les = map (zip langs) es :: [[(Language,Expr)]]
-  env <- getGrammarEnv egDest (map mdDest langs)
+  env <- getGrammarEnv eg (map mdDest langs)
   let rs = map (tree2rules env) les
 
   -- RULES POSTPROCESSING
@@ -224,21 +224,20 @@ data LangEnv = LangEnv {
   resourcemodules :: [String] -- to be opened
 }
 
-getGrammarEnv :: FilePath -> [FilePath] -> IO GrammarEnv
-getGrammarEnv abstr dicts = do
-  syntpgf <- readPGF abstr
-  let (_,synt,la,_) = partsOfFileName abstr
+getGrammarEnv :: PGF -> [FilePath] -> IO GrammarEnv
+getGrammarEnv eg dicts = do
+  let absName = show $ abstractName eg
   dictpgfs <- mapM readPGF dicts
   return $ GrammarEnv {
     absname = mkCId "Extracted",  --- hard-coded name of generated module
-    syntaxpgf = syntpgf,
-    absbasemodules = [synt ++ la], --- extending the syntax module
+    syntaxpgf = eg,
+    absbasemodules = [absName], --- extending the syntax module
     langenvs = M.fromList [
       (mkCId lang,
        LangEnv {
          cncname = mkCId ("Extracted" ++ lang),
          dictpgf = pgf,
-         basemodules = [synt++la++lang], --- extending the syntax module
+         basemodules = [absName++lang], --- extending the syntax module
          resourcemodules = [morphodict ++ lang, "Paradigms" ++ lang, "MakeStructural" ++ lang]
          }) |
               (dict,pgf) <- zip dicts dictpgfs,
