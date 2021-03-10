@@ -87,18 +87,17 @@ generateGrammar ap ep mp op = do
   -- RULES GENERATION
   let les = map (zip langs) es :: [[(Language,Expr)]]
   env <- getGrammarEnv egDest (map mdDest langs)
-  let rs = map (tree2rules env . map (\(l,t) -> (show l,t))) les
+  let rs = map (tree2rules env) les
 
   -- RULES POSTPROCESSING
   -- TODO: review after merge 
   let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs)
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
   let absGrLines = a:"flags startcat = Utt ;":as -- lines of (abstract) Extracted.gf
-  let langs = map fst (M.toList $ langenvs env)
-  let langGrLines = map (\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) langs -- lines of (concrete) ExtractedLang.gf
+  let langGrLines = map ((\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) . show) langs -- lines of (concrete) ExtractedLang.gf
   mapM_ 
-      (\(l,g) -> writeFile (dropFileName egDest ++ "Extracted" ++ l ++ ".gf") g) 
-      (("":langs) `zip` map unlines (absGrLines:langGrLines))
+      (\(l,g) -> writeFile (op ++ l ++ ".gf") g) 
+      (("":map show langs) `zip` map unlines (absGrLines:langGrLines))
   where 
     isPron r = "Pron" `isInfixOf` r
     egDest = ep ++ ".pgf"
@@ -210,15 +209,14 @@ sentId = read . drop 4 . last . words . head . udCommentLines
 
 {- Grammar rules generation -}
 
-type LangName = String
-
 data GrammarEnv = GrammarEnv {
   absname :: CId,
   syntaxpgf :: PGF,
   absbasemodules :: [String],
-  langenvs :: M.Map LangName LangEnv -- lookup with langname e.g. "Eng"
+  langenvs :: M.Map Language LangEnv -- lookup with language id
 }
 
+-- | Concrete syntax environment
 data LangEnv = LangEnv {
   cncname  :: CId,
   dictpgf  :: PGF,
@@ -236,7 +234,7 @@ getGrammarEnv abstr dicts = do
     syntaxpgf = syntpgf,
     absbasemodules = [synt ++ la], --- extending the syntax module
     langenvs = M.fromList [
-      (lang,
+      (mkCId lang,
        LangEnv {
          cncname = mkCId ("Extracted" ++ lang),
          dictpgf = pgf,
@@ -250,11 +248,11 @@ getGrammarEnv abstr dicts = do
 
 data BuiltRules = BuiltRules {
   funname  :: String,
-  linrules :: [(LangName,(String,String))],   -- term with its cat
-  unknowns :: [(LangName,[(String,String)])]  -- unknown lex item with its cat
+  linrules :: [(Language,(String,String))],   -- term with its cat
+  unknowns :: [(Language,[(String,String)])]  -- unknown lex item with its cat
 } deriving Show
 
-tree2rules :: GrammarEnv -> [(LangName,Tree)] -> BuiltRules
+tree2rules :: GrammarEnv -> [(Language,Tree)] -> BuiltRules
 tree2rules env lts = BuiltRules {
   funname = fun,
   linrules = [(lang, (linrule lang tree, showCId cat)) | (lang,tree) <- lts, (cat,_) <- [valcat lang (rootfun tree)]],
@@ -283,15 +281,15 @@ tree2rules env lts = BuiltRules {
     rootfun t = root (expr2abstree t)
     synpgf = syntaxpgf env
     (firstlang,firsttree) = head lts
-    envoflang l = fromMaybe (error ("unknown lang " ++ l)) $ M.lookup l (langenvs env)
+    envoflang l = fromMaybe (error ("unknown lang " ++ show l)) $ M.lookup l (langenvs env)
 
 prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
   unwords ["fun",funname br,":",cat,";","--", unwords cats,"--","Abstr"]
   ] ++ [
-  mark c (unwords ["lin",funname br,"=",lin,";","--",lang]) | (lang,(lin,c)) <- linrules br
+  mark c (unwords ["lin",funname br,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- linrules br
   ] ++ [
-  unwords ["oper",fun,"=","mk"++cat, word fun,";","--",lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
+  unwords ["oper",fun,"=","mk"++cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
   ]
  where
    word f = "\"" ++ takeWhile (/='_') f ++ "\""
@@ -305,11 +303,11 @@ prBuiltGrammar env ruless = unlines $ [
    ] ++ [
    unwords ["concrete", showCId (cncname lenv), "of", absn, "=",
             intercalate ", " (depath (basemodules lenv)), "**",
-            "open", intercalate ", " (depath (resourcemodules lenv)), "in","{","--", lang]
+            "open", intercalate ", " (depath (resourcemodules lenv)), "in","{","--", show lang]
      | (lang,lenv) <- M.assocs (langenvs env) 
    ] ++
    map prBuiltRules ruless ++ [
-  "} -- " ++ lang | lang <- "Abstr" : langs
+  "} -- " ++ lang | lang <- "Abstr" : map show langs
    ]
  where
    absn = showCId (absname env)
