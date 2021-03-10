@@ -86,7 +86,7 @@ generateGrammar ap ep mp op = do
   -- RULES GENERATION
   let les = map (zip langs) es :: [[(Language,Expr)]]
   env <- getGrammarEnv egDest (map mdDest langs)
-  let rs = map (tree2rules env) (map (map (\(l,t) -> (show l,t))) les)
+  let rs = map (tree2rules env . map (\(l,t) -> (show l,t))) les
 
   -- RULES POSTPROCESSING
   -- TODO: review after merge 
@@ -260,7 +260,7 @@ tree2rules env lts = BuiltRules {
 }
   where
     fun = showCId
-      (mkFun (concatMap (init . partsOfFun) (concatMap lexitems (map snd lts)))
+      (mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
              (fst (valcat firstlang (rootfun firsttree))))
  
     valcat l f = case functionType synpgf f of
@@ -281,7 +281,7 @@ tree2rules env lts = BuiltRules {
     rootfun t = root (expr2abstree t)
     synpgf = syntaxpgf env
     (firstlang,firsttree) = head lts
-    envoflang l = maybe (error ("unknown lang " ++ l)) id $ M.lookup l (langenvs env)
+    envoflang l = fromMaybe (error ("unknown lang " ++ l)) $ M.lookup l (langenvs env)
 
 prBuiltRules br = unlines $ [
   unwords ["fun",funname br,":",cat,";","--", unwords cats,"--","Abstr"]
@@ -297,11 +297,11 @@ prBuiltRules br = unlines $ [
 
 prBuiltGrammar env ruless = unlines $ [
    unwords ["abstract", absn, "=",
-            concat (intersperse "," (depath (absbasemodules env))), "**","{","-- Abstr"] 
+            intercalate "," (depath (absbasemodules env)), "**","{","-- Abstr"] 
    ] ++ [
    unwords ["concrete", showCId (cncname lenv), "of", absn, "=",
-            concat (intersperse ", " (depath (basemodules lenv))), "**",
-            "open", concat (intersperse ", " (depath (resourcemodules lenv))), "in","{","--", lang]
+            intercalate ", " (depath (basemodules lenv)), "**",
+            "open", intercalate ", " (depath (resourcemodules lenv)), "in","{","--", lang]
      | (lang,lenv) <- M.assocs (langenvs env) 
    ] ++
    map prBuiltRules ruless ++ [
