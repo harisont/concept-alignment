@@ -68,14 +68,6 @@ generateGrammar ap ep mp op = do
   eg <- compileToPGF noOptions egps
   mds <- mapM (compileToPGF noOptions . (\(a,b) -> [a,b])) mdps
 
-  -- WRITING PGFs in the right place (extraction grammar and morphodicts)
-  -- (TODO: GF Options didn't seem to work, but they should)
-  writePGF noOptions eg
-  mapM_ (writePGF noOptions) mds 
-  renameFile (takeBaseName ep ++ ".pgf") egDest
-  mapM_ (\l -> 
-    renameFile (takeBaseName mp ++ show l ++ "Abs.pgf") (mdDest l)) langs
-
   -- TREE CONVERSIONS
   -- 1. gf-ud's UD -> gf-ud's GF 
   udEnvs <- mapM (flip (getEnv ep) "Utt" . show) langs
@@ -86,7 +78,7 @@ generateGrammar ap ep mp op = do
 
   -- RULES GENERATION
   let les = map (zip langs) es :: [[(Language,Expr)]]
-  env <- getGrammarEnv eg (map mdDest langs)
+  env <- getGrammarEnv eg mds
   let rs = map (tree2rules env) les
 
   -- RULES POSTPROCESSING
@@ -100,8 +92,6 @@ generateGrammar ap ep mp op = do
       (("":map show langs) `zip` map unlines (absGrLines:langGrLines))
   where 
     isPron r = "Pron" `isInfixOf` r
-    egDest = ep ++ ".pgf"
-    mdDest l = mp ++ show l ++ ".pgf"
     rmBackups = filter (not . any hasBackup) 
       where hasBackup a = any isBackupFunction (allNodesRTree a)
 
@@ -224,10 +214,9 @@ data LangEnv = LangEnv {
   resourcemodules :: [String] -- to be opened
 }
 
-getGrammarEnv :: PGF -> [FilePath] -> IO GrammarEnv
-getGrammarEnv eg dicts = do
+getGrammarEnv :: PGF -> [PGF] -> IO GrammarEnv
+getGrammarEnv eg ms = do
   let absName = show $ abstractName eg
-  dictpgfs <- mapM readPGF dicts
   return $ GrammarEnv {
     absname = mkCId "Extracted",  --- hard-coded name of generated module
     syntaxpgf = eg,
@@ -236,12 +225,13 @@ getGrammarEnv eg dicts = do
       (mkCId lang,
        LangEnv {
          cncname = mkCId ("Extracted" ++ lang),
-         dictpgf = pgf,
-         basemodules = [absName++lang], --- extending the syntax module
-         resourcemodules = [morphodict ++ lang, "Paradigms" ++ lang, "MakeStructural" ++ lang]
+         dictpgf = m,
+         basemodules = [absName ++ lang], --- extending the syntax module
+         resourcemodules = [name ++ lang, "Paradigms" ++ lang, "MakeStructural" ++ lang]
          }) |
-              (dict,pgf) <- zip dicts dictpgfs,
-              let (_,morphodict,lang,_) = partsOfFileName dict
+              m <- ms,
+              let cncame = reverse $ drop 3 $ reverse $ show $ abstractName m,
+              let (name,lang) = splitAt (length cname - 3) cname 
        ]
     }
 
