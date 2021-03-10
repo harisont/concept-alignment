@@ -78,7 +78,7 @@ generateGrammar ap ep mp op = do
 
   -- RULES GENERATION
   let les = map (zip langs) es :: [[(Language,Expr)]]
-  env <- getGrammarEnv eg mds
+  env <- getGrammarEnv eg mds op
   let rs = map (tree2rules env) les
 
   -- RULES POSTPROCESSING
@@ -214,23 +214,24 @@ data LangEnv = LangEnv {
   resourcemodules :: [String] -- to be opened
 }
 
-getGrammarEnv :: PGF -> [PGF] -> IO GrammarEnv
-getGrammarEnv eg ms = do
-  let absName = show $ abstractName eg
+getGrammarEnv :: PGF -> [PGF] -> OutPref -> IO GrammarEnv
+getGrammarEnv eg ms op = do
+  let egName = show $ abstractName eg -- name of the extraction grammar
+  let ggName = takeBaseName op
   return $ GrammarEnv {
-    absname = mkCId "Extracted",  --- hard-coded name of generated module
+    absname = mkCId ggName,  --- hard-coded name of generated module
     syntaxpgf = eg,
-    absbasemodules = [absName], --- extending the syntax module
+    absbasemodules = [egName], --- extending the syntax module
     langenvs = M.fromList [
       (mkCId lang,
        LangEnv {
-         cncname = mkCId ("Extracted" ++ lang),
+         cncname = mkCId (ggName ++ lang),
          dictpgf = m,
-         basemodules = [absName ++ lang], --- extending the syntax module
+         basemodules = [egName ++ lang], --- extending the syntax module
          resourcemodules = [name ++ lang, "Paradigms" ++ lang, "MakeStructural" ++ lang]
          }) |
               m <- ms,
-              let cncame = reverse $ drop 3 $ reverse $ show $ abstractName m,
+              let cname = reverse $ drop 3 $ reverse $ show $ abstractName m,
               let (name,lang) = splitAt (length cname - 3) cname 
        ]
     }
