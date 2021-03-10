@@ -3,12 +3,15 @@ module ArgvParse where
 import System.Console.GetOpt
 import System.Exit
 
--- | All flags used in the three executables. Which ones is used in which is
+-- | All flags used in the 5 executables. Which ones is used in which is
 -- specified in each module's options constant
 data Flag = Pharaoh String
           | Path String
           | MaxSize String
           | Pattern String
+          | ExtractionGrammar String
+          | MorphoDicts String
+          | Alignments String
           | All
           | Clauses 
           | Rest
