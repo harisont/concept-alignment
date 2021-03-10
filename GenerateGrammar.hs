@@ -214,6 +214,9 @@ data LangEnv = LangEnv {
   resourcemodules :: [String] -- to be opened
 }
 
+-- | Given the pgf of the extraction grammar, the pgfs of the morphological
+-- dictionaries and the prefix of the grammar to be generated, return
+-- the environment of the generated grammar
 getGrammarEnv :: PGF -> [PGF] -> OutPref -> IO GrammarEnv
 getGrammarEnv eg ms op = do
   let egName = show $ abstractName eg -- name of the extraction grammar
@@ -242,6 +245,8 @@ data BuiltRules = BuiltRules {
   unknowns :: [(Language,[(String,String)])]  -- unknown lex item with its cat
 } deriving Show
 
+-- | Given the to-generate grammar environment and a n-lingual "concept", 
+-- generate the corresponding GF rules
 tree2rules :: GrammarEnv -> [(Language,Tree)] -> BuiltRules
 tree2rules env lts = BuiltRules {
   funname = fun,
@@ -273,6 +278,7 @@ tree2rules env lts = BuiltRules {
     (firstlang,firsttree) = head lts
     envoflang l = fromMaybe (error ("unknown lang " ++ show l)) $ M.lookup l (langenvs env)
 
+-- | Print generated rules corresponding to a concept
 prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
   unwords ["fun",funname br,":",cat,";","--", unwords cats,"--","Abstr"]
@@ -286,6 +292,9 @@ prBuiltRules br = unlines $ [
    cat:cats = nub (map (snd . snd) (linrules br))
    mark c s = if c==cat then s else "--- " ++ s
 
+-- | Given the environment of a grammar and its rules, print the entire
+-- grammar (abstract and concrete syntaxes mixed together, will be 
+-- distinguished by their final comment)
 prBuiltGrammar :: GrammarEnv -> [BuiltRules] -> String
 prBuiltGrammar env ruless = unlines $ [
    unwords ["abstract", absn, "=",
