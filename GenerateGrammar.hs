@@ -53,7 +53,7 @@ type OutPref = FilePath         -- generated grammar prefix (optional)
 type MDPref = FilePath          -- morphodicts prefix
 type AlignedPref = FilePath     -- aligned CoNNL-U files prefix
                                          
--- TODO: return an IO grammar, make main write files
+-- TODO: return an IO grammar & make main write files?
 generateGrammar :: AlignedPref -> ExtrPref -> MDPref -> OutPref -> IO ()
 generateGrammar ap ep mp op = do
 
@@ -82,7 +82,7 @@ generateGrammar ap ep mp op = do
   let rs = map (tree2rules env) les
 
   -- RULES POSTPROCESSING
-  -- TODO: review after merge 
+  -- TODO: review (also nub?)
   let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs)
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
   let absGrLines = a:"flags startcat = Utt ;":as -- lines of (abstract) Extracted.gf
