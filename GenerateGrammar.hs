@@ -74,7 +74,7 @@ generateGrammar ap ep mp op = do
   let as = zipWith (map . uds2ast) udEnvs us
   let as' = rmBackups $ transpose as -- rm Backups
   -- 2. gf-ud's GF to GF's GF
-  let es = map (map ast2expr) as'
+  let es = map (map abstree2expr) as'
 
   -- RULES GENERATION
   let les = map (zip langs) es :: [[(Language,Expr)]]
@@ -163,13 +163,6 @@ uds2ast env uds = head $ map (expandMacro env) (devtree2abstrees
                                                 $ simpleRoot
                                                 $ udSentence2tree uds)
   where simpleRoot (RTree n ts) = RTree (n { udDEPREL = "root"}) ts
-
--- | Convert a gf-ud AbsTree into a GF Expr (i.e. a gf-ud AT to a GF AT)
-ast2expr :: AbsTree -> Expr
-ast2expr a = case readExpr (prAbsTree a) of
-  Just e -> e
-  _ -> error "invalid AbsTree"
-
 
 {- Misc helper functions -}
 
