@@ -14,7 +14,7 @@ import System.Exit
 
 import Data.Functor
 import Data.List
-import Data.Char (isAlpha)
+import Data.Char (isAlpha,toLower)
 import qualified Data.Map as M
 import Data.Maybe
 
@@ -66,13 +66,14 @@ generateGrammar ap ep mp op = do
 
   -- PARSING & COMPILATION
   us <- mapM parseUDFile aps <&> getAlignments :: IO [[UDSentence]]
+  let us' = map (map normalizeCase) us 
   eg <- compileToPGF noOptions egps
   mds <- mapM (compileToPGF noOptions . (\(a,b) -> [a,b])) mdps
 
   -- TREE CONVERSIONS
   -- 1. gf-ud's UD -> gf-ud's GF 
   udEnvs <- mapM (flip (getEnv ep) "Utt" . show) langs
-  let as = zipWith (map . uds2ast) udEnvs us
+  let as = zipWith (map . uds2ast) udEnvs us'
   let as' = rmBackups $ transpose as -- rm Backups
   -- 2. gf-ud's GF to GF's GF
   let es = map (map abstree2expr) as'
@@ -169,6 +170,13 @@ uds2ast env uds = head $ map (expandMacro env) (devtree2abstrees
   where simpleRoot (RTree n ts) = RTree (n { udDEPREL = "root"}) ts
 
 {- Misc helper functions -}
+
+normalizeCase :: UDSentence -> UDSentence
+normalizeCase s = if udUPOS w == "PNOUN" then s else s {
+  udWordLines = w { udLEMMA = [toLower c | c <- udLEMMA w]}:ws
+}
+  where 
+    (w:ws) = udWordLines s
 
 -- | Check that a file is in CoNNL-U format (by its extension)
 isConllu :: FilePath -> Bool
