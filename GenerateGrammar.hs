@@ -81,9 +81,10 @@ generateGrammar ap ep mp op = do
   let les = map (zip langs) es :: [[(Language,Expr)]]
   env <- getGrammarEnv eg mds op
   let rs = map (tree2rules env) les
-  let rs' = filter (all isAlpha' . funname) rs
 
   -- RULES POSTPROCESSING
+  -- rm duplicatesrules with non-alphanumeric names
+  let rs' = nubBy (\r1 r2 -> funname r1 == funname r2) (filter (all isAlpha' . funname) rs)
   -- rm pronoun stuff and print to the various files
   let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs')
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
