@@ -14,6 +14,7 @@ import System.Exit
 
 import Data.Functor
 import Data.List
+import Data.Char (isAlpha)
 import qualified Data.Map as M
 import Data.Maybe
 
@@ -80,10 +81,11 @@ generateGrammar ap ep mp op = do
   let les = map (zip langs) es :: [[(Language,Expr)]]
   env <- getGrammarEnv eg mds op
   let rs = map (tree2rules env) les
+  let rs' = filter (all isAlpha' . funname) rs
 
   -- RULES POSTPROCESSING
   -- rm pronoun stuff and print to the various files
-  let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs)
+  let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs')
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
   let absGrLines = a:"flags startcat = Utt ;":as -- lines of (abstract) Extracted.gf
   let langGrLines = map ((\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) . show) langs -- lines of (concrete) ExtractedLang.gf
@@ -91,6 +93,7 @@ generateGrammar ap ep mp op = do
       (\(l,g) -> writeFile (op ++ l ++ ".gf") g) 
       (("":map show langs) `zip` map unlines (absGrLines:langGrLines))
   where 
+    isAlpha' c = isAlpha c || c == '_'
     isPron r = "Pron" `isInfixOf` r
     rmBackups = filter (not . any hasBackup) 
       where hasBackup a = any isBackupFunction (allNodesRTree a)
