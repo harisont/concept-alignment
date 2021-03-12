@@ -1,84 +1,112 @@
+-- gf-ud's ExtractEng:
 #auxfun DetCN_thePl det cn : The -> CN -> NP = DetCN thePl_Det cn ; det head[Number=Plur]
 #auxfun DetCN_theSg det cn : The -> CN -> NP = DetCN the_Det cn ; det head[Number=Sing]
 #auxfun DetCN_aPl cn : CN -> NP = PluralNP cn ; head[Number=Plur]
-
 #disable the_Det thePl_Det
 
-#word 'd would VerbForm=Fin
-#word would would VerbForm=Fin
-#word wouldn't would VerbForm=Fin
-#word 'll will VerbForm=Fin
-#word will will VerbForm=Fin
-#word won't will VerbForm=Fin|Pol=Neg
-#word 'm be Mood=Ind|Number=Sing|Person=1|Tense=Pres|VerbForm=Fin
+-- SYNCAT WORDS:
+-- be
 #word am be Mood=Ind|Number=Sing|Person=1|Tense=Pres|VerbForm=Fin
-#word 're be Mood=Ind|Tense=Pres|VerbForm=Fin
+#word 'm be Mood=Ind|Number=Sing|Person=1|Tense=Pres|VerbForm=Fin
 #word are be Mood=Ind|Tense=Pres|VerbForm=Fin
+#word 're be Mood=Ind|Tense=Pres|VerbForm=Fin
 #word aren't be Mood=Ind|Tense=Pres|VerbForm=Fin|Pol=Neg
-#word 's be Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin
 #word is be Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin
+#word 's be Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin
 #word isn't be Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Pol=Neg
 #word was be Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin
 #word wasn't be Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin|Pol=Neg
 #word were be Mood=Ind|Tense=Past|VerbForm=Fin
 #word weren't be Mood=Ind|Tense=Past|VerbForm=Fin|Pol=Neg
-#word 've be VerbForm=Inf
 #word be be VerbForm=Inf
 #word been be Tense=Past|VerbForm=Part
-#word being be Tense=Pres|VerbForm=
+#word being be Tense=Pres|VerbForm=Part
+-- do
 #word does do Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin
 #word doesn't do Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Pol=Neg
 #word do do  VerbForm=Inf
 #word don't do  VerbForm=Inf|Pol=Neg
 #word did do Mood=Ind|Tense=Past|VerbForm=Fin
 #word didn't do Mood=Ind|Tense=Past|VerbForm=Fin|Pol=Neg
-#word had have Mood=Ind|Tense=Past|VerbForm=Fin
-#word hadn't have  Mood=Ind|Tense=Past|VerbForm=Fin|Pol=Neg
+-- have
+#word have have VerbForm=Inf
+#word 've have VerbForm=Inf
+#word haven't have VerbForm=Inf|Pol=Neg
 #word has have Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin
 #word hasn't have Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Pol=Neg
-#word have have VerbForm=Inf
-#word haven't have VerbForm=Inf|Pol=Neg
+#word had have Mood=Ind|Tense=Past|VerbForm=Fin
+#word hadn't have  Mood=Ind|Tense=Past|VerbForm=Fin|Pol=Neg
+-- will
+#word 'll will VerbForm=Fin
+#word will will VerbForm=Fin
+#word won't will VerbForm=Fin|Pol=Neg
+-- would
+#word 'd would VerbForm=Fin
+#word would would VerbForm=Fin
+#word wouldn't would VerbForm=Fin
+-- refl. pronouns
+#word myself myself Number=Sing|Person=1|PronType=Prs
+#word ourselves ourselves Number=Plur|Person=1|PronType=Prs
+#word yourself yourself Number=Sing|Person=2|PronType=Prs
+#word yourselves yourselves Number=Plur|Person=2|PronType=Prs
+#word himself himself Gender=Masc|Number=Sing|Person=3|PronType=Prs
+#word herself herself Gender=Fem|Number=Sing|Person=3|PronType=Prs
+#word itself itself Gender=Neut|Number=Sing|Person=3|PronType=Prs
+#word themselves themselves Number=Plur|Person=3|PronType=Prs
+-- other
 #word not not Polarity=Neg
 #word to to _
 #word - - _
-#word herself herself Gender=Fem|Number=Sing|Person=3|PronType=Prs
-#word himself himself Gender=Masc|Number=Sing|Person=3|PronType=Prs
-#word itself itself Gender=Neut|Number=Sing|Person=3|PronType=Prs
-#word myself myself Number=Sing|Person=1|PronType=Prs
-#word ourselves ourselves Number=Plur|Person=1|PronType=Prs
-#word themselves themselves Number=Plur|Person=3|PronType=Prs
-#word yourself yourself Number=Sing|Person=2|PronType=Prs
-#word yourselves yourselves Number=Plur|Person=2|PronType=Prs
 
-#lemma DEFAULT_ do Do aux head
+-- LEMMAS
 #lemma DEFAULT_ be Cop cop head
+#lemma DEFAULT_ do Do aux head
 #lemma DEFAULT_ have Have aux head
 #lemma DEFAULT_ will Will aux head
 #lemma DEFAULT_ would Would aux head
-#lemma DEFAULT_ that That mark head
-#lemma DEFAULT_ to To mark head
-#lemma DEFAULT_ there There expl head
-#lemma DEFAULT_ not Neg advmod head
-#lemma DEFAULT_ , Comma punct head
-#lemma DEFAULT_ 's Gen case head
-#lemma DEFAULT_ ' Gen case head
-#lemma DEFAULT_ herself Herself head pron
-#lemma DEFAULT_ himself Himself head pron
-#lemma DEFAULT_ itself Itself head pron
+-- refl. pronouns
 #lemma DEFAULT_ myself Myself head pron
 #lemma DEFAULT_ ourselves Ourselves head pron
-#lemma DEFAULT_ themselves Themselves head pron
 #lemma DEFAULT_ yourself Yourself head pron
 #lemma DEFAULT_ yourselves Yourselves head pron
+#lemma DEFAULT_ himself Himself head pron
+#lemma DEFAULT_ herself Herself head pron
+#lemma DEFAULT_ itself Itself head pron
+#lemma DEFAULT_ themselves Themselves head pron
+-- other
+#lemma DEFAULT_ not Neg advmod head
+#lemma DEFAULT_ to To mark head
+#lemma DEFAULT_ - - compound head
 
+-- AUXILIARY CATs
+#auxcat Cop AUX
+#auxcat Do AUX
+#auxcat Have AUX
+#auxcat Will AUX
+#auxcat Would AUX
+--#auxcat To PART
+
+-- AUXILIARY FUNs (many from MiniLangEng.labels)
+#auxfun UseAP_Cop cop comp : Cop -> AP -> VP = UseAP comp ; cop head
+#auxfun UseNP_Cop cop comp : Cop -> NP -> VP = UseNP comp ; cop head
+#auxfun UseVP_Cop cop comp : Cop -> VP -> VP = UseVP comp ; cop head -- ?
+#auxfun UsePP_Cop cop comp : Cop -> PP -> VP = UsePP comp ; cop head
+#auxfun QuestCl_Do aux cl : Do -> Cl -> QCl = QuestCl cl ; aux head
+#auxfun QuestCl_Cop aux cl : Cop -> Cl -> QCl = QuestCl cl ; aux head
+#auxfun UseCl_Sim cl : Cl -> S = UseCl TSim PPos cl ; head
+#auxfun UseCl_Ant have cl : Have -> Cl -> S = UseCl TAnt PPos cl ; aux head
+#auxfun UseCl_Fut will cl : Will -> Cl -> S = UseCl TFut PPos cl ; aux head
+#auxfun UseCl_NegSim do neg cl : Do -> Neg -> Cl -> S = UseCl TSim PNeg cl ; aux advmod head
+#auxfun UseCl_NegAnt have neg cl : Have -> Neg -> Cl -> S = UseCl TAnt PNeg cl ; aux advmod head
+#auxfun UseAP_Cop cop comp : Cop -> AP -> VP = UseAP comp ; cop head
+#auxfun UseCl_NegCop neg cl : Neg -> Cl -> S = UseCl TSim PNeg cl ; advmod head
+
+-- MORPHO MAPPINGS (from various gf-ud examples)
 #morpho Conj 0 _
 #morpho Conj 1 _
-
+#morpho Det 0 _
 #morpho Pron 0 Case=Nom|PronType=Prs -- --- Case=Nom|Number=Sing|Person=3|PronType=Prs
 #morpho Pron 1 Case=Gen|PronType=Prs -- --- Case=Gen|Number=Sing|Person=3|PronType=Prs
 #morpho Pron 2 Case=Acc|PronType=Prs -- --- Case=Acc|Number=Sing|Person=3|PronType=Prs
-#morpho Pron 3 Case=Gen|PronType=Prs -- --- Case=Gen|Number=Sing|Person=3|PronType=Prs|Poss=Yes
-#morpho Pron 4 Case=Nom|PronType=Prs -- --- Case=Nom|Number=Sing|Person=3|PronType=Prs
-#morpho Pron 5 Case=Gen|PronType=Prs -- --- Case=Gen|Number=Sing|Person=3|PronType=Prs
-
-#morpho Det 0 Definite=Ind|PronType=Art
+#morpho Pron 3 Poss=Yes|PronType=Prs -- --- Number=Sing|Person=3|Poss=Yes|PronType=Prs ; as Det, nmod:poss
+-- ...
