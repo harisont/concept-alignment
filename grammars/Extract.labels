@@ -8,7 +8,7 @@
 #fun PrepCN	head nmod
 #fun FlatPN	head flat -- PN -> PN -> PN
 #fun CompoundN	compound head
-#fun PrepPP head obl
+#fun PrepVP head obl
 
 #cat A	      ADJ primary
 #cat Adv      ADV primary
@@ -19,5 +19,3 @@
 #cat Pron     PRON primary
 #cat V	      VERB primary
 #cat Conj     CCONJ primary
-
-
