@@ -1,0 +1,50 @@
+-- gf-ud's ExtractEng:
+#auxfun DetCN_thePl det cn : The -> CN -> NP = DetCN thePl_Det cn ; det head[Number=Plur]
+#auxfun DetCN_theSg det cn : The -> CN -> NP = DetCN the_Det cn ; det head[Number=Sing]
+#auxfun DetCN_aPl cn : CN -> NP = PluralNP cn ; head[Number=Plur]
+
+#disable the_Det thePl_Det
+
+-- SYNCAT WORDS:
+-- vara
+#word är  be  Mood=Ind|Tense=Pres|VerbForm=Fin
+#word var be  Mood=Ind|Tense=Past|VerbForm=Fin
+#word varit be  Tense=Past|VerbForm=Part
+#word vara   be  VerbForm=Inf
+-- ha
+#word har  have  Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin
+#word ha have  VerbForm=Inf
+#word hade  have  Mood=Ind|Tense=Past|VerbForm=Fin
+-- komma
+#word kommer komma Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin --?
+-- ska
+#word ska will VerbForm=Fin
+-- skulle
+#word skulle skola  Mood=Ind|Tense=Past|VerbForm=Fin|Voice=Act
+-- refl. pronouns
+#word mig mig Number=Sing|Person=1|PronType=Prs
+#word oss oss Number=Plur|Person=1|PronType=Prs
+#word dig dig Number=Sing|Person=2|PronType=Prs
+#word er er Number=Plur|Person=2|PronType=Prs
+#word sig sig Person=3|PronType=Prs
+-- other
+#word inte inte Polarity=Neg
+#word att att _
+
+-- LEMMAS
+#lemma DEFAULT_ be Cop cop head
+#lemma DEFAULT_ have Have aux head
+--#lemma DEFAULT_ komma ? 
+#lemma DEFAULT_ will Will aux head
+#lemma DEFAULT_ skola Would aux head
+-- refl. pronouns
+#lemma DEFAULT_ mig Myself head pron
+#lemma DEFAULT_ oss Ourselves head pron
+#lemma DEFAULT_ dig Yourself head pron
+#lemma DEFAULT_ er Yourselves head pron
+#lemma DEFAULT_ sig Himself head pron
+#lemma DEFAULT_ sig Herself head pron
+#lemma DEFAULT_ sig Itself head pron
+#lemma DEFAULT_ sig Themselves head pron
+#lemma DEFAULT_ inte Neg advmod head
+#lemma DEFAULT_ att To mark head
