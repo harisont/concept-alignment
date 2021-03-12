@@ -14,6 +14,7 @@ import System.Exit
 
 import Data.Functor
 import Data.List
+import Data.Char (isAlpha,toLower)
 import qualified Data.Map as M
 import Data.Maybe
 
@@ -65,16 +66,17 @@ generateGrammar ap ep mp op = do
 
   -- PARSING & COMPILATION
   us <- mapM parseUDFile aps <&> getAlignments :: IO [[UDSentence]]
+  let us' = map (map normalizeCase) us 
   eg <- compileToPGF noOptions egps
   mds <- mapM (compileToPGF noOptions . (\(a,b) -> [a,b])) mdps
 
   -- TREE CONVERSIONS
   -- 1. gf-ud's UD -> gf-ud's GF 
   udEnvs <- mapM (flip (getEnv ep) "Utt" . show) langs
-  let as = zipWith (map . uds2ast) udEnvs us
+  let as = zipWith (map . uds2ast) udEnvs us'
   let as' = rmBackups $ transpose as -- rm Backups
   -- 2. gf-ud's GF to GF's GF
-  let es = map (map ast2expr) as'
+  let es = map (map abstree2expr) as'
 
   -- RULES GENERATION
   let les = map (zip langs) es :: [[(Language,Expr)]]
@@ -82,8 +84,10 @@ generateGrammar ap ep mp op = do
   let rs = map (tree2rules env) les
 
   -- RULES POSTPROCESSING
-  -- TODO: review (also nub?)
-  let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs)
+  -- rm duplicatesrules with non-alphanumeric names
+  let rs' = nubBy (\r1 r2 -> funname r1 == funname r2) (filter (all isAlpha' . funname) rs)
+  -- rm pronoun stuff and print to the various files
+  let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs')
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
   let absGrLines = a:"flags startcat = Utt ;":as -- lines of (abstract) Extracted.gf
   let langGrLines = map ((\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) . show) langs -- lines of (concrete) ExtractedLang.gf
@@ -91,6 +95,7 @@ generateGrammar ap ep mp op = do
       (\(l,g) -> writeFile (op ++ l ++ ".gf") g) 
       (("":map show langs) `zip` map unlines (absGrLines:langGrLines))
   where 
+    isAlpha' c = isAlpha c || c == '_'
     isPron r = "Pron" `isInfixOf` r
     rmBackups = filter (not . any hasBackup) 
       where hasBackup a = any isBackupFunction (allNodesRTree a)
@@ -164,14 +169,14 @@ uds2ast env uds = head $ map (expandMacro env) (devtree2abstrees
                                                 $ udSentence2tree uds)
   where simpleRoot (RTree n ts) = RTree (n { udDEPREL = "root"}) ts
 
--- | Convert a gf-ud AbsTree into a GF Expr (i.e. a gf-ud AT to a GF AT)
-ast2expr :: AbsTree -> Expr
-ast2expr a = case readExpr (prAbsTree a) of
-  Just e -> e
-  _ -> error "invalid AbsTree"
-
-
 {- Misc helper functions -}
+
+normalizeCase :: UDSentence -> UDSentence
+normalizeCase s = if udUPOS w == "PNOUN" then s else s {
+  udWordLines = w { udLEMMA = [toLower c | c <- udLEMMA w]}:ws
+}
+  where 
+    (w:ws) = udWordLines s
 
 -- | Check that a file is in CoNNL-U format (by its extension)
 isConllu :: FilePath -> Bool
@@ -251,20 +256,23 @@ tree2rules :: GrammarEnv -> [(Language,Tree)] -> BuiltRules
 tree2rules env lts = BuiltRules {
   funname = fun,
   linrules = [(lang, (linrule lang tree, showCId cat)) | (lang,tree) <- lts, (cat,_) <- [valcat lang (rootfun tree)]],
-  unknowns = [(lang, unknown lang tree) | (lang,tree) <- lts]
+  unknowns = [(lang, unknown lang tree) | (lang,tree) <- lts] -- oper (when something is not found)
 }
   where
+    -- construct function name (e.g. come_komma_Utt) using the lemmas in all
+    -- n langs and the category in the first language
     fun = showCId
       (mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
              (fst (valcat firstlang (rootfun firsttree))))
- 
+
+    valcat :: Language -> CId -> (CId,Int)
     valcat l f = case functionType synpgf f of
-      Just ty -> case unType ty of
-        (_,cat,_) -> (cat,0)                       -- function in syntax
+      Just ty -> case unType ty of -- 0: func found in the extraction grammar
+        (_,cat,_) -> (cat,0)
       _ -> case functionType (dictpgf (envoflang l)) f of
-        Just ty -> case unType ty of
-          (_,cat,_) -> (cat,1)                     -- word in lexicon
-        _ -> (mkCId (last (partsOfFun f)),2) -- unknown word
+        Just ty -> case unType ty of -- 1: func found in the morphodict
+          (_,cat,_) -> (cat,1)
+        _ -> (mkCId (last (partsOfFun f)),2) -- 2: func not found
 
     unknown l t = [(showCId f, showCId c) |
       f <- lexitems t,
@@ -290,7 +298,7 @@ prBuiltRules br = unlines $ [
  where
    word f = "\"" ++ takeWhile (/='_') f ++ "\""
    cat:cats = nub (map (snd . snd) (linrules br))
-   mark c s = if c==cat then s else "--- " ++ s
+   mark c s = if c==cat then s else "--- " ++ s -- comment out rule if the category is not the same in both languages
 
 -- | Given the environment of a grammar and its rules, print the entire
 -- grammar (abstract and concrete syntaxes mixed together, will be 
