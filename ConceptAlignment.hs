@@ -448,33 +448,10 @@ abstractUDTree = mapRTree udSimpleDEPREL
 
 -- | convert an alignment into a pair of CoNNL-U sentences
 alignment2sentencePair :: Alignment -> (UDSentence, UDSentence)
-alignment2sentencePair (A (t,u)) = (subtree2Sentence t, subtree2Sentence u)
-
--- | Convert a subtree into a "complete" UD tree (has a root, nodes [1..n]) in 
--- valid CoNLL-U format
-subtree2Sentence :: UDTree -> UDSentence
-subtree2Sentence = adjustIds . markRoot
+alignment2sentencePair (A (t,u)) = 
+  (udTree2adjustedSentence t, udTree2adjustedSentence u)
   where 
-    markRoot (RTree n ts) = RTree (n { 
-      udDEPREL = "root:" ++ udDEPREL n,
-      udHEAD = udIdRoot
-    }) ts
-    adjustIds t = UDSentence cs (map (replaceIds ids) us)
-      where 
-        (UDSentence cs us) = udTree2sentence t
-        ids = map udID us
-        replaceIds ids w = case udHEAD w of 
-          UDIdInt 0 -> w { -- root
-            udID = i' $ udID w
-          }
-          UDIdInt _ -> w {
-            udID = i' $ udID w,
-            udHEAD = i' $ udHEAD w
-          }
-          _ -> error "don't know what to do when UDId are not integers"
-          where i' i = UDIdInt $ 1 + fromJust (i `elemIndex` ids)
-
-
+    udTree2adjustedSentence = adjustUDIds . udTree2sentence . createRoot
 {- Selection of alignments for MT -}
 
 -- | Select the alignments relevant for MT. Namely:

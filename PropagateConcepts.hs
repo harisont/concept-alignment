@@ -25,7 +25,7 @@ main = do
                 let byExcl = Rest `elem` flags
                 let fp = listToMaybe [path | Path path <- flags] 
                 let fp' = fromJust fp
-                let cs' = map rmAddedRoot cs
+                let cs' = map unadjust cs
                 let as = map (propagate criteria segment byExcl (ts,us)) cs'
                 if Linearize `elem` flags
                     then 
@@ -47,15 +47,9 @@ main = do
         maybeFst Nothing = Nothing 
         maybeFst (Just (a,_)) = Just a  
         -- remove root "supertype" added by subtree2Sentence
-        rmAddedRoot :: UDTree -> UDTree
-        rmAddedRoot (RTree n ts) = 
-            RTree n { udDEPREL = if r `isPrefixOf` label
-                then drop (length r) label
-                else label
-            } ts
-            where
-                label = udDEPREL n
-                r = "root:"
+        unadjust :: UDTree -> UDTree
+        unadjust (RTree n ts) = 
+            RTree n { udDEPREL = udDEPS n} ts
 
 {- Argument parsing -} 
 

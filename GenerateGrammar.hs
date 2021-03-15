@@ -165,9 +165,7 @@ uds2ast env uds = head $ map (expandMacro env) (devtree2abstrees
                                                 $ combineTrees env
                                                 $ analyseWords env
                                                 $ udtree2devtree
-                                                $ simpleRoot
                                                 $ udSentence2tree uds)
-  where simpleRoot (RTree n ts) = RTree (n { udDEPREL = "root"}) ts
 
 {- Misc helper functions -}
 
