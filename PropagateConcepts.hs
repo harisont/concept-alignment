@@ -46,10 +46,13 @@ main = do
         maybeFst :: Maybe (a,b) -> Maybe a
         maybeFst Nothing = Nothing 
         maybeFst (Just (a,_)) = Just a  
-        -- remove root "supertype" added by subtree2Sentence
+        -- use original label
         unadjust :: UDTree -> UDTree
-        unadjust (RTree n ts) = 
-            RTree n { udDEPREL = udDEPS n} ts
+        unadjust (RTree n ts) = RTree n { 
+            udDEPREL = fromMaybe (udDEPREL n) (getOrigLabel n)
+        } ts
+            where getOrigLabel n = 
+                    listToMaybe [head ls | UDData "ORIG_LABEL" ls <- udMISC n]
 
 {- Argument parsing -} 
 
