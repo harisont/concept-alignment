@@ -20,7 +20,7 @@ import Data.Maybe
 
 -- gf
 import GF hiding (isPrefixOf, main, Label, Cat)
-import GF.Support
+import GF.Support hiding ((+++))
 import PGF
 
 -- gf-ud
@@ -251,6 +251,10 @@ instance Show Signature where
 returnType :: Signature -> Cat
 returnType (Signature cats) = head cats
 
+-- concatenation between signatures
+(+++) :: Signature -> Signature -> Signature
+Signature s1 +++ Signature s2 = Signature (s1 ++ s2)
+
 data BuiltRules = BuiltRules {
   funname  :: CId,
   linrules :: [(Language,(String,Signature))],   -- funs/lins
@@ -262,7 +266,7 @@ data BuiltRules = BuiltRules {
 tree2rules :: GrammarEnv -> [(Language,Tree)] -> BuiltRules
 tree2rules env lts = BuiltRules {
   funname = fun,
-  linrules = [(lang, (linrule lang tree, cat)) | (lang,tree) <- lts, (cat,_) <- [signature lang (rootfun tree)]],
+  linrules = [(lang, (linrule lang tree, cat)) | (lang,tree) <- lts, (cat,_) <- [signature lang tree]],
   unknowns = [(lang, unknown lang tree) | (lang,tree) <- lts] -- oper (when something is not found)
 }
   where
@@ -270,20 +274,25 @@ tree2rules env lts = BuiltRules {
     -- n langs and the category in the first language
     fun = 
       mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
-             (returnType $ fst (signature firstlang (rootfun firsttree)))
+             (returnType $ fst (signature firstlang firsttree))
 
-    signature :: Language -> CId -> (Signature,Int)
-    signature l f = case functionType synpgf f of
+    signature :: Language -> Tree -> (Signature,Int)
+    signature l t = case functionType synpgf f of
       Just ty -> case unType ty of -- 0: func found in the extraction grammar
-        (_,cat,_) -> (Signature [cat],0)
+        (_,cat,_) -> (Signature (paramTypes ++ [cat]),0)
       _ -> case functionType (dictpgf (envoflang l)) f of
         Just ty -> case unType ty of -- 1: func found in the morphodict
-          (_,cat,_) -> (Signature [cat],1)
-        _ -> (Signature [mkCId $ last (partsOfFun f)],2) -- 2: func not found
+          (_,cat,_) -> (Signature (paramTypes ++ [cat]),1)
+        _ -> (Signature (paramTypes ++ [mkCId $ last (partsOfFun f)]),2) -- 2: func not found
+      where 
+        f = rootfun t
+        paramTypes = catMaybes [
+              if label `isInfixOf` show t then Just cat else Nothing 
+              | (label,cat) <- verbargs]
 
     unknown l t = [(showCId f, c) |
       f <- lexitems t,
-      (c,2) <- [signature l f]
+      (c,2) <- [signature l t]
       ]
 
     linrule lang tree = showExpr [] tree
@@ -296,7 +305,7 @@ tree2rules env lts = BuiltRules {
 -- | Print generated rules corresponding to a concept
 prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
-  unwords ["fun",show $ funname br,":",show cat,";","--", unwords (map show cats),"--","Abstr"]
+  unwords ["fun",show $ funname br,":",show cat,";","--","Abstr"]
   ] ++ [
   mark c (unwords ["lin",show $ funname br,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- linrules br
   ] ++ [
