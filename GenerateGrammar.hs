@@ -19,7 +19,7 @@ import qualified Data.Map as M
 import Data.Maybe
 
 -- gf
-import GF hiding (isPrefixOf, main)
+import GF hiding (isPrefixOf, main, Label, Cat)
 import GF.Support
 import PGF
 
@@ -85,7 +85,7 @@ generateGrammar ap ep mp op = do
 
   -- RULES POSTPROCESSING
   -- rm duplicatesrules with non-alphanumeric names
-  let rs' = nubBy (\r1 r2 -> funname r1 == funname r2) (filter (all isAlpha' . funname) rs)
+  let rs' = nubBy (\r1 r2 -> funname r1 == funname r2) (filter (all isAlpha' . show . funname) rs)
   -- rm pronoun stuff and print to the various files
   let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs')
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
@@ -243,9 +243,9 @@ getGrammarEnv eg ms op = do
     }
 
 data BuiltRules = BuiltRules {
-  funname  :: String,
-  linrules :: [(Language,(String,String))],   -- term with its cat
-  unknowns :: [(Language,[(String,String)])]  -- unknown lex item with its cat
+  funname  :: CId,
+  linrules :: [(Language,(String,Cat))],   -- funs/lins
+  unknowns :: [(Language,[(String,Cat)])]  -- opers
 } deriving Show
 
 -- | Given the to-generate grammar environment and a n-lingual "concept", 
@@ -253,15 +253,15 @@ data BuiltRules = BuiltRules {
 tree2rules :: GrammarEnv -> [(Language,Tree)] -> BuiltRules
 tree2rules env lts = BuiltRules {
   funname = fun,
-  linrules = [(lang, (linrule lang tree, showCId cat)) | (lang,tree) <- lts, (cat,_) <- [valcat lang (rootfun tree)]],
+  linrules = [(lang, (linrule lang tree, cat)) | (lang,tree) <- lts, (cat,_) <- [valcat lang (rootfun tree)]],
   unknowns = [(lang, unknown lang tree) | (lang,tree) <- lts] -- oper (when something is not found)
 }
   where
     -- construct function name (e.g. come_komma_Utt) using the lemmas in all
     -- n langs and the category in the first language
-    fun = showCId
-      (mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
-             (fst (valcat firstlang (rootfun firsttree))))
+    fun = 
+      mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
+             (fst (valcat firstlang (rootfun firsttree)))
 
     valcat :: Language -> CId -> (CId,Int)
     valcat l f = case functionType synpgf f of
@@ -272,7 +272,7 @@ tree2rules env lts = BuiltRules {
           (_,cat,_) -> (cat,1)
         _ -> (mkCId (last (partsOfFun f)),2) -- 2: func not found
 
-    unknown l t = [(showCId f, showCId c) |
+    unknown l t = [(showCId f, c) |
       f <- lexitems t,
       (c,2) <- [valcat l f]
       ]
@@ -287,11 +287,11 @@ tree2rules env lts = BuiltRules {
 -- | Print generated rules corresponding to a concept
 prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
-  unwords ["fun",funname br,":",cat,";","--", unwords cats,"--","Abstr"]
+  unwords ["fun",show $ funname br,":",show cat,";","--", unwords (map show cats),"--","Abstr"]
   ] ++ [
-  mark c (unwords ["lin",funname br,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- linrules br
+  mark c (unwords ["lin",show $ funname br,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- linrules br
   ] ++ [
-  unwords ["oper",fun,"=","mk"++cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
+  unwords ["oper",fun,"=","mk"++show cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
   ]
  where
    word f = "\"" ++ takeWhile (/='_') f ++ "\""
@@ -319,6 +319,17 @@ prBuiltGrammar env ruless = unlines $ [
    langs = M.keys (langenvs env)
    depath modules = map takeFileName modules
 
+-- dependency labels of verb arguments paired with the corresponding Cat
+verbargs :: [(Label,Cat)]
+verbargs = [
+    ("nsubj",mkCId "NP"),
+    ("csubj",mkCId "Cl"),
+    ("obj",mkCId "NP"),
+    ("obl",mkCId "PP"),
+    ("iobj",mkCId "NP"),
+    ("ccomp",mkCId "Cl"),
+    ("xcomp",mkCId "Cl")
+  ]
 
 {- Argument parsing -} 
 
