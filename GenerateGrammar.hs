@@ -242,10 +242,19 @@ getGrammarEnv eg ms op = do
        ]
     }
 
+newtype Signature = Signature [Cat]
+   deriving Eq
+
+instance Show Signature where
+  show (Signature cats) = unwords $ intersperse "->" (map show cats)
+
+returnType :: Signature -> Cat
+returnType (Signature cats) = head cats
+
 data BuiltRules = BuiltRules {
   funname  :: CId,
-  linrules :: [(Language,(String,Cat))],   -- funs/lins
-  unknowns :: [(Language,[(String,Cat)])]  -- opers
+  linrules :: [(Language,(String,Signature))],   -- funs/lins
+  unknowns :: [(Language,[(String,Signature)])]  -- opers
 } deriving Show
 
 -- | Given the to-generate grammar environment and a n-lingual "concept", 
@@ -253,7 +262,7 @@ data BuiltRules = BuiltRules {
 tree2rules :: GrammarEnv -> [(Language,Tree)] -> BuiltRules
 tree2rules env lts = BuiltRules {
   funname = fun,
-  linrules = [(lang, (linrule lang tree, cat)) | (lang,tree) <- lts, (cat,_) <- [valcat lang (rootfun tree)]],
+  linrules = [(lang, (linrule lang tree, cat)) | (lang,tree) <- lts, (cat,_) <- [signature lang (rootfun tree)]],
   unknowns = [(lang, unknown lang tree) | (lang,tree) <- lts] -- oper (when something is not found)
 }
   where
@@ -261,20 +270,20 @@ tree2rules env lts = BuiltRules {
     -- n langs and the category in the first language
     fun = 
       mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
-             (fst (valcat firstlang (rootfun firsttree)))
+             (returnType $ fst (signature firstlang (rootfun firsttree)))
 
-    valcat :: Language -> CId -> (CId,Int)
-    valcat l f = case functionType synpgf f of
+    signature :: Language -> CId -> (Signature,Int)
+    signature l f = case functionType synpgf f of
       Just ty -> case unType ty of -- 0: func found in the extraction grammar
-        (_,cat,_) -> (cat,0)
+        (_,cat,_) -> (Signature [cat],0)
       _ -> case functionType (dictpgf (envoflang l)) f of
         Just ty -> case unType ty of -- 1: func found in the morphodict
-          (_,cat,_) -> (cat,1)
-        _ -> (mkCId (last (partsOfFun f)),2) -- 2: func not found
+          (_,cat,_) -> (Signature [cat],1)
+        _ -> (Signature [mkCId $ last (partsOfFun f)],2) -- 2: func not found
 
     unknown l t = [(showCId f, c) |
       f <- lexitems t,
-      (c,2) <- [valcat l f]
+      (c,2) <- [signature l f]
       ]
 
     linrule lang tree = showExpr [] tree
