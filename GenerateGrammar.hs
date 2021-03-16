@@ -20,7 +20,7 @@ import Data.Maybe
 
 -- gf
 import GF hiding (isPrefixOf, main, Label, Cat)
-import GF.Support hiding ((+++))
+import GF.Support
 import PGF
 
 -- gf-ud
@@ -249,11 +249,7 @@ instance Show Signature where
   show (Signature cats) = unwords $ intersperse "->" (map show cats)
 
 returnType :: Signature -> Cat
-returnType (Signature cats) = head cats
-
--- concatenation between signatures
-(+++) :: Signature -> Signature -> Signature
-Signature s1 +++ Signature s2 = Signature (s1 ++ s2)
+returnType (Signature cats) = last cats
 
 data BuiltRules = BuiltRules {
   funname  :: CId,
@@ -307,14 +303,17 @@ prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
   unwords ["fun",show $ funname br,":",show cat,";","--","Abstr"]
   ] ++ [
-  mark c (unwords ["lin",show $ funname br,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- linrules br
+  mark c (unwords ["lin",show $ funname br,unwords paramNames,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- lins
   ] ++ [
   unwords ["oper",fun,"=","mk"++show cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
   ]
  where
-   word f = "\"" ++ takeWhile (/='_') f ++ "\""
-   cat:cats = nub (map (snd . snd) (linrules br))
-   mark c s = if c==cat then s else "--- " ++ s -- comment out rule if the category is not the same in both languages
+  word f = "\"" ++ takeWhile (/='_') f ++ "\""
+  cat:cats = nub (map (snd . snd) lins)
+  mark c s = if c==cat then s else "--- " ++ s -- comment out rule if the signature is not the same in both languages (for the moment at least)
+  lins = linrules br
+  paramNames = ['p':show n | n <- [1..length $ tail params]]
+    where (Signature params) = snd $ snd $ head lins
 
 -- | Given the environment of a grammar and its rules, print the entire
 -- grammar (abstract and concrete syntaxes mixed together, will be 
