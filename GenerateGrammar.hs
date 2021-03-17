@@ -288,7 +288,7 @@ tree2rules env lts = BuiltRules {
 
     unknown l t = [(showCId f, c) |
       f <- lexitems t,
-      (c,2) <- [signature l (abstree2expr (RTree f []))]
+      (c,2) <- if any (`isPrefixOf` (show f)) (map fst verbargs) then [] else [signature l (abstree2expr (RTree f []))]
       ]
 
     linrule lang tree = showExpr [] tree
