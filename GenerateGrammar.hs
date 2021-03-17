@@ -303,7 +303,7 @@ prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
   unwords ["fun",show $ funname br,":",show cat,";","--","Abstr"]
   ] ++ [
-  mark c (unwords ["lin",show $ funname br,unwords paramNames,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- lins
+  mark c (unwords ["lin",show $ funname br,unwords paramNames,"=",lin' lin,";","--",show lang]) | (lang,(lin,c)) <- lins
   ] ++ [
   unwords ["oper",fun,"=","mk"++show cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
   ]
@@ -314,6 +314,15 @@ prBuiltRules br = unlines $ [
   lins = linrules br
   paramNames = ['p':show n | n <- [1..length $ tail params]]
     where (Signature params) = snd $ snd $ head lins
+  lin' lin = unwords $ replace (words lin) paramNames
+  -- replace leaves with param names
+  replace (w:ws) pars@(p:ps) = 
+    if any ((`isPrefixOf` w) . fst) verbargs 
+      then (p++brackets):replace ws ps 
+      else w:replace ws pars
+    where brackets = takeWhile (== ')') $ reverse w
+  replace ws [] = ws 
+  replace [] _ = []
 
 -- | Given the environment of a grammar and its rules, print the entire
 -- grammar (abstract and concrete syntaxes mixed together, will be 
