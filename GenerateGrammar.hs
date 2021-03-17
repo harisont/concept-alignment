@@ -288,7 +288,7 @@ tree2rules env lts = BuiltRules {
 
     unknown l t = [(showCId f, c) |
       f <- lexitems t,
-      (c,2) <- [signature l t]
+      (c,2) <- [signature l (abstree2expr (RTree f []))]
       ]
 
     linrule lang tree = showExpr [] tree
