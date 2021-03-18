@@ -371,7 +371,7 @@ options =
 
 help :: String
 help = usageInfo
-        ("Usage: stack exec -- generate-grammar [alignments_prefix] -e extraction_grammar_prefix -m morphodicts_prefix [-l languages_to_use] [-o generated_grammar_prefix]."
-        ++ "The generated grammar is by default named Generated."
-        ++ "NOTE: alignments should follow the same naming conventions applying to GF grammars: they should only differ in the final lang id (e.g. AlignedEng).")
+        ("Usage: stack exec -- generate-grammar alignments_prefixes [flags]."
+        ++ "\nThe generated grammar is by default named Generated."
+        ++ "\nNOTE: alignments should follow the same naming conventions applying to GF grammars: they should only differ in the final lang id (e.g. AlignedEng).")
         options

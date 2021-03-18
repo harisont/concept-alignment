@@ -87,18 +87,16 @@ statistics are needed.
 The grammar generation module can be run as follows:
 
 ```
-stack exec -- generate-grammar path_to_extract_grammar paths_to_morphodicts paths_to_aligned_conllu_files
+"Usage: stack exec -- generate-grammar alignments_prefixes"
 ```
 
-Here, `path_to_extract_grammar` should point to the extraction grammar
-in `.pgf` format. `paths_to_morphodicts` stands for the path of the
-morphological dictionaries of the languages involved, also in `.pgf`
-format.
+Here, `alignments_prefixes` is a list of space-separated prefixes of aligned CoNNL-U files to derive grammar rules from. 
 
-Similarly, `paths_to_aligned_conllu_files` is to be replaced with the
-files containing the concepts in CoNNL-u format. These files should be,
-in terms of the languages they are written in, in the same order as the
-morphological dictionaries.
+Flags: 
+
+- `--extraction-grammar=PREFIX` (prefix of the extraction grammar, by default `grammars/Extract`)
+- `--morphodicts=PREFIX` (prefix common to all the morphological dictionaries to be used,by default `MorphoDict` since, __if the GF RGL is set up correctly__, morphological dictionaries should be in your GF path). Specifying a value for this parameter is often necessary, even when the morphological dictionaries to be used are the RGL's.
+- `--output=PREFIX` (prefix of the generated (output) grammar, by default `grammars/Generated`).
 
 ### `translate`
 
