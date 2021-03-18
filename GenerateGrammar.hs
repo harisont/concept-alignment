@@ -37,12 +37,12 @@ main = do
     then putStrLn help >> exitSuccess
     else do 
       case args of
-        [apref] -> do 
+        aprefs@(_:_) -> do 
           -- TODO: functionalize
           let epref = fromMaybe "grammars/Extract" (listToMaybe [e | ExtractionGrammar e <- flags])
           let mpref = fromMaybe "MorphoDict" (listToMaybe [m | MorphoDicts m <- flags])
           let opref = fromMaybe "grammars/Generated" (listToMaybe [o | Path o <- flags])
-          generateGrammar apref epref mpref opref 
+          generateGrammar aprefs epref mpref opref 
         _ -> do
           putStrLn "Wrong number of arguments" 
           putStrLn help 
@@ -55,31 +55,33 @@ type MDPref = FilePath          -- morphodicts prefix
 type AlignedPref = FilePath     -- aligned CoNNL-U files prefix
                                          
 -- TODO: return an IO grammar & make main write files?
-generateGrammar :: AlignedPref -> ExtrPref -> MDPref -> OutPref -> IO ()
-generateGrammar ap ep mp op = do
+generateGrammar :: [AlignedPref] -> ExtrPref -> MDPref -> OutPref -> IO ()
+generateGrammar aps ep mp op = do
 
   -- GETTING PATHS FROM PREFIXES
-  aps <- conlluPaths ap    -- paths to the CoNNL-U files
-  langs <- conlluLangs aps -- languages to use (alignments langs)
-  egps <- gfPaths ep langs -- paths to the modules of the extraction grammar
-  mdps <- mdPaths mp langs -- (pairs of) paths to the morphodicts
+  cps <- mapM conlluPaths aps   -- paths to the CoNNL-U files
+  langs <- mapM conlluLangs cps -- languages to use (alignments langs)
+  let langs' = foldr1 intersect langs
+  egps <- gfPaths ep langs'     -- paths to the modules of the extr. grammar
+  mdps <- mdPaths mp langs'     -- (pairs of) paths to the morphodicts
 
   -- PARSING & COMPILATION
-  us <- mapM parseUDFile aps <&> getAlignments :: IO [[UDSentence]]
-  let us' = map (map normalizeCase) us 
+  us <- mapM (mapM parseUDFile) cps 
+  let us' = map concat (transpose (map getAlignments us))
+  let us'' = map (map normalizeCase) us'
   eg <- compileToPGF noOptions egps
   mds <- mapM (compileToPGF noOptions . (\(a,b) -> [a,b])) mdps
 
   -- TREE CONVERSIONS
   -- 1. gf-ud's UD -> gf-ud's GF 
-  udEnvs <- mapM (flip (getEnv ep) "Utt" . show) langs
-  let as = zipWith (map . uds2ast) udEnvs us'
+  udEnvs <- mapM (flip (getEnv ep) "Utt" . show) langs'
+  let as = zipWith (map . uds2ast) udEnvs us''
   let as' = rmBackups $ transpose as -- rm Backups
   -- 2. gf-ud's GF to GF's GF
   let es = map (map abstree2expr) as'
 
   -- RULES GENERATION
-  let les = map (zip langs) es :: [[(Language,Expr)]]
+  let les = map (zip langs') es :: [[(Language,Expr)]]
   env <- getGrammarEnv eg mds op
   let rs = map (tree2rules env) les
 
@@ -90,10 +92,10 @@ generateGrammar ap ep mp op = do
   let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs')
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
   let absGrLines = a:"flags startcat = Utt ;":as -- lines of (abstract) Extracted.gf
-  let langGrLines = map ((\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) . show) langs -- lines of (concrete) ExtractedLang.gf
+  let langGrLines = map ((\l -> filter ((" -- " ++ l) `isSuffixOf`) allGrLines) . show) langs' -- lines of (concrete) ExtractedLang.gf
   mapM_ 
       (\(l,g) -> writeFile (op ++ l ++ ".gf") g) 
-      (("":map show langs) `zip` map unlines (absGrLines:langGrLines))
+      (("":map show langs') `zip` map unlines (absGrLines:langGrLines))
   where 
     isAlpha' c = isAlpha c || c == '_'
     isPron r = "Pron" `isInfixOf` r
