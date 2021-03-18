@@ -303,7 +303,7 @@ tree2rules env lts = BuiltRules {
 -- | Print generated rules corresponding to a concept
 prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
-  unwords ["fun",show $ funname br,":",show cat,";","--","Abstr"]
+  unwords ["fun",show $ funname br,":",show $ head cats,";","--","Abstr"]
   ] ++ [
   mark c (unwords ["lin",show $ funname br,unwords paramNames,"=",lin' lin,";","--",show lang]) | (lang,(lin,c)) <- lins
   ] ++ [
@@ -311,8 +311,8 @@ prBuiltRules br = unlines $ [
   ]
  where
   word f = "\"" ++ takeWhile (/='_') f ++ "\""
-  cat:cats = nub (map (snd . snd) lins)
-  mark c s = if c==cat then s else "--- " ++ s -- comment out rule if the signature is not the same in both languages (for the moment at least)
+  cats = nub (map (snd . snd) lins)
+  mark c s = if all (==c) cats then s else "--- " ++ s -- comment out rule if the signature is not the same in both languages (for the moment at least)
   lins = linrules br
   paramNames = ['p':show n | n <- [1..length $ tail params]]
     where (Signature params) = snd $ snd $ head lins
