@@ -348,11 +348,11 @@ prBuiltGrammar env ruless = unlines $ [
 -- dependency labels of verb arguments paired with the corresponding Cat
 verbargs :: [(Label,Cat)]
 verbargs = [
-    ("nsubj",mkCId "NP"),
+    ("nsubj",mkCId "N"),
     ("csubj",mkCId "Cl"),
-    ("obj",mkCId "NP"),
-    ("obl",mkCId "PP"),
-    ("iobj",mkCId "NP"),
+    ("obj",mkCId "N"),
+    ("obl",mkCId "N"),
+    ("iobj",mkCId "N"),
     ("ccomp",mkCId "Cl"),
     ("xcomp",mkCId "Cl")
   ]
