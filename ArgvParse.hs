@@ -11,7 +11,6 @@ data Flag = Pharaoh String
           | Pattern String
           | ExtractionGrammar String
           | MorphoDicts String
-          | Alignments String
           | All
           | Clauses 
           | Rest

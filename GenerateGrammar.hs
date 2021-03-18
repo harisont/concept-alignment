@@ -363,14 +363,13 @@ options :: [OptDescr Flag]
 options =
  [ Option ['e'] ["extraction-grammar"]                          (ReqArg ExtractionGrammar "PREFIX")  "prefix of the extraction grammar, e.g. grammars/Extract."
  , Option ['m'] ["morphodicts", "morphological-dictionaries"]   (ReqArg MorphoDicts "PREFIX")        "prefix common to all the morphological dictionaries to be used, e.g. grammars/Morphodict." 
- , Option ['a'] ["alignments"]                                  (ReqArg Alignments  "PREFIX")        "prefix common to all the aligned CoNNL-U files to be used, e.g. alignments/aligned." 
  , Option ['o'] ["output", "generated-grammar"]                 (ReqArg Path "PREFIX")               "prefix of the generated (output) grammar, e.g. grammars/Generated." 
  , Option ['h'] ["help"]                                        (NoArg Help)                         "show this help message"
  ]
 
 help :: String
 help = usageInfo
-        ("Usage: stack exec -- generate-grammar -e extraction_grammar_prefix -m morphodicts_prefix -a alignments_prefix [-l languages_to_use] [-o generated_grammar_prefix]."
+        ("Usage: stack exec -- generate-grammar [alignments_prefix] -e extraction_grammar_prefix -m morphodicts_prefix [-l languages_to_use] [-o generated_grammar_prefix]."
         ++ "The generated grammar is by default named Generated."
         ++ "NOTE: alignments should follow the same naming conventions applying to GF grammars: they should only differ in the final lang id (e.g. AlignedEng).")
         options
