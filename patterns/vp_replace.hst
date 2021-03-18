@@ -26,12 +26,12 @@ COMPOSE [
     PRUNE (OR [DEPREL_ "nsubj", DEPREL "obj", DEPREL "cop", DEPREL "iobj"]) 0
   ],
   CHANGES [
-    IF (DEPREL_ "nsubj") (REPLACE_FORM "*" "{NP_nsubj}"),
-    IF (DEPREL "csubj")  (REPLACE_FORM "*" "{Cl_csubj}"),
-    IF (DEPREL "obj")    (REPLACE_FORM "*" "{NP_obj}"), 
-    IF (DEPREL "obl")    (REPLACE_FORM "*" "{NP_obl}"), 
-    IF (DEPREL "iobj")   (REPLACE_FORM "*" "{NP_iobj}"),
-    IF (DEPREL "ccomp")  (REPLACE_FORM "*" "{Cl_ccomp}"), 
-    IF (DEPREL "xcomp")  (REPLACE_FORM "*" "{Cl_xcomp}")
+    IF (DEPREL_ "nsubj") (REPLACE_LEMMA "*" "nsubj"),
+    IF (DEPREL "csubj")  (REPLACE_LEMMA "*" "csubj"),
+    IF (DEPREL "obj")    (REPLACE_LEMMA "*" "obj"), 
+    IF (DEPREL "obl")    (REPLACE_LEMMA "*" "obl"), 
+    IF (DEPREL "iobj")   (REPLACE_LEMMA "*" "iobj"),
+    IF (DEPREL "ccomp")  (REPLACE_LEMMA "*" "ccomp"), 
+    IF (DEPREL "xcomp")  (REPLACE_LEMMA "*" "xcomp")
   ]
 ]
