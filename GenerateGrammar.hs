@@ -19,7 +19,7 @@ import qualified Data.Map as M
 import Data.Maybe
 
 -- gf
-import GF hiding (isPrefixOf, main)
+import GF hiding (isPrefixOf, main, Label, Cat)
 import GF.Support
 import PGF
 
@@ -85,7 +85,7 @@ generateGrammar ap ep mp op = do
 
   -- RULES POSTPROCESSING
   -- rm duplicatesrules with non-alphanumeric names
-  let rs' = nubBy (\r1 r2 -> funname r1 == funname r2) (filter (all isAlpha' . funname) rs)
+  let rs' = nubBy (\r1 r2 -> funname r1 == funname r2) (filter (all isAlpha' . show . funname) rs)
   -- rm pronoun stuff and print to the various files
   let allGrLines = filter (not . isPron) (lines $ prBuiltGrammar env rs')
   let (a:as) = filter (" -- Abstr" `isSuffixOf`) allGrLines 
@@ -242,10 +242,19 @@ getGrammarEnv eg ms op = do
        ]
     }
 
+newtype Signature = Signature [Cat]
+   deriving Eq
+
+instance Show Signature where
+  show (Signature cats) = unwords $ intersperse "->" (map show cats)
+
+returnType :: Signature -> Cat
+returnType (Signature cats) = last cats
+
 data BuiltRules = BuiltRules {
-  funname  :: String,
-  linrules :: [(Language,(String,String))],   -- term with its cat
-  unknowns :: [(Language,[(String,String)])]  -- unknown lex item with its cat
+  funname  :: CId,
+  linrules :: [(Language,(String,Signature))],   -- funs/lins
+  unknowns :: [(Language,[(String,Signature)])]  -- opers
 } deriving Show
 
 -- | Given the to-generate grammar environment and a n-lingual "concept", 
@@ -253,28 +262,33 @@ data BuiltRules = BuiltRules {
 tree2rules :: GrammarEnv -> [(Language,Tree)] -> BuiltRules
 tree2rules env lts = BuiltRules {
   funname = fun,
-  linrules = [(lang, (linrule lang tree, showCId cat)) | (lang,tree) <- lts, (cat,_) <- [valcat lang (rootfun tree)]],
+  linrules = [(lang, (linrule lang tree, cat)) | (lang,tree) <- lts, (cat,_) <- [signature lang tree]],
   unknowns = [(lang, unknown lang tree) | (lang,tree) <- lts] -- oper (when something is not found)
 }
   where
     -- construct function name (e.g. come_komma_Utt) using the lemmas in all
     -- n langs and the category in the first language
-    fun = showCId
-      (mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
-             (fst (valcat firstlang (rootfun firsttree))))
+    fun = 
+      mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
+             (returnType $ fst (signature firstlang firsttree))
 
-    valcat :: Language -> CId -> (CId,Int)
-    valcat l f = case functionType synpgf f of
+    signature :: Language -> Tree -> (Signature,Int)
+    signature l t = case functionType synpgf f of
       Just ty -> case unType ty of -- 0: func found in the extraction grammar
-        (_,cat,_) -> (cat,0)
+        (_,cat,_) -> (Signature (paramTypes ++ [cat]),0)
       _ -> case functionType (dictpgf (envoflang l)) f of
         Just ty -> case unType ty of -- 1: func found in the morphodict
-          (_,cat,_) -> (cat,1)
-        _ -> (mkCId (last (partsOfFun f)),2) -- 2: func not found
+          (_,cat,_) -> (Signature (paramTypes ++ [cat]),1)
+        _ -> (Signature (paramTypes ++ [mkCId $ last (partsOfFun f)]),2) -- 2: func not found
+      where 
+        f = rootfun t
+        paramTypes = catMaybes [
+              if label `isInfixOf` show t then Just cat else Nothing 
+              | (label,cat) <- verbargs]
 
-    unknown l t = [(showCId f, showCId c) |
+    unknown l t = [(showCId f, c) |
       f <- lexitems t,
-      (c,2) <- [valcat l f]
+      (c,2) <- if any (`isPrefixOf` (show f)) (map fst verbargs) then [] else [signature l (abstree2expr (RTree f []))]
       ]
 
     linrule lang tree = showExpr [] tree
@@ -287,16 +301,28 @@ tree2rules env lts = BuiltRules {
 -- | Print generated rules corresponding to a concept
 prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
-  unwords ["fun",funname br,":",cat,";","--", unwords cats,"--","Abstr"]
+  unwords ["fun",show $ funname br,":",show cat,";","--","Abstr"]
   ] ++ [
-  mark c (unwords ["lin",funname br,"=",lin,";","--",show lang]) | (lang,(lin,c)) <- linrules br
+  mark c (unwords ["lin",show $ funname br,unwords paramNames,"=",lin' lin,";","--",show lang]) | (lang,(lin,c)) <- lins
   ] ++ [
-  unwords ["oper",fun,"=","mk"++cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
+  unwords ["oper",fun,"=","mk"++show cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
   ]
  where
-   word f = "\"" ++ takeWhile (/='_') f ++ "\""
-   cat:cats = nub (map (snd . snd) (linrules br))
-   mark c s = if c==cat then s else "--- " ++ s -- comment out rule if the category is not the same in both languages
+  word f = "\"" ++ takeWhile (/='_') f ++ "\""
+  cat:cats = nub (map (snd . snd) lins)
+  mark c s = if c==cat then s else "--- " ++ s -- comment out rule if the signature is not the same in both languages (for the moment at least)
+  lins = linrules br
+  paramNames = ['p':show n | n <- [1..length $ tail params]]
+    where (Signature params) = snd $ snd $ head lins
+  lin' lin = unwords $ replace (words lin) paramNames
+  -- replace leaves with param names
+  replace (w:ws) pars@(p:ps) = 
+    if any ((`isPrefixOf` w) . fst) verbargs 
+      then (p++brackets):replace ws ps 
+      else w:replace ws pars
+    where brackets = takeWhile (== ')') $ reverse w
+  replace ws [] = ws 
+  replace [] _ = []
 
 -- | Given the environment of a grammar and its rules, print the entire
 -- grammar (abstract and concrete syntaxes mixed together, will be 
@@ -319,6 +345,17 @@ prBuiltGrammar env ruless = unlines $ [
    langs = M.keys (langenvs env)
    depath modules = map takeFileName modules
 
+-- dependency labels of verb arguments paired with the corresponding Cat
+verbargs :: [(Label,Cat)]
+verbargs = [
+    ("nsubj",mkCId "N"),
+    ("csubj",mkCId "Cl"),
+    ("obj",mkCId "N"),
+    ("obl",mkCId "N"),
+    ("iobj",mkCId "N"),
+    ("ccomp",mkCId "Cl"),
+    ("xcomp",mkCId "Cl")
+  ]
 
 {- Argument parsing -} 
 
