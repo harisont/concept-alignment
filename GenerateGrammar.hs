@@ -26,7 +26,7 @@ import PGF
 -- gf-ud
 import RTree
 import UDConcepts
-import UDAnnotations
+import UDAnnotations hiding (getEnv)
 import GFConcepts
 import UD2GF
 
@@ -74,7 +74,7 @@ generateGrammar aps ep mp op = do
 
   -- TREE CONVERSIONS
   -- 1. gf-ud's UD -> gf-ud's GF 
-  udEnvs <- mapM (flip (getEnv ep) "Utt" . show) langs'
+  udEnvs <- mapM (flip (getEnv eg ep) "Utt" . show) langs'
   let as = zipWith (map . uds2ast) udEnvs us''
   let as' = rmBackups $ transpose as -- rm Backups
   -- 2. gf-ud's GF to GF's GF
@@ -202,6 +202,17 @@ sentId :: UDSentence -> Int
 sentId = read . drop 4 . last . words . head . udCommentLines
 
 
+-- | Like UDAnnotations.getEnv, but uses pgf instead of paths
+-- (this is a bad solution but I don't necessarily want to rely on the pgf
+-- to be in a certain location)
+getEnv :: PGF -> String -> String -> String -> IO UDEnv
+getEnv pgf pref eng cat = do
+  abslabels <- readFile (stdAbsLabelsFile pref) >>= return . pAbsLabels
+  cnclabels <- readFile (stdCncLabelsFile pref eng) >>= return . pCncLabels
+  let actlang = stdLanguage pref eng
+  let env = mkUDEnv pgf abslabels cnclabels actlang cat
+  return $ addMissing env
+
 {- Grammar rules generation -}
 
 data GrammarEnv = GrammarEnv {
@@ -227,7 +238,7 @@ getGrammarEnv eg ms op = do
   let egName = show $ abstractName eg -- name of the extraction grammar
   let ggName = takeBaseName op
   return $ GrammarEnv {
-    absname = mkCId ggName,  --- hard-coded name of generated module
+    absname = mkCId ggName,
     syntaxpgf = eg,
     absbasemodules = [egName], --- extending the syntax module
     langenvs = M.fromList [
@@ -303,7 +314,7 @@ tree2rules env lts = BuiltRules {
 -- | Print generated rules corresponding to a concept
 prBuiltRules :: BuiltRules -> String
 prBuiltRules br = unlines $ [
-  unwords ["fun",show $ funname br,":",show cat,";","--","Abstr"]
+  unwords ["fun",show $ funname br,":",show $ head cats,";","--","Abstr"]
   ] ++ [
   mark c (unwords ["lin",show $ funname br,unwords paramNames,"=",lin' lin,";","--",show lang]) | (lang,(lin,c)) <- lins
   ] ++ [
@@ -311,8 +322,8 @@ prBuiltRules br = unlines $ [
   ]
  where
   word f = "\"" ++ takeWhile (/='_') f ++ "\""
-  cat:cats = nub (map (snd . snd) lins)
-  mark c s = if c==cat then s else "--- " ++ s -- comment out rule if the signature is not the same in both languages (for the moment at least)
+  cats = nub (map (snd . snd) lins)
+  mark c s = if all (==c) cats then s else "--- " ++ s -- comment out rule if the signature is not the same in both languages (for the moment at least)
   lins = linrules br
   paramNames = ['p':show n | n <- [1..length $ tail params]]
     where (Signature params) = snd $ snd $ head lins
