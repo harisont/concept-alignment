@@ -7,7 +7,7 @@ As mentioned in Section \ref{aligns}, Concept Propagation (CP) is the task of fi
 
 There are two scenarios in which CP can prove useful:\smallskip
 \begin{enumerate}
-    \item when working on a parallel text $A$ in more than two languages. In this case, CP can be used, after CE has been performed on a pair of languages $\langle L_1,L_2 \rangle$, to propagate the extracted alignments in a third version of the text in a new language $L_3$. In this case, the expectation is for the program to be able to propagate the vast majority\footnote{even though handling common translation divergences help, free translation involving radical differences in sentence structure can make it so that some concepts lack a clear counterpart in the text in $L_3$.} of the concepts in the set
+    \item when working on a parallel text $A$ in more than two languages. In this case, CP can be used, after CE has been performed on a pair of languages $\langle L_1,L_2 \rangle$, to propagate the extracted alignments in a third version of the text in a new language $L_3$. In this case, the expectation is for the program to be able to propagate the vast majority\footnote{Even though handling common translation divergences help, free translation involving radical differences in sentence structure can make it so that some concepts lack a clear counterpart in the text in $L_3$.} of the concepts in the set
     \item when working on two bilingual parallel texts $A$ and $B$ with one language in common, say $A$ in two languages $\langle L_1,L_2 \rangle$ and $B$ in two languages $\langle L_2, L_3 \rangle$. After performing CE on the first pair, CP can be used to look for the extracted concepts in the $L_2$ version of the second and, if they do appear in such text, find their counterparts in $L_3$. Of course, the number of concepts that can be propagated in this scenario can be significantly lower, especially if the two parallel texts do not belong to the same domain.
 \end{enumerate}\smallskip
 
@@ -25,7 +25,7 @@ There are two scenarios in which CP can prove useful:\smallskip
     \label{scens}
 \end{figure}
 
-Our algorithm is meant to be as general as possible, and as such it is not optimized for the first scenario, but rather covers both without making any assumptions in terms of sentence alignment\footnote{a way to make the algorithm more efficient for the first scenario could in fact be to rely on the fact that the $n$-lingual parallel text is sentence-aligned, keep track of the sentence from which a particular concept has been extracted and only try to find a equivalent in the corresponding $L_3$ sentence.}. 
+Our algorithm is meant to be as general as possible, and as such it is not optimized for the first scenario, but rather covers both without making any assumptions in terms of sentence alignment\footnote{A way to make the algorithm more efficient for the first scenario could in fact be to rely on the fact that the $n$-lingual parallel text is sentence-aligned, keep track of the sentence from which a particular concept has been extracted and only try to find a equivalent in the corresponding $L_3$ sentence.}. 
 It works as follows: for each alignment obtained by performing CE on text $A$, we consider the dependency tree in language $L_2$. We then look for such tree among all subtrees the $L_2$ version of text $B$ is composed of. If a sentence in the $L_2$ version of text $B$ does contain $a_i^2$, we align such sentence to its $L_3$ counterpart using the same procedure as described in Section \ref{extrain} for CE. Finally, if multiple possible correspondences are found, the $L_3$ dependency subtree which is closest in depth to $a_i^2$ is selected. This is meant to avoid, for instance, mistakenly aligning a full sentence tree to a dependency tree extracted when aligning heads, which would otherwise be likely, as their heads are obviously both labelled \texttt{root}. In the next two sections, we discuss some important details of the algorithm, and in Section \ref{heads2} in particular will get to other issues related to head alignment.
 
 \begin{figure}[H]
@@ -83,9 +83,9 @@ It is interesting to notice, however, that the amount of errors is significantly
     \begin{tabular}{|l|l|l|}
     \hline
     \textbf{}              & \textbf{en-sv} & \textbf{it-sv} \\ \hline
-    \textbf{propagated}             & 1019 (85.05\%) & 979 (84.64\%) \\ \hline
-    \textbf{tot. errors}            & 133 (13.05\%)  & 187 (19.1\%)  \\ \hline
-    \textbf{CP-introduced}          & 75 (56.39\%)   & 84 (44.91\%)   \\ \hline
+    \textbf{propagated}             & 1019 (85\%) & 979 (85\%) \\ \hline
+    \textbf{tot. errors}            & 133 (13\%)  & 187 (19\%)  \\ \hline
+    \textbf{CP-introduced}          & 75 (56\%)   & 84 (45\%)   \\ \hline
     \end{tabular}
     \caption[Performance of CP Scenario 1 on manually annotated data]{Results of propagating the Italian-English alignments obtained via CE on the first 100 sentences of the PUD corpus to Swedish, using either the English or Italian subtrees as a starting point.}
     \label{tcp1}
@@ -100,7 +100,7 @@ On top of evaluating the program on PUD data dividing the set of sentences used 
 These two small bilingual corpora allow us to perform two additional experiments: \smallskip
 \begin{enumerate}
     \item to extract English-Swedish alignments from the CSE corpus and propagate them to Italian using the DMI corpus
-    \item vice versa, to extract English-Italian alignments from the DMI corpus and propagate them to Swedish using the CSE corpus
+    \item vice versa, to extract English-Italian alignments from the DMI corpus and propagate them to Swedish using the CSE corpus.
 \end{enumerate} \smallskip
 
 \subsubsection{Experimental results}
@@ -113,14 +113,14 @@ However, some common content words, like $\langle$\textit{``always'', ``sempre''
 
 \begin{table}[H]
     \centering
-    \scriptsize
+    \footnotesize
     \begin{tabular}{|l|l|l|l|l|l|l|}
     \hline
     \textbf{}                     & \textbf{en-it-sv} & \textbf{it-en-sv} & \textbf{en-sv-it} & \textbf{sv-en-it} & \textbf{it-sv-en} & \textbf{sv-it-en} \\ \hline
     \textbf{extracted}   & 638               & 638               & 687               & 687               & 608               & 608               \\ \hline
-    \textbf{propagated}                    & 92 (14.42\%)      & 92 (14.42\%)      & 98 (14.26\%)      & 84 (12.22\%)      & 101 (16.61\%)     & 87 (14.37\%)      \\ \hline
-    \textbf{tot. errors}                   & 46 (50\%)         & 21 (22.82\%)      & 42 (42.85\%)      & 24 (28.57\%)      & 21 (20.79\%)      & 28 (32.18\%)      \\ \hline
-    \textbf{CP-introduced}                 & 33 (71.73\%)      & 11 (52.38\%)      & 21 (50\%)         & 12 (50\%)         & 12 (57.14\%)      & 21 (75\%)         \\ \hline
+    \textbf{propagated}                    & 92 (14\%)      & 92 (14\%)      & 98 (14\%)      & 84 (12\%)      & 101 (17\%)     & 87 (14\%)      \\ \hline
+    \textbf{tot. errors}                   & 46 (50\%)         & 21 (23\%)      & 42 (43\%)      & 24 (29\%)      & 21 (21\%)      & 28 (32\%)      \\ \hline
+    \textbf{CP-introduced}                 & 33 (72\%)      & 11 (52\%)      & 21 (50\%)         & 12 (50\%)         & 12 (57\%)      & 21 (75\%)         \\ \hline
     \end{tabular}
     \caption[Performance of CP Scenario 2 on manually annotated non-homogeneous data]{Results of CP for various language pairs using PUD (non-homogeneous) data. For each column, the first two languages are the ones used for extraction and the second two the ones used for propagation.}
     \label{tcp2pud}
@@ -140,9 +140,9 @@ Quantitatively, the results of the last pair of experiments, performed on two di
     \hline
                            & \textbf{sv-en-it} & \textbf{it-en-sv} \\ \hline
     \textbf{extracted}     & 1950              & 1823              \\ \hline
-    \textbf{propagated}             & 205 (10.51\%)     & 200 (10.97\%)     \\ \hline
-    \textbf{tot. errors}            & 66 (32.19\%)      & 61 (30.5\%)       \\ \hline
-    \textbf{CP-introduced} & 33 (50\%)        & 33 (54.09\%)      \\ \hline
+    \textbf{propagated}             & 205 (11\%)     & 200 (11\%)     \\ \hline
+    \textbf{tot. errors}            & 66 (32\%)      & 61 (30\%)       \\ \hline
+    \textbf{CP-introduced} & 33 (50\%)        & 33 (54\%)      \\ \hline
     \end{tabular}
     \caption[Performance of CP Scenario 2 on automatically parsed homogeneous data]{Results of CP for using two different bilingual corpora belonging to the same domain of course plans. For each column, the first two languages are the ones used for extraction and the second two the ones used for propagation.}
     \label{tcp2courses}

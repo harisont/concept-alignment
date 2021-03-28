@@ -3,8 +3,7 @@
 
 The main objective of this thesis project was to develop a syntax-based Concept Alignment system and put it to the test in the context of domain-specific MT. The approach we propose basically consists in analyzing texts with a dependency parser, UDPipe, and comparing the resulting trees. For the MT evaluation, such dependency trees are converted to Abstract Syntax Trees, from which the rules of a multilingual generative phrase-structure grammar are derived. The framework we make use of to this extent, GF, makes the grammar itself sufficient to perform simple MT experiments.\smallskip
 
-The tangible fruits of this work are a Haskell library and a number of executables, whose usage is described in Appendix \ref{b}, offering an easy to use and configure interface to perform both variants of CA, extraction and propagation, and a variety of kinds of evaluations. \smallskip
-
+The tangible fruits of this work are a Haskell library and a number of executables, whose usage is described in Appendix \ref{b}, offering an easy to use and configure interface to perform both variants of CA, extraction and propagation, and a variety of kinds of evaluations. 
 To assess the quality of the alignments obtained with such system, the extraction and propagation components were first tested without taking the target application context into account. \smallskip
 
 When it comes to CE, the core part of this work, comparison against a pre-existing basic implementation shows significant improvements in terms of both the quality and the quantity of the resulting alignments. 
@@ -21,7 +20,7 @@ These results, while encouraging, suggest that there is still much room for impr
 
 \subsection*{Further integration with statistical alignment techniques} 
 With regards to the CA component itself, it is important to remember that both the quantity and the quality of the alignments are a direct consequence of those of the dependency trees they are obtained from. 
-Apart from working on dependency parsers directly, a possibility is to experiment more with hybrid alignment approaches, integrating the results prodiced by statistical tools (which only depend on the quantity and quality of raw data rather than also on that of their analyses) with those of our rule-based system. 
+Apart from working on dependency parsers directly, a possibility is to experiment more with hybrid alignment approaches, integrating the results produced by statistical tools (which only depend on the quantity and quality of raw data rather than also on that of their analyses) with those of our rule-based system. 
 A basic way to do that has already been implemented, but has not been made use of in the final MT experiments due to the small size of the corpora involved.
 
 \subsection*{Aligning verb phrases}
