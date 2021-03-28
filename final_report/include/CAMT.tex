@@ -143,7 +143,7 @@ Built using PGF, the API meant to be used for embedding GF grammars in Haskell p
 The only difference between translating inside the GF shell and using this ad-hoc program, apart from the increased ease of use of the latter, are that: \smallskip
 
 \begin{itemize}
-    \item while GF can parse the SL string in a variety of ways and, as a consequence, return multiple TL linearizations, our program only outputs the first candidate translation, preliminarily discarding trees containing terminal nodes that have no linearization in the TL\footnote{A linearization can be missing, for instance, if a concrete syntax is postprocessed by simply getting rid of an ``illegal'' verb causing compilation problems (cf. Section \ref{grgn})} 
+    \item while GF can parse the SL string in a variety of ways and, as a consequence, return multiple TL linearizations, our program only outputs the first candidate translation, preliminarily discarding trees containing terminal nodes that have no linearization in the TL\footnote{A linearization can be missing, for instance, if a concrete syntax is postprocessed by simply getting rid of an ``illegal'' verb causing compilation problems. In the experiments conducted during this project, this initially happened even with some irregular (but correctly lemmatized!) Italian verbs whose infinitive does not end in ``\textit{-are}'', ``\textit{-ere}'' or ``\textit{-ire}'', such as ``\textit{porre}.'' The Italian morphological dictionary was then modified so to also handle this type of verbs.} 
     \item to facilitate the experiments, our standalone has been written so that it can translate several newline-separated sentences at once.
 \end{itemize}
 
@@ -224,7 +224,7 @@ This happens in a variety of ways: at times, clauses are simply not identified a
 Most often, however, clauses are simply not attached to the right node and/or given a label that, while still identifying them as clauses, does not give correct information about their type. \smallskip
 
 To address this problem, the CE module has been modified so that it can try to align individual clauses instead of sentences. 
-The idea is to obtain, from each pair of sentence trees to align, a pair of lists of subtrees whose heads are labelled \texttt{root}, \texttt{csubj}, \texttt{ccomp}, \texttt{xcomp}, \texttt{advcl} or  \texttt{acl}\footnote{All these clausal labels are defined in Appendix \ref{a_lab}}.
+The idea is to obtain, from each pair of sentence trees to align, a pair of lists of subtrees whose heads are labelled \texttt{root}, \texttt{csubj}, \texttt{ccomp}, \texttt{xcomp}, \texttt{advcl} or  \texttt{acl}\footnote{All these clausal labels are defined in Appendix \ref{a_lab}.}.
 
 \begin{figure}[h]
 \footnotesize
