@@ -528,7 +528,7 @@ The pair just mentioned simply becomes a tuple of equivalent expressions in diff
 
 While this general definition does not specify it, expressions are not necessarily represented as strings, but can rather be defined as tree-like structures, and in the present case as dependency trees that can later be replaced by GF ASTs. Matching ASTs can finally be used to generate the rules of a multilingual GF grammar, as we will discuss in Chapter \ref{ch5}. \smallskip
 
-As mentioned in the introduction, the task of aligning concepts comes in two variants:
+As mentioned in the Introduction, the task of aligning concepts comes in two variants:
 \begin{enumerate}
     \item \textbf{\textit{Concept Extraction}} (CE), which consists in identifying new concepts via linguistic comparison and whose output is a set of bilingual alignments
     \item \textbf{\textit{Concept Propagation}} (CP), i.e. the task of finding the concrete expressions corresponding to a set of known concepts in a particular language. Here, by concepts we do not mean necessarily ASTs, as a suitable approach is to propagate UD tree alignments before obtaining the corresponding abstract representation.
@@ -554,7 +554,7 @@ The IBM Models are a sequence of increasingly complex alignment models \cite{bit
 
 The GIZA++ toolkit \cite{gizapp}, an open source implementation of the IBM models based on the initial GIZA package \cite{giza}, is widely used, for instance in SMT systems such as Moses \cite{moses}. \smallskip
 
-As mentioned in the introduction, however, alignment can be performed at different levels of abstraction: to bring this to the extreme, there are contexts in which we might want to align full sentences, or even whole documents. While the latter two levels of abstraction are not necessarily relevant to MT, only aligning individual words is also, as discussed in the Introduction, not always the best option. For this reason, word alignment is often generalized to \textit{phrase alignment}. In systems like GIZA++, whose output is a list of pairs of word positions indicating which words in the SL string are to be aligned with which words in the TL string (commonly referred to as the \textit{pharaoh format}), extracting phrase alignments by combining the indices is realtively straightforward. \smallskip 
+As mentioned in the Introduction, however, alignment can be performed at different levels of abstraction: to bring this to the extreme, there are contexts in which we might want to align full sentences, or even whole documents. While the latter two levels of abstraction are not necessarily relevant to MT, only aligning individual words is also, as discussed in the Introduction, not always the best option. For this reason, word alignment is often generalized to \textit{phrase alignment}. In systems like GIZA++, whose output is a list of pairs of word positions indicating which words in the SL string are to be aligned with which words in the TL string (commonly referred to as the \textit{pharaoh format}), extracting phrase alignments by combining the indices is realtively straightforward. \smallskip 
 
 \begin{figure}[h]
     \centering

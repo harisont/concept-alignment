@@ -596,8 +596,8 @@ Most importantly, using manually annotated data would also have meant not testin
 \smallskip
 
 \subsection{The English corpus} \label{eng}
-Even avoiding CP, the small size of these corpora, the limitations of the language models used for parsing and the issues encountered in the UD-to-GF conversion make both the lexica resulting from this process relatively small.
-This, together with the issues GF parsing suffers from, discussed in Chapter \ref{ch2}, makes working on arbitrary sentences taken from documents similar to those the course plans corpora are composed of extremely hard. \smallskip
+Even without CP, the small size of these corpora, the limitations of the language models used for parsing and the issues encountered in the UD-to-GF conversion make both of the lexica resulting from this process relatively small.
+This, together with the issues GF parsing suffers from (as discussed in Chapter \ref{ch2}), makes working on arbitrary sentences extremely hard. Even only using sentences extracted from documents that are similar, both stylistically and in terms of content, to those the course plans corpora are composed of is not especially helpful. \smallskip
 
 As a consequence, our choice for this first MT experiment was to generate the sentences to translate directly in the GF shell, making use of its random AST generation functionality. As discussed in Section \ref{extend}, in fact, the (extended) CSE and DMI grammars allow for arbitrary variations - both grammatical and in terms of content words - over a small set of basic sentences. \smallskip
 
@@ -688,8 +688,8 @@ Another common case is that of wrong (or at least very confusing) adjective coll
 Grammatical errors in Swedish are less common and, apart from long adjectives never being turned to the comparative degree periphrastically (e.g. ``\textit{relevant\underline{are}}'' instead of ``\textit{mer relevant}''), less systematic. 
 Only in one case, for instance, gender is incorrect (``\textit{programbibliotek\underline{en}}''). \smallskip
 
-Some errorsregarding the extracted concepts are also interesting to analyze.
-In English-Swedish, while several compounds, such as $\langle$\textit{``computer science'', ``datavetenskap''}$\rangle$, are aligned correctly, there are cases in which a single-root noun is translated as a compound (e.g. $\langle$ \textit{``theory'', ``automatateori''} $\rangle$). This is not necessarily an actual alignment error, as it might rather be that the English version of the text was being less specific than its Swedish counterpart, thus producing an alignment that, during evaluation, would have been marked as ``correct but not reusable'' (\texttt{=}). \smallskip
+Some errors regarding the extracted concepts are also interesting to analyze.
+In English-Swedish, while several compounds, such as $\langle$\textit{``computer science'', ``datavetenskap''}$\rangle$, are aligned correctly, there are cases in which a single-root noun is translated as a compound (e.g. $\langle$ \textit{``theory'', ``automatateori''} $\rangle$). This is not necessarily an actual alignment error, as it might well be the case that the English version of the text was being less specific than its Swedish counterpart, thus producing an alignment that, during evaluation, would have been marked as ``correct but not reusable'' (\texttt{=}). \smallskip
 
 ``Reasonable'' alignment errors appear in the DMI corpus sentences too. 
 The English phrase ``\textit{attendance of lessons}'', for instance, becomes simply ``\textit{frequenza}'' in the Italian translation. 

@@ -226,7 +226,7 @@ After extracting subtree alignments, it is possible and generally useful to remo
  \label{prefal}
 \end{figure}
 
-Obviously, the ``full-sentence'' tree pair is itself an alignment, even though a trivial one, as it represents a sentence-level correspondence in a case where, due to the approach being syntactic comparison, the inputs are assumed to be sentences that correspond to each other\footnote{Contrary to what it may seem, however, sentence-level alignment is in general not at a trivial task, as it is often the case, especially in certain language pairs, that one \textit{orthographic} sentence, i.e. a sentence defined based on the presence of a full stop, maps to more than one orthographic sentences in the translated text, or vice versa.}.
+Obviously, the ``full-sentence'' tree pair is itself an alignment, even though a trivial one, as it represents a sentence-level correspondence in a case where, due to the approach being syntactic comparison, the inputs are assumed to be sentences that correspond to each other\footnote{Contrary to what it may seem, however, sentence-level alignment is in general not na trivial task, as it is often the case, especially in certain language pairs, that one \textit{orthographic} sentence, i.e. a sentence defined based on the presence of a full stop, maps to more than one orthographic sentences in the translated text, or vice versa.}.
 
 As we will see in the following sections, such algorithm is useful both as a baseline and as a source of inspiration for our improved CE program.
 
@@ -308,7 +308,7 @@ Conflational divergences involve the translation of two or more words in the sou
 \end{example}
 but there are also other cases, like
 \begin{example} 
- ``I'll come and \underline{say hello} to Bruno and Andrea'' VS ``Verrò a \underline{salutare} Bruno e Andrea''
+ ``I'll come and \underline{say hi} to Bruno and Andrea'' VS ``Verrò a \underline{salutare} Bruno e Andrea''
 \end{example} 
 where the single word ``\textit{salutare}'' is not a compound but expresses the same meaning as ``\textit{say}'' and ``\textit{hi}'' together. \smallskip
 Divergences like the one described in the latter example are usually captured by Criterion \ref{udmatch}, while compounds often need to be taken care of explicitly. For reasons that will become clear later, these cases are discussed in Section \ref{heads}.
