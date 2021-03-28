@@ -23,7 +23,7 @@ Questions of structure and constituency are settled by the syntax of $L$, while 
 According to this definition, then, if $L$ is compositional, the meaning of an expression $e$ in $L$ cannot depend directly on the context in which $S$ is used in or on the intentions of the speaker who uses it, even though it might be the case that the meanings of the constituents of $e$ depend on the context or on the speaker's intentions, thus making the sentence indirectly depend on them \cite{semcom2}. \smallskip
 
 While many artificial languages, such as programming languages, are compositional by construction, the general validity of this principle for natural languages is, despite many arguments in favor, under debate. 
-In this work, we make the assumption that compositionality also holds for natural languages, or at least that it is a useful notion applying to most natural language sentences\footnote{in Section \ref{evalign}, however, we will see that idiomatic expressions, often used as an arguments against compositionality, are also challenging to deal with in the context of grammar-based CA.}. \smallskip
+In this work, we make the assumption that compositionality also holds for natural languages, or at least that it is a useful notion applying to most natural language sentences\footnote{In Section \ref{evalign}, however, we will see that idiomatic expressions, often used as an arguments against compositionality, are also challenging to deal with in the context of grammar-based CA.}. \smallskip
 
 In particular, we adapt the notion of semantic compositionality to translation. 
 The intuitive idea is that the translation of a sentence is composed of translations of each part of the original one. Adjusting Definition \ref{sc}:
@@ -119,7 +119,7 @@ Intuitively, this means that dependency trees are simpler than their phrase stru
 Existing \textit{dependency parsers}, such as UDPipe \cite{udpipe1} and the Standford parser \cite{standford}, are often - but not always \cite{rasp} - neural pipelines trained on dependency treebanks, significantly more robust than their phrase structure counterparts. 
 
 % cons
-On the other hand, there is currently no effective way to use these trees as a starting point for NLG: dependency grammars are an effective way to describe language, but, unlike phrase-structure grammars, they are not \textit{generative},\footnote{that does not mean, however, that dependency grammars have not been made use of in MT research, in conjunction with statistical techniques, in order to better capture grammatical generalizations \cite{treelet}.}. \smallskip
+On the other hand, there is currently no effective way to use these trees as a starting point for NLG: dependency grammars are an effective way to describe language, but, unlike phrase-structure grammars, they are not \textit{generative},\footnote{That does not mean, however, that dependency grammars have not been made use of in MT research, in conjunction with statistical techniques, in order to better capture grammatical generalizations \cite{treelet}.}. \smallskip
 
 One idea is, then, to develop a hybrid system where the frontend is a dependency parser and the backend a grammaticality-preserving GF-based target language generation module. 
 This work goes in this direction, and the connecting link between these two seemingly incompatible stages of the pipeline is, as we will elaborate on in Section \ref{ourapproach}, a CA component able to identify matching dependency trees and generate the corresponding GF concrete and abstract syntax functions: concepts.
@@ -134,13 +134,13 @@ The basic idea behind such standard is to provide a set of Part-Of-Speech (POS) 
 
 In the following, we give a quick overview of the standard format UD uses to store dependency trees and of the aspects of the annotation scheme that are most relevant to the task at hand. 
 Appendix \ref{a} provides a more comprehensive, but not completely exhaustive, description of all the POS tags and dependency labels mentioned in the examples appearing in this work based on that in \cite{compsyn}. 
-The reader interested in a full specification of the UD annotation scheme may refer to the official UD documentation\footnote{available at \url{universaldependencies.org}.}. 
+The reader interested in a full specification of the UD annotation scheme may refer to the official UD documentation\footnote{Available at \url{universaldependencies.org}.}. 
 
 \paragraph{The CoNLL-U format} \label{conll}
-The standard plain text format for dependency trees, CoNLL-U, is an extension of CoNNL-X \cite{conllx} which may contain \textit{comment lines}, starting with \texttt{\#}, \textit{blank lines} marking sentence boundaries and \textit{word lines} containing the annotation of a single token (generally a word, with some exceptions\footnote{examples of such exceptions are Italian contractions such as ``\textit{dello}'', which is generally divided into ``\textit{del}'' + ``\textit{lo}''.} in 10 tab-separated fields: \smallskip
+The standard plain text format for dependency trees, CoNLL-U, is an extension of CoNNL-X \cite{conllx} which may contain \textit{comment lines}, starting with \texttt{\#}, \textit{blank lines} marking sentence boundaries and \textit{word lines} containing the annotation of a single token (generally a word, with some exceptions\footnote{Examples of such exceptions are Italian contractions such as ``\textit{dello}'', which is generally divided into ``\textit{del}'' + ``\textit{lo}''.} in 10 tab-separated fields: \smallskip
 
 \begin{enumerate}
-    \item \texttt{ID}: integer\footnote{again, there are exceptions: in the case of Italian contractions and other multiword tokens, ranges may be used. Furthermore, empty nodes are characterized by decimal numbers between 0 and 1.} representing the position of the word in the sentence, starting from 1
+    \item \texttt{ID}: integer\footnote{Again, there are exceptions: in the case of Italian contractions and other multiword tokens, ranges may be used. Furthermore, empty nodes are characterized by decimal numbers between 0 and 1.} representing the position of the word in the sentence, starting from 1
     \item \texttt{FORM}: inflected from of the word
     \item \texttt{LEMMA}: lemmatized form of the word
     \item \texttt{UPOS}: universal POS tag
@@ -204,7 +204,7 @@ Universal POS tags mark the core part-of-speech categories, such as nouns, verbs
 
 An important distinction we can make based on POS tags is, as we will see in Section \ref{criteria}, that between \textit{content} and \textit{function} words.
 \textit{Content} or \textit{open class} words are words with a lexical meaning (nouns, lexical verbs, adjectives, adverbs and interjections).
-\textit{Function} words, like pronouns and determiners, only have a grammatical meaning. Since they do not readily accept new members\footnote{one exception is the recent introduction of the gender-neutral pronoun ``\textit{hen}'' in Swedish.}, they are often referred to also as \textit{closed class} words. \smallskip
+\textit{Function} words, like pronouns and determiners, only have a grammatical meaning. Since they do not readily accept new members\footnote{One exception is the recent introduction of the gender-neutral pronoun ``\textit{hen}'' in Swedish.}, they are often referred to also as \textit{closed class} words. \smallskip
 
 While the majority of Universal POS tags correspond to the grammatical categories of traditional grammars, the UD annotation scheme does have its peculiarities. 
 Most importantly for the following discussion, verbs are divided into lexical verbs, tagged \texttt{VERB}, and auxiliaries, tagged \texttt{AUX}, thus providing an easy way to distinguish between content verbs and function verbs. 
