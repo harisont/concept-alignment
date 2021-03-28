@@ -83,9 +83,9 @@ It is interesting to notice, however, that the amount of errors is significantly
     \begin{tabular}{|l|l|l|}
     \hline
     \textbf{}              & \textbf{en-sv} & \textbf{it-sv} \\ \hline
-    \textbf{propagated}             & 1019 (85.05\%) & 979 (84.64\%) \\ \hline
-    \textbf{tot. errors}            & 133 (13.05\%)  & 187 (19.1\%)  \\ \hline
-    \textbf{CP-introduced}          & 75 (56.39\%)   & 84 (44.91\%)   \\ \hline
+    \textbf{propagated}             & 1019 (85\%) & 979 (85\%) \\ \hline
+    \textbf{tot. errors}            & 133 (13\%)  & 187 (19\%)  \\ \hline
+    \textbf{CP-introduced}          & 75 (56\%)   & 84 (45\%)   \\ \hline
     \end{tabular}
     \caption[Performance of CP Scenario 1 on manually annotated data]{Results of propagating the Italian-English alignments obtained via CE on the first 100 sentences of the PUD corpus to Swedish, using either the English or Italian subtrees as a starting point.}
     \label{tcp1}
@@ -113,14 +113,14 @@ However, some common content words, like $\langle$\textit{``always'', ``sempre''
 
 \begin{table}[H]
     \centering
-    \scriptsize
+    \footnotesize
     \begin{tabular}{|l|l|l|l|l|l|l|}
     \hline
     \textbf{}                     & \textbf{en-it-sv} & \textbf{it-en-sv} & \textbf{en-sv-it} & \textbf{sv-en-it} & \textbf{it-sv-en} & \textbf{sv-it-en} \\ \hline
     \textbf{extracted}   & 638               & 638               & 687               & 687               & 608               & 608               \\ \hline
-    \textbf{propagated}                    & 92 (14.42\%)      & 92 (14.42\%)      & 98 (14.26\%)      & 84 (12.22\%)      & 101 (16.61\%)     & 87 (14.37\%)      \\ \hline
-    \textbf{tot. errors}                   & 46 (50\%)         & 21 (22.82\%)      & 42 (42.85\%)      & 24 (28.57\%)      & 21 (20.79\%)      & 28 (32.18\%)      \\ \hline
-    \textbf{CP-introduced}                 & 33 (71.73\%)      & 11 (52.38\%)      & 21 (50\%)         & 12 (50\%)         & 12 (57.14\%)      & 21 (75\%)         \\ \hline
+    \textbf{propagated}                    & 92 (14\%)      & 92 (14\%)      & 98 (14\%)      & 84 (12\%)      & 101 (17\%)     & 87 (14\%)      \\ \hline
+    \textbf{tot. errors}                   & 46 (50\%)         & 21 (23\%)      & 42 (43\%)      & 24 (29\%)      & 21 (21\%)      & 28 (32\%)      \\ \hline
+    \textbf{CP-introduced}                 & 33 (72\%)      & 11 (52\%)      & 21 (50\%)         & 12 (50\%)         & 12 (57\%)      & 21 (75\%)         \\ \hline
     \end{tabular}
     \caption[Performance of CP Scenario 2 on manually annotated non-homogeneous data]{Results of CP for various language pairs using PUD (non-homogeneous) data. For each column, the first two languages are the ones used for extraction and the second two the ones used for propagation.}
     \label{tcp2pud}
@@ -140,9 +140,9 @@ Quantitatively, the results of the last pair of experiments, performed on two di
     \hline
                            & \textbf{sv-en-it} & \textbf{it-en-sv} \\ \hline
     \textbf{extracted}     & 1950              & 1823              \\ \hline
-    \textbf{propagated}             & 205 (10.51\%)     & 200 (10.97\%)     \\ \hline
-    \textbf{tot. errors}            & 66 (32.19\%)      & 61 (30.5\%)       \\ \hline
-    \textbf{CP-introduced} & 33 (50\%)        & 33 (54.09\%)      \\ \hline
+    \textbf{propagated}             & 205 (11\%)     & 200 (11\%)     \\ \hline
+    \textbf{tot. errors}            & 66 (32\%)      & 61 (30\%)       \\ \hline
+    \textbf{CP-introduced} & 33 (50\%)        & 33 (54\%)      \\ \hline
     \end{tabular}
     \caption[Performance of CP Scenario 2 on automatically parsed homogeneous data]{Results of CP for using two different bilingual corpora belonging to the same domain of course plans. For each column, the first two languages are the ones used for extraction and the second two the ones used for propagation.}
     \label{tcp2courses}

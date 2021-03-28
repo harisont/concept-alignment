@@ -567,8 +567,8 @@ Table \ref{tbase} compares the results obtained with the baseline with those obt
    & \multicolumn{2}{l|}{\textbf{baseline}} & \multicolumn{2}{l|}{\textbf{improved version}} \\ \hline
  \textbf{}   & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}  & \textbf{en-sv} \\ \hline
  \textbf{distinct alignments} & 1097  & 1257 & 1198   & 1314  \\ \hline
- \textbf{correct (+ and =)} & 830 (58.12\%) & 995 (79.15\%)  & 964 (80.46\%) & 1105 (84.03\%) \\ \hline
- \textbf{correct and useful (+)} & 776 (54.34\%) & 976 (77.64\%)  & 896 (74.79\%) & 1082 (82.28\%) \\ \hline
+ \textbf{correct (+ and =)} & 830 (58\%) & 995 (79\%)  & 964 (80\%) & 1105 (84\%) \\ \hline
+ \textbf{correct and useful (+)} & 776 (54\%) & 976 (78.64\%)  & 896 (75\%) & 1082 (82\%) \\ \hline
  \end{tabular}
  \caption[Comparison between the baseline and the improved version of the CE on manually annotated data]{Comparison between the baseline and the improved version of the CE module using manually annotated sentences from the PUD treebank in two different language pairs, English-Italian and English-Swedish.}
  \label{tbase}
@@ -593,15 +593,15 @@ Cross-language pair differences are, in this case, minimal, confirming that the 
  \hline
  \textbf{criteria}       & \multicolumn{2}{l|}{\textbf{alignments extracted}} & \multicolumn{2}{l|}{\textbf{correct (+ and =)}} \\ \hline
  \textbf{}       & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}  & \textbf{en-sv}  \\ \hline
- \textbf{matching UD labels}      & 39.39\%  & 37.71\%  & 78.60\%  & 80.24\%  \\ \hline
- \textbf{POS-equivalence}       & 3\%  & 1.82\%  & 83.33\%  & 83.33\%  \\ \hline
- \textbf{known divergence}       & 2.08\%   & 1.36\%  & 52\%   & 55.55\%  \\ \hline
+ \textbf{matching UD labels}      & 39\%  & 38\%  & 79\%  & 80\%  \\ \hline
+ \textbf{POS-equivalence}       & 3\%  & 2\%  & 83\%  & 83\%  \\ \hline
+ \textbf{known divergence}       & 2\%   & 1\%  & 52\%   & 56\%  \\ \hline
  \textbf{known alignment}       & 0\%  & 0\%  & -  & -  \\ \hline
- \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + POS-equivalence\end{tabular}}  & 20.95\%  & 24.71\%  & 93.03\%  & 94.76\%  \\ \hline
- \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + head alignment\end{tabular}}  & 21.78\%  & 19.61\%  & 67.81\%  & 76.74\%  \\ \hline
- \textbf{\begin{tabular}[c]{@{}l@{}}POS-equivalence\\ + head alignment\end{tabular}}  & 1.33\%   & 1.29\%  & 75\%   & 64.70\%  \\ \hline
- \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + known alignment\end{tabular}}  & 0.25\%   & 0.45\%  & 66.66\%  & 83.33\%  \\ \hline
- \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + POS-equivalence\\ + head alignment\end{tabular}} & 10.85\%  & 12.69\%  & 95.38\%  & 90.41\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + POS-equivalence\end{tabular}}  & 21\%  & 25\%  & 93\%  & 95\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + head alignment\end{tabular}}  & 22\%  & 20\%  & 68\%  & 77\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}POS-equivalence\\ + head alignment\end{tabular}}  & 1\%   & 1\%  & 75\%   & 65\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + known alignment\end{tabular}}  & 0\%   & 0\%  & 67\%  & 83\%  \\ \hline
+ \textbf{\begin{tabular}[c]{@{}l@{}}matching UD labels\\ + POS-equivalence\\ + head alignment\end{tabular}} & 11\%  & 13\%  & 95\%  & 90\%  \\ \hline
  \end{tabular}
  \caption[Criterion-specific statistics]{Criterion-specific statistics. The leftmost column specifies a criterion or combination of criteria. The central column indicates the percentage of alignments extracted because of each set of criteria, and the rightmost one specifies how many of them were marked as \texttt{+} or \texttt{-}.}
  \label{treas}
@@ -619,8 +619,8 @@ Of course, it is also interesting to compare the performance of the CE module on
  \hline
  \textbf{}   & \textbf{DMI (en-it, 798 sentences)} & \textbf{CSE (en-sv, 498 sentences)} \\ \hline
  \textbf{distinct alignments} & 352  & 529  \\ \hline
- \textbf{correct (+ and =)} & 243 (69.03\%) & 368 (69.56\%) \\ \hline
- \textbf{correct and useful (+)} & 229 (65.05\%) & 351 (66.35\%) \\ \hline
+ \textbf{correct (+ and =)} & 243 (69\%) & 368 (70\%) \\ \hline
+ \textbf{correct and useful (+)} & 229 (65\%) & 351 (66\%) \\ \hline
  \end{tabular}
  \caption[Performance of CE on barely sentence-aligned data]{Performance of CE on barely sentence-aligned data, parsed automatically. Two distinct corpora of different size have been used for the two different language pairs, so the two columns are not to be compared with each other, but rather with Table \ref{tbase}.}
  \label{tcereal}
@@ -649,8 +649,8 @@ For a fairer comparison, since \texttt{fast\_align} works at the word level, onl
  \hline
   & \textbf{our system} & \textbf{\texttt{fast\_align} 100} & \textbf{\texttt{fast\_align} 1000}\\ \hline
   \textbf{distinct alignments} & 716 & 1440 & 1435 \\ \hline
-  \textbf{correct} & 536 (74.86\%) & 410 (28.47\%) & 656 (45.71\%)\\ \hline
-  \textbf{correct and useful} & 491 (68.57\%) & 371 (25.76\%) & 590 (41.11\%)\\ \hline
+  \textbf{correct} & 536 (75\%) & 410 (28\%) & 656 (46\%)\\ \hline
+  \textbf{correct and useful} & 491 (69\%) & 371 (26\%) & 590 (41\%)\\ \hline
  \end{tabular}
  \caption[Comparison between the improved CE module and \texttt{fast\_align}]{Comparison between the improved CE module and \texttt{fast\_align} trained on the first 100 only (column 2) and on the whole PUD corpus (column 3).}
  \label{tfast}
