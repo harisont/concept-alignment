@@ -1,6 +1,6 @@
 # Syntax-based Concept Alignment for Machine Translation
 
-This repository contains the code, [report](final_report/Main.pdf) and presentation [slides](presentation/presentation.pdf) of my Master's thesis project (Göteborgs Univeristet, A.Y. 2020-21).
+This repository contains the code, [report](final_report/synbased_ca_for_mt.pdf) and presentation [slides](presentation/presentation.pdf) of my Master's thesis project (Göteborgs Univeristet, A.Y. 2020-21).
 
 ---
 ## Installation
