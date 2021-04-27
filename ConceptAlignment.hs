@@ -337,52 +337,52 @@ alignHeads (A (RTree n ts,RTree m us))
 {- Propagation functions -}
 
 -- | Generic (not optimized for same text in n languages) propagation function
-propagate :: [Criterion]            -- ^ a list of criteria 
-                                    -- (sorted by priority)
-          -> Bool                   -- ^ -- ^ a flag indicating whether clause 
-                                    -- segmentation should be performed
-          -> Bool                   -- ^ a flag indicating whether alignment
-                                    --"by exclusion" should also be performed 
-          -> ([UDTree],[UDTree])    -- a pair of lists of UD trees (the
-                                    -- sentences to propagate on) in L1, L2
-          -> UDTree                 -- a previously extracted L1 concept
-          -> Maybe (Alignment,Info) -- an (Alignment,Info) pair, if found
-propagate cs segment byExcl ([],_) _ = Nothing 
-propagate cs segment byExcl (t:ts,u:us) c =
-  let 
-    as = M.toList $ alignSent M.empty [] cs Nothing segment byExcl (t,u)
-    as' = case (c `isSubUDTree'` t, c `isHeadSubUDTree` t) of
-      (True,_) -> sortOnDepth as
-      (_,True) -> sortOnDepth (filter (\(_,(rs,_)) -> HEAD `elem` rs) as)
-      (False,False) -> []
-    in case find (\(a,_) -> c =~ sl a) as' of
-      Nothing -> propagate cs segment byExcl (ts,us) c
-      n -> n
-    where 
-      -- difference between the depth of the SL aligned subtree and c:
-      -- the smaller, the better (mostly used to avoid that root nodes are
-      -- aligned with full sentences, but also makes sense in general)
-      depthDiff :: RTree a -> Int
-      depthDiff t = abs (depthRTree t - depthRTree c)
-      sortOnDepth :: [(Alignment,Info)] ->[(Alignment,Info)]
-      sortOnDepth = sortOn (depthDiff . sl . fst)
-      -- check if c is the head of one of t's subtrees
-      isHeadSubUDTree :: UDTree -> UDTree -> Bool
-      isHeadSubUDTree c t = 
-        isJust $ listToMaybe $ 
-          sortOn depthDiff (filter (isHeadUDTree c) (allSubRTrees t))
+--propagate :: [Criterion]            -- ^ a list of criteria 
+--                                    -- (sorted by priority)
+--          -> Bool                   -- ^ -- ^ a flag indicating whether clause 
+--                                    -- segmentation should be performed
+--          -> Bool                   -- ^ a flag indicating whether alignment
+--                                    --"by exclusion" should also be performed 
+--          -> ([UDTree],[UDTree])    -- a pair of lists of UD trees (the
+--                                    -- sentences to propagate on) in L1, L2
+--          -> UDTree                 -- a previously extracted L1 concept
+--          -> Maybe (Alignment,Info) -- an (Alignment,Info) pair, if found
+--propagate cs segment byExcl ([],_) _ = Nothing 
+--propagate cs segment byExcl (t:ts,u:us) c =
+--  let 
+--    as = M.toList $ alignSent M.empty [] cs Nothing segment byExcl (t,u)
+--    as' = case (c `isSubUDTree'` t, c `isHeadSubUDTree` t) of
+--      (True,_) -> sortOnDepth as
+--      (_,True) -> sortOnDepth (filter (\(_,(rs,_)) -> HEAD `elem` rs) as)
+--      (False,False) -> []
+--    in case find (\(a,_) -> c =~ sl a) as' of
+--      Nothing -> propagate cs segment byExcl (ts,us) c
+--      n -> n
+--    where 
+--      -- difference between the depth of the SL aligned subtree and c:
+--      -- the smaller, the better (mostly used to avoid that root nodes are
+--      -- aligned with full sentences, but also makes sense in general)
+--      depthDiff :: RTree a -> Int
+--      depthDiff t = abs (depthRTree t - depthRTree c)
+--      sortOnDepth :: [(Alignment,Info)] ->[(Alignment,Info)]
+--      sortOnDepth = sortOn (depthDiff . sl . fst)
+--      -- check if c is the head of one of t's subtrees
+--      isHeadSubUDTree :: UDTree -> UDTree -> Bool
+--      isHeadSubUDTree c t = 
+--        isJust $ listToMaybe $ 
+--          sortOn depthDiff (filter (isHeadUDTree c) (allSubRTrees t))
 
--- check if a UD tree is the head of another
-isHeadUDTree :: UDTree -> UDTree -> Bool
-isHeadUDTree (RTree n []) (RTree m _) = n =~ m
-isHeadUDTree (RTree n ts) (RTree m _) = n =~ m && (hasAuxOnly || hasCompOnly) 
-  where 
-    hasAuxOnly = all (`isLabelled` "aux") ts
-    hasCompOnly = all 
-      (\t -> 
-        udSimpleDEPREL (root t) `elem` ["compound", "flat", "nmod", "amod"]
-      ) 
-      ts
+---- check if a UD tree is the head of another
+--isHeadUDTree :: UDTree -> UDTree -> Bool
+--isHeadUDTree (RTree n []) (RTree m _) = n =~ m
+--isHeadUDTree (RTree n ts) (RTree m _) = n =~ m && (hasAuxOnly || hasCompOnly) 
+--  where 
+--    hasAuxOnly = all (`isLabelled` "aux") ts
+--    hasCompOnly = all 
+--      (\t -> 
+--        udSimpleDEPREL (root t) `elem` ["compound", "flat", "nmod", "amod"]
+--      ) 
+--      ts
 
 {- POS-utils -}
 
