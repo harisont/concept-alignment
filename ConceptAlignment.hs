@@ -4,87 +4,125 @@ import Data.Maybe
 import Data.List
 import Data.List.Split
 import qualified Data.MultiSet as MS
-import qualified Data.Map as M
 import qualified Data.Set as S
+import qualified Data.Map as M
 import RTree
 import UDConcepts
 import UDPatterns
 
 {- Basic (mostly data types) definitions and instances for alignments etc. -}
 
--- | An alignment is a pair of corresponding UD subtrees (not a type synonym
--- because of custom Eq and Ord instances)
--- TODO: type synonym instances and just a pair?
-newtype Alignment = A (UDTree,UDTree)
+-- | An alignment is a pair of corresponding UD (sub)trees associated to some 
+-- metadata 
+data Alignment = A {
+  trees :: AlignedTrees,    -- ^ pair of UD subtrees
+  meta :: Meta              -- ^ metadata
+} deriving (Show,Read,Eq,Ord)
 
--- | Left (SL) tree of an alignment
+-- | Initialize a potential alignment given just the pair of trees
+initAlignment :: AlignedTrees -> Alignment
+initAlignment tu = A {
+  trees = tu,
+  meta = initMeta
+}
+
+-- | Convert an alignment into a (key,value) pair, where the key is the tree
+-- pair and the "value" is the metadata
+alignment2keyval :: Alignment -> (AlignedTrees,Meta)
+alignment2keyval a = (trees a,meta a)
+
+-- | Convert a (key,value) pair, where the key is the tree pair and the 
+-- "value" is the metadata, into an Alignment
+keyval2alignment :: (AlignedTrees,Meta) -> Alignment
+keyval2alignment (k,v) = A {
+  trees = k,
+  meta = v
+}
+
+-- | Left (source language) tree of an alignment
 sl :: Alignment -> UDTree
-sl (A (t,u)) = t
+sl a = let (AT (t,u)) = trees a in t
 
--- | Correct (TL) tree of an alignment
+-- | Right (target language) tree of an alignment
 tl :: Alignment -> UDTree
-tl (A (t,u)) = u
+tl a = let (AT (t,u)) = trees a in u
 
--- | Alignments are shown as pairs
-instance Show Alignment where
-  show (A a) = show a
-
--- | prAlignment is used instead of show to "visually" inspect the alignments
+-- | prAlignment is used instead of show for inspecting the alignments in an
+-- easier way, e.g. in EvAlign and for debugging
 prAlignment :: Alignment -> String
-prAlignment a = t' ++ "|" ++ u'
-  where (t',u') = linearize a
+prAlignment a = prTrees a 
+                ++ " reasons: " ++ show (reasons $ meta a)
+                ++ " sentence IDs: " ++ show (sentIds $ meta a)
+                ++ " n. occurrences: " ++ show (nOccurrences $ meta a)
+  where prTrees a = linearize (sl a) ++ " ||| " ++ linearize (tl a)
 
--- | Two alignment are equal whenever their "linearizations" are the same
-instance Eq Alignment where
-  a == b = linearize a == linearize b
-
--- | Linearize the alignment to a pair of strings, ignoring initial whitespace
-linearize :: Alignment -> (String,String)
-linearize (A (t,u)) = (prUDTreeString' t,prUDTreeString' u)
-  where prUDTreeString' = dropWhile (== ' ') . prUDTreeString
-
--- | Alignments can be ordered based on:
--- 1. size of their left tree
--- 2. size of their Correct tree
--- 3. "linearization" of their left tree (alphabetically)
--- 4. "linearization" of their Correct tree (alphabetically)
-instance Ord Alignment where
-  (A (t1,u1)) <= (A (t2,u2)) = k t2 u2 <= k t1 u1
-    where 
-      k t u = (depthRTree t,depthRTree u,prUDTreeString t,prUDTreeString u)
-
--- | Check if an alignment contains another;
+-- | Check if an alignment "contains" another;
 -- used both in pruning and selection of alignments for MT
 contains :: Alignment -> Alignment -> Bool
-(A (t1,u1)) `contains` (A (t2,u2)) = t2 `isSubRTree` t1 && u2 `isSubRTree` u1
+a `contains` b = (sl b `isSubRTree` sl a) && (tl b `isSubRTree` tl a)
 
--- | Alignments is a mapping where keys are of type Alignment and values are 
--- tuples with other relevant info 
-type Alignments = M.Map Alignment Info
+-- | AlignedTrees basically represents a pair of UD trees, but it is a newtype
+-- due to the custom implementation of (==) 
+newtype AlignedTrees = AT (UDTree,UDTree)
+  deriving (Show,Read)
 
--- | Relevant infos are the set of reasons for an alignment and its number of
--- occurrences
-type Info = (S.Set Reason,Int)
+-- | Two pairs of aligned trees are considered equal whenever their
+-- linearizations are the same
+instance Eq AlignedTrees where
+  AT (t1,u1) == AT (t2,u2) = linearize t1 == linearize t2 
+                          && linearize u1 == linearize u2
 
--- | Record type for linearized alignments, mostly used in EvAlign
-data LinAlignment = LAlignment {
-  ltrees :: (String, String),
-  lreasons :: [Reason],
-  loccurrences :: Int
-} deriving (Eq)
-
--- | Custom instance of Show for LinAlignments
-instance Show LinAlignment where
-  show (LAlignment (t,u) r n) = t ++ "|" ++ u ++ show r ++ show n
-
--- | Custom instance of Read for LinAlignments
-instance Read LinAlignment where
-  readsPrec _ s = [(LAlignment (t,u) r n, "")]
+-- | Aligned trees can be ordered based on:
+-- 1. size of their left tree
+-- 2. size of their right tree
+-- 3. "linearization" of their left tree (alphabetically)
+-- 4. "linearization" of their right tree (alphabetically)
+instance Ord AlignedTrees where
+  a <= b = k a <= k b
     where 
-      [t,u] = splitOn "|" $ takeWhile (/='[') s
-      r = 
-        (read $ takeWhile (/=']') (dropWhile (/='[') s) ++ "]") :: [Reason]
-      n = read (tail $ dropWhile (/=']') s) :: Int
+      k x = (depthRTree sla,depthRTree tla,linearize sla,linearize tla)
+        where AT (sla,tla) = x
+
+-- | The metadata of an alignment are:
+data Meta = M {
+  reasons :: S.Set Reason,  -- ^ reasons for alignment
+  sentIds :: S.Set Int,     -- ^ ids of the sentences it was inferred from
+  nOccurrences :: Int       -- ^ total number of occurrences
+} deriving (Show,Read,Eq,Ord)
+
+-- | Initialize metadata with default vals
+initMeta :: Meta
+initMeta = M {
+  reasons = S.empty,
+  sentIds = S.empty,
+  nOccurrences = 1
+}
+
+
+{- Helper functions for alignment maps-}
+
+-- | Combine the metadata of two (equivalent) alignments
+combineMeta :: Meta -> Meta -> Meta
+m `combineMeta` n = M {
+  reasons = reasons m `S.union` reasons n,
+  sentIds = sentIds m `S.union` sentIds n,
+  nOccurrences = nOccurrences m + nOccurrences n
+}
+
+-- TODO: docs
+insert' :: (AlignedTrees,Meta) -> M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta 
+insert' (at,m) = M.insertWith combineMeta at m
+
+union' :: M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta 
+union' = M.unionWith combineMeta
+
+unions' :: [M.Map AlignedTrees Meta] -> M.Map AlignedTrees Meta
+unions' = M.unionsWith combineMeta
+  
+-- | Linearize a UD tree ignoring initial whitespace
+-- TODO: move to gfud
+linearize :: UDTree -> String
+linearize = dropWhile (== ' ') . prUDTreeString
 
 -- | Type of manual annotations.
 -- An alignment can be incorrect (-), correct in the specific context where it 
@@ -104,18 +142,8 @@ instance Read Annotation where
   readsPrec _ "+" = [(Correct, "")]
   readsPrec _ a = error $ "annotation error: " ++ show a
 
--- | Alignment can be associated with annotations
-type AnnotatedAlignment = (Annotation,LinAlignment)
-
--- | Convert an alignment and its "statistics" to a LinAlignment
-toLinAlignment :: (Alignment, (S.Set Reason, Int)) -> LinAlignment
-toLinAlignment (a, (rs, n)) = 
-  LAlignment (linearize a) (S.toList rs) n
-
--- | Combine reasons and n_occurrences 
--- (used for union(s)With, fromListWith etc.) 
-combineVals :: Info -> Info -> Info
-combineVals (r,n) (s,m) = (r `S.union` s,n + m)
+-- | Alignments can be associated with annotations
+type Alignment' = (Annotation,Alignment)
 
 -- | Reasons for alignment
 data Reason = DIV   -- known interlingual divergence
@@ -128,7 +156,7 @@ data Reason = DIV   -- known interlingual divergence
             | PM    -- obtained via pattern matching/replacement pattern
             | PREV  -- already found in another sentence 
             | FAST  -- found by fast_align
-  deriving (Eq, Show, Read, Ord, Enum, Bounded)
+  deriving (Eq,Show,Read,Ord,Enum,Bounded)
 
 -- | Data type for alignment criteria. Each criterion is composed of
 data Criterion = C {
@@ -145,9 +173,9 @@ data Criterion = C {
 }
 
 -- | Special criterion necessary for effective clause segmentation
--- (that's why it isn't defined in module Criteria)
-cl :: Criterion
-cl = C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
+-- (that's why it is defined here and not in module Criteria)
+clause :: Criterion
+clause = C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
   where 
     -- a clause of a certain type is translated as a clause of another type 
     divClause :: UDTree -> UDTree -> Bool
@@ -157,85 +185,75 @@ cl = C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
 {- Alignment functions -}
 
 -- | Align a list of pairs of / corresponding / dependency trees   
-align :: [LinAlignment]       -- ^ a list of known linearized alignments
-      -> [Criterion]          -- ^ a list of criteria (sorted by priority)
-      -> Maybe UDPattern  -- ^ a replacement pattern
-      -> Bool                 -- ^ a flag indicating whether clause 
-                              -- segmentation should be performed  
-      -> Bool                 -- ^ a flag indicating whether alignment "by 
-                              -- exclusion" should also be performed 
-      -> [(UDTree,UDTree)]    -- ^ the list of pairs of dependency trees
-      -> Alignments           -- ^ a Map of alignments
-align = align' M.empty
-  where
-    align' as _ _ _ _ _ [] = as
-    align' as las cs r segment byExcl (tu:tus) =
-      align' (
-        M.unionWith combineVals as (
-          alignSent as las cs r segment byExcl tu
-        )
-      ) las cs r segment byExcl tus
+align :: S.Set Alignment           -- ^ a set of known alignments (e.g. from 
+                                   -- statistical tools)
+      -> [Criterion]               -- ^ a list of criteria (sorted by 
+                                   -- priority)
+      -> Maybe UDPattern           -- ^ a gf-ud pattern
+      -> Bool                      -- ^ a flag indicating whether clause 
+                                   -- segmentation should be performed 
+      -> Bool                      -- ^ a flag indicating whether alignment  
+                                   -- "by exclusion" should also be performed 
+      -> [(UDSentence,UDSentence)] -- ^ the list of sentences to align 
+      -> S.Set Alignment           -- ^ a set of alignments
+align as _ _ _ _ [] = as
+align as cs p cl ex (s:ss) = align (S.fromList $ map keyval2alignment (M.toList $ alignSent as' cs p cl ex s)) cs p cl ex ss
+  where as' = M.fromListWith combineMeta (S.toList $ S.map alignment2keyval as)
 
--- | Sentence-level alignment function
-alignSent :: Alignments           -- ^ a map of known alignments
-          -> [LinAlignment]       -- ^ a list of known linearized alignments
-          -> [Criterion]          -- ^ a list of criteria (sorted by priority)
-          -> Maybe UDPattern      -- ^ a pattern
-          -> Bool                 -- ^ a flag indicating whether clause 
-                                  -- segmentation should be performed 
-          -> Bool                 -- ^ a flag indicating whether alignment "by 
-                                  -- exclusion" should also be performed 
-          -> (UDTree,UDTree)      -- ^ a pair of dependency trees 
-          -> Alignments           -- ^ a Map of alignments
-alignSent as las cs r segment byExcl (t,u) = 
-  M.fromListWith combineVals (as' ++ as'')
-  where
-    -- "basic" alignment based on sentence/clause recursive alignment
-    as' = if segment then alignClauses as cs (t,u) else alignSent' as cs (t,u)
-    -- attempts to align subtrees that could not be aligned properly
-    as'' = if byExcl 
-      then alignRest (M.fromListWith combineVals as') cs (t,u)
-      else []
-    
-    -- actual recursive function working with a list of (key,val) pairs 
-    alignSent' as cs (t@(RTree n ts), u@(RTree m us))
-      -- 1+ criteria match
-      | (not . null) cs' = prune as'
-      | A (t,u) `M.member` as = [
-          (A (t,u),(S.singleton PREV,1)), 
-          (alignHeads (A (t,u)),(S.fromList [HEAD,PREV], 1))
-        ]
-      | linearize (A (t,u)) `elem` map ltrees las = [
-          (A (t,u),(S.singleton FAST,1))
-        ]
-      | otherwise = []
-        where
-          -- applying criteria 
-          cs' = map snd (filter fst (zip [f t u | f <- map func cs] cs))
-          c = head cs' -- the first determines reasons & if heads are aligned
-          -- new alignments, subtrees included
-          as' = case (isJust r,headAlign c,isJust mtup) of
-            -- not using a pattern: add head if necessary
-            (False,True,_) -> h:tu:sas
-            (False,False,_) -> tu:sas
-            -- using a pattern: only add alignment if something has changed
-            (True,_,True) -> tup:sas
-            (True,_,False) -> sas
-            where 
-              tu = (A (t,u),(reas c,1)) -- (t,u)
-              mtup = if isJust r 
-                then alignPattern (fromJust r) (fst tu) 
-                else Nothing
-              tup = (fromJust mtup,(S.insert PM (reas c), 1))
-              h = (alignHeads $ fst tu,(S.insert HEAD (reas c), 1)) -- heads 
-              -- subtree alignments
-              sas = concatMap (alignSent' as cs) [(t,u) | t <- ts', u <- us']
-                where (ts',us') = (sortByLabel ts,sortByLabel us)
-                        where sortByLabel = sortOn (udSimpleDEPREL . root)
-    
+-- | Sentence-level alignment function. Can be use independently of align   
+alignSent :: M.Map AlignedTrees Meta   -- ^ a map of known alignments (e.g. 
+                                       -- from statistical tools)
+          -> [Criterion]               -- ^ a list of criteria (sorted by 
+                                       -- priority)
+          -> Maybe UDPattern           -- ^ a gf-ud pattern
+          -> Bool                      -- ^ a flag indicating whether clause 
+                                       -- segmentation should be performed 
+          -> Bool                      -- ^ a flag indicating whether   
+                                       -- alignment "by exclusion" should also 
+                                       -- be performed 
+          -> (UDSentence,UDSentence)   -- ^ the sentences to align 
+          -> M.Map AlignedTrees Meta   -- ^ a map of alignments
+alignSent as cs p cl ex s@(s1,s2) = if ex then extra else basic --TODO: extra `union` basic?
+  where 
+    basic = if cl then alignClauses (t,u) else alignSent' cs (t,u)
+    extra = alignRest basic -- alignments obtained "by exclusion"
+    id = if sentId s1 == sentId s2 
+              then sentId s1 
+              else error "unaligned sentences"
+    (t,u) = (udSentence2tree s1, udSentence2tree s2)
+
+    -- the list of criteria is needed because of how alignClause works
+    alignSent' :: [Criterion] -> (UDTree,UDTree) ->M.Map AlignedTrees Meta
+    alignSent' cs (t@(RTree n ts),u@(RTree m us)) = if (not . null) matchingCs
+      then case (isJust p,headAlign (head matchingCs)) of
+        -- not using a gf-ud pattern
+        (False,True) -> insert' (alignment2keyval h) (insert' (alignment2keyval a) as) `union'` as'
+        (False,False) -> insert' (alignment2keyval a) as `union'` as'
+        -- using a gf-ud pattern: ignore head alignment altogether
+        (True,_) -> if isJust m 
+          then insert' (alignment2keyval $ fromJust m) (as `union'` as')
+          else as `union'` as'
+      else M.empty
+      where 
+        a = (initAlignment $ AT (t,u)) { 
+          meta = initMeta {
+            reasons = S.unions $ map reas matchingCs,
+            sentIds = S.singleton id 
+          }
+        }
+        h = alignHeads a -- TODO: add HEAD to reasons in alignHead
+        m = alignPattern (fromJust p) a
+        -- subtree alignments
+        as' = unions' $ map (alignSent' cs) [(t,u) | t <- ts', u <- us']
+            where (ts',us') = (sortByLabel ts,sortByLabel us)
+                    where sortByLabel = sortOn (udSimpleDEPREL . root)
+        matchingCs = 
+          map snd (filter fst (zip [f t u | f <- map func cs] cs))
+
     -- call alignSent' on all pairs of clauses found in t and u
-    alignClauses as cs (t,u) = 
-        prune $ concatMap (alignSent' as (cs ++ [cl])) clausePairs
+    alignClauses :: (UDTree,UDTree) ->M.Map AlignedTrees Meta
+    alignClauses (t,u) = 
+        unions' $ map (alignSent' (cs ++ [clause])) clausePairs
       where 
         clausePairs = [(ct,cu) | ct <- cts, cu <- cus, 
                                  length (clauses ct) == length (clauses cu)]
@@ -246,8 +264,9 @@ alignSent as las cs r segment byExcl (t,u) =
 
     -- call alignSent' on all pairs of unaligned nominals + modifiers
     -- ("alignment by exclusion")
-    alignRest as cs (t,u) = 
-      prune $ concatMap (alignSent' as cs') nomPairs
+    alignRest :: M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta
+    alignRest as = 
+      unions' $ map (alignSent' cs') nomPairs
         where
           nomPairs = [(nt,nu) | nt <- nts, nt `notElem` las, 
                                 nu <- nus, nu `notElem` ras,
@@ -257,56 +276,40 @@ alignSent as las cs r segment byExcl (t,u) =
           (nts,nus) = (sortNs $ nommods t, sortNs $ nommods u)
           sortNs = sortOn (\(RTree n ts) -> 
             (udSimpleDEPREL n,dependencyDistance n))
-          (las,ras) = unzip $ map (\(A x) -> x) (M.keys as)
+          (las,ras) = (map (\((AT (t,u)),v) -> t) (M.toList as), map (\((AT (t,u)),v) -> u) (M.toList as))
           cs' = map 
             (\(C f _ h s) -> C f (S.singleton REST) h s) 
             (filter strict cs)
 
--- | Helper function removing the less valid alternative alignments
-prune :: [(Alignment,Info)] -> [(Alignment,Info)]
--- two different sorting functions are used one after another so it's easier
--- to change the code to une only one of them or change the order in which
--- they are applied
-prune = nubBy areAlt . sortByFertility . sortByReasons
-  where 
-    -- check if two alignments are alternative to each other comparing THE
-    -- ACTUAL TREES, and not their "linearizations"
-    areAlt (A (t1,u1),_) (A (t2,u2),_) = t1 == t2 || u1 == u2
-    -- sort alignments by number of reasons (decreasing order), then by first
-    sortByReasons = sortOn (\(_,(rs,n)) -> 
-      let rs' = rs `S.difference` S.fromList [HEAD,PREV,PM] 
-      in (-(length rs'), maximum $ S.elems rs))
-    -- alt. fertility-based sorting strategy
-    -- top alignments are the ones that lead to more sub-alignments
-    sortByFertility as = sortOn (\(a,_) -> - (length $ subas a)) as
-      where subas a = filter (\a' -> a `contains` a') (map fst as)
-
--- | Helper function for pattern alignment: given an alignment and a 
--- replacement pattern, return the corresponding pattern-replaced one 
--- (if applicable)
-alignPattern :: UDPattern -> Alignment -> Maybe Alignment
-alignPattern r a@(A (t,u)) = 
-  case (ifMatchUDPattern r t,ifMatchUDPattern r u) of
-    -- only return an alignment if the pattern applies to both members
-    (True,True) -> Just a
-    _ -> Nothing
+    -- check if an alignment matches a certain gf-ud pattern.
+    -- TODO: now it can become a boolean function: no replacement is done
+    alignPattern :: UDPattern -> Alignment -> Maybe Alignment
+    alignPattern p a = 
+      case (ifMatchUDPattern p (sl a),ifMatchUDPattern p (tl a)) of
+        -- only return an alignment if the pattern applies to both members
+        (True,True) -> Just a
+        _ -> Nothing
 
 -- | Helper function for head alignment: given an alignment, return a new one  
 -- for their "heads", respecting any compounds and aux+verbs (and more?)
+-- TODO: mv inside
 alignHeads :: Alignment -> Alignment
-alignHeads (A (RTree n ts,RTree m us))
+alignHeads a
   -- if there are compound constructions, look for their counterparts and
   -- align accordingly
-  | (not . null) cts = A (RTree n cts, RTree m (compCounterparts ts us))
-  | (not . null) cus = A (RTree n (compCounterparts us ts), RTree m cus)
+  | (not . null) cts = 
+      initHeadAlignment $ AT (RTree n cts, RTree m (compCounterparts ts us))
+  | (not . null) cus = 
+      initHeadAlignment $ AT (RTree n (compCounterparts us ts), RTree m cus)
   -- if the roots are verbs (to avoid messing with copulas) and only one of
   -- them has 1+ auxiliaries, align verb | verb + auxiliaries
   | all isVerb [n,m] && (not . null) ats && null aus = 
-      A (RTree n ats, RTree m [])
+      initHeadAlignment $ AT (RTree n ats, RTree m [])
   | all isVerb [n,m] && null ats && (not . null) aus = 
-      A (RTree n [], RTree m aus) 
-  | otherwise = A (RTree n [], RTree m [])
+      initHeadAlignment $ AT (RTree n [], RTree m aus) 
+  | otherwise = initHeadAlignment $ AT (RTree n [], RTree m [])
   where
+    AT (RTree n ts,RTree m us) = trees a
     -- select subtrees labelled in a certain way 
     filterByLabel l xs = filter (`isLabelled` l) xs
 
@@ -314,6 +317,10 @@ alignHeads (A (RTree n ts,RTree m us))
     aus = filterByLabel "aux" us
     cts = filterByLabel "compound" ts
     cus = filterByLabel "compound" us
+
+    -- TODO: add other reasons
+    initHeadAlignment tu = a { meta = (meta a) { reasons = S.singleton HEAD } }
+      where a = initAlignment tu
 
     -- given two lists of subtrees, select those that, in the second,
     -- could correspond to a compound construction in the first, i.e.
@@ -448,10 +455,13 @@ abstractUDTree = mapRTree udSimpleDEPREL
 
 -- | convert an alignment into a pair of CoNNL-U sentences
 alignment2sentencePair :: Alignment -> (UDSentence, UDSentence)
-alignment2sentencePair (A (t,u)) = 
-  (udTree2adjustedSentence t, udTree2adjustedSentence u)
+alignment2sentencePair a = 
+  (udTree2adjustedSentence $ sl a, udTree2adjustedSentence $ tl a)
   where 
     udTree2adjustedSentence = adjustUDIds . udTree2sentence . createRoot
+-- TODO: add each sentence its metadata in udCommentLines
+
+
 {- Selection of alignments for MT -}
 
 -- | Select the alignments relevant for MT. Namely:
