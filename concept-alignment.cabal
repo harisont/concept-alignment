@@ -11,24 +11,24 @@ build-type: Simple
 extra-source-files: README.md
 cabal-version: >= 1.10
 
---executable extract-concepts
---  main-is: ExtractConcepts.hs
---  other-modules:
---    ConceptAlignment,
---    Criteria,
---    FastAlignUtils,
---    ArgvParse
---  build-depends:
---    base,
---    containers,
---    gf,
---    gf-ud,
---    multiset,
---    split,
---    filepath
---  ghc-options: -main-is ExtractConcepts
---  default-language: Haskell2010
---
+executable extract-concepts
+  main-is: ExtractConcepts.hs
+  other-modules:
+    ConceptAlignment,
+    Criteria,
+    --FastAlignUtils,
+    ArgvParse
+  build-depends:
+    base,
+    containers,
+    gf,
+    gf-ud,
+    multiset,
+    split,
+    filepath
+  ghc-options: -main-is ExtractConcepts
+  default-language: Haskell2010
+
 --executable propagate-concepts
 --  main-is: PropagateConcepts.hs
 --  other-modules:

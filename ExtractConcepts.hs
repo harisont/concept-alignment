@@ -11,7 +11,7 @@ import System.Exit
 import UDConcepts
 import UDPatterns
 import ConceptAlignment
-import FastAlignUtils
+--import FastAlignUtils
 import Criteria 
 import ArgvParse
 
@@ -58,12 +58,13 @@ main = do
     getSmtAlignments flags src trg = case [path | Pharaoh path <- flags] of
       [] -> return []
       [path] -> do
-        indices <- readFile path >>= return . parsePh
-        srcConllu <- readFile src
-        trgConllu <- readFile trg
-        let bitext = take 100 $ parseBi $ conllu2bi (srcConllu,trgConllu)
-        print $ ltrees $ phToLas bitext indices !! 5
-        return $ phToLas bitext indices
+        undefined
+        --indices <- readFile path >>= return . parsePh
+        --srcConllu <- readFile src
+        --trgConllu <- readFile trg
+        --let bitext = take 100 $ parseBi $ conllu2bi (srcConllu,trgConllu)
+        --print $ ltrees $ phToLas bitext indices !! 5
+        --return $ phToLas bitext indices
       _ -> undefined
     getPattern :: [Flag] -> IO (Maybe UDPattern)
     getPattern flags = do
