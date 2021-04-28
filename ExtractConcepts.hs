@@ -22,31 +22,31 @@ main = do
     [src,trg] -> if Help `elem` flags
       then putStrLn help >> exitSuccess
       else do
-        ts <- conlluFile2UDTrees src
-        us <- conlluFile2UDTrees trg
+        ts <- parseUDFile src
+        us <- parseUDFile trg
         let tus = zip ts us -- let tus = take 50 $ zip ts us
-        smtAs <- getSmtAlignments flags src trg
+        let smtAs = S.empty -- <- getSmtAlignments flags src trg
         let segment = Clauses `elem` flags
         let byExcl = Rest `elem` flags
         let fp = listToMaybe [path | Path path <- flags] 
         let fp' = fromJust fp
         r <- getPattern flags
-        let as = M.toList $ align smtAs criteria r segment byExcl tus
+        let as = align smtAs criteria r segment byExcl tus
         let m = listToMaybe [read mmax :: Int | MaxSize mmax <- flags]
-        let as' = if All `elem` flags then as else selectForMT m as
-        let as'' = sortByConfidence as'
+        let as' = if All `elem` flags then as else as --TODO: selectForMT m as
+        let as'' = {-TODO: sortByConfidence $-} S.toList as' 
         if Linearize `elem` flags
           then 
             if isJust fp 
-              then writeFile fp' (unlines $ map (show . toLinAlignment) as'') 
-              else mapM_ (print . toLinAlignment) as''
+              then writeFile fp' (unlines $ map prAlignment as'') 
+              else mapM_ (putStrLn . prAlignment) as''
           else 
             if isJust fp 
               then do
-                let numberedSentPairs = [1..] `zip` map (alignment2sentencePair . fst) as''
+                let numberedSentPairs = [1..] `zip` map alignment2sentencePair as''
                 writeFile (insertLang fp' "SL") (unlines [prUDSentence (fst x) (fst $ snd x) | x <- numberedSentPairs])
                 writeFile (insertLang fp' "TL") (unlines [prUDSentence (fst x) (snd $ snd x) | x <- numberedSentPairs]) 
-              else mapM_ (print . fst) as''
+              else mapM_ print as''
     _ -> do
       putStrLn "Wrong number of arguments."
       putStrLn help
@@ -76,12 +76,12 @@ main = do
             else return Nothing
 
 -- | Sort alignments by how likely theyare to be correct (kinda). 
-sortByConfidence :: [(Alignment,Info)] -> [(Alignment,Info)]
-sortByConfidence = sortOn (\(a,(r,o)) -> 
-                        let rs = (S.toList r) \\ [HEAD, PREV] 
+sortByConfidence :: [Alignment] -> [Alignment]
+sortByConfidence = sortOn (\a -> 
+                        let rs = S.toList (reasons $ meta a) \\ [HEAD, PREV] 
                         in (
                             -(length rs), 
-                            -(o), 
+                            -(nOccurrences $ meta a), 
                             tail rs
                           )) 
 
