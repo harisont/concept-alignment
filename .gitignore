@@ -56,3 +56,6 @@ presentation/beamerthememhthm.sty
 
 # temporary secrets
 grammars/*.gf
+
+# paper template guide
+paper/acl_latex*
