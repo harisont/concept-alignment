@@ -56,3 +56,7 @@ presentation/beamerthememhthm.sty
 
 # temporary secrets
 grammars/*.gf
+
+# UD treebanks
+data/ud-treebanks-v2.6
+data/PUD_test
