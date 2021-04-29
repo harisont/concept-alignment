@@ -51,10 +51,13 @@ tl a = let (AT (t,u)) = trees a in u
 -- easier way, e.g. in EvAlign and for debugging
 prAlignment :: Alignment -> String
 prAlignment a = prTrees a 
-                ++ " reasons: " ++ show (reasons $ meta a)
-                ++ " sentence IDs: " ++ show (sentIds $ meta a)
+                ++ "    --"
+                ++ " reasons: " ++ showSet (reasons $ meta a)
+                ++ " sentence IDs: " ++ showSet (sentIds $ meta a)
                 ++ " n. occurrences: " ++ show (nOccurrences $ meta a)
-  where prTrees a = linearize (sl a) ++ " ||| " ++ linearize (tl a)
+  where 
+    prTrees a = linearize (sl a) ++ " ||| " ++ linearize (tl a)
+    showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
 
 -- | Check if an alignment "contains" another;
 -- used both in pruning and selection of alignments for MT
