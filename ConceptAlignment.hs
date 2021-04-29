@@ -290,56 +290,59 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else basic --TODO: extra `u
         (True,True) -> Just a
         _ -> Nothing
 
--- | Helper function for head alignment: given an alignment, return a new one  
--- for their "heads", respecting any compounds and aux+verbs (and more?)
--- TODO: mv inside
-alignHeads :: Alignment -> Alignment
-alignHeads a
-  -- if there are compound constructions, look for their counterparts and
-  -- align accordingly
-  | (not . null) cts = 
-      initHeadAlignment $ AT (RTree n cts, RTree m (compCounterparts ts us))
-  | (not . null) cus = 
-      initHeadAlignment $ AT (RTree n (compCounterparts us ts), RTree m cus)
-  -- if the roots are verbs (to avoid messing with copulas) and only one of
-  -- them has 1+ auxiliaries, align verb | verb + auxiliaries
-  | all isVerb [n,m] && (not . null) ats && null aus = 
-      initHeadAlignment $ AT (RTree n ats, RTree m [])
-  | all isVerb [n,m] && null ats && (not . null) aus = 
-      initHeadAlignment $ AT (RTree n [], RTree m aus) 
-  | otherwise = initHeadAlignment $ AT (RTree n [], RTree m [])
-  where
-    AT (RTree n ts,RTree m us) = trees a
-    -- select subtrees labelled in a certain way 
-    filterByLabel l xs = filter (`isLabelled` l) xs
-
-    ats = filterByLabel "aux" ts
-    aus = filterByLabel "aux" us
-    cts = filterByLabel "compound" ts
-    cus = filterByLabel "compound" us
-
-    -- TODO: add other reasons
-    initHeadAlignment tu = a { meta = (meta a) { reasons = S.singleton HEAD } }
-      where a = initAlignment tu
-
-    -- given two lists of subtrees, select those that, in the second,
-    -- could correspond to a compound construction in the first, i.e.
-    compCounterparts :: [UDTree] -> [UDTree] -> [UDTree]
-    compCounterparts ts us = cus ++ fus' ++ nus' ++ aus'
+    -- head alignment: given an alignment, return a new one  
+    -- for their "heads", respecting any compounds and aux+verbs (and more?)
+    alignHeads :: Alignment -> Alignment
+    alignHeads a
+      -- if there are compound constructions, look for their counterparts and
+      -- align accordingly
+      | (not . null) cts = 
+          initHeadAlignment $ AT (RTree n cts, RTree m (compCounterparts ts us))
+      | (not . null) cus = 
+          initHeadAlignment $ AT (RTree n (compCounterparts us ts), RTree m cus)
+      -- if the roots are verbs (to avoid messing with copulas) and only one of
+      -- them has 1+ auxiliaries, align verb | verb + auxiliaries
+      | all isVerb [n,m] && (not . null) ats && null aus = 
+          initHeadAlignment $ AT (RTree n ats, RTree m [])
+      | all isVerb [n,m] && null ats && (not . null) aus = 
+          initHeadAlignment $ AT (RTree n [], RTree m aus) 
+      | otherwise = initHeadAlignment $ AT (RTree n [], RTree m [])
       where
+        AT (RTree n ts,RTree m us) = trees a
+        -- select subtrees labelled in a certain way 
+        filterByLabel l xs = filter (`isLabelled` l) xs
+    
+        ats = filterByLabel "aux" ts
+        aus = filterByLabel "aux" us
+        cts = filterByLabel "compound" ts
         cus = filterByLabel "compound" us
-        fus' = if length fus > length fts then fus else []
-          where 
-            fus = filterByLabel "flat" us
-            fts = filterByLabel "flat" ts
-        nus' = if length nus > length nts then nus else []
+    
+        -- TODO: add other reasons
+        initHeadAlignment tu = a { 
+          meta = (meta a) { 
+            reasons = S.singleton HEAD,
+            sentIds = S.singleton id } 
+        }
+          where a = initAlignment tu
+    
+        -- given two lists of subtrees, select those that, in the second,
+        -- could correspond to a compound construction in the first, i.e.
+        compCounterparts :: [UDTree] -> [UDTree] -> [UDTree]
+        compCounterparts ts us = cus ++ fus' ++ nus' ++ aus'
           where
-            nus = filterByLabel "nmod" us
-            nts = filterByLabel "nmod" ts
-        aus' = if length aus > length ats then aus else []
-          where
-            aus = filterByLabel "amod" us
-            ats = filterByLabel "amod" ts 
+            cus = filterByLabel "compound" us
+            fus' = if length fus > length fts then fus else []
+              where 
+                fus = filterByLabel "flat" us
+                fts = filterByLabel "flat" ts
+            nus' = if length nus > length nts then nus else []
+              where
+                nus = filterByLabel "nmod" us
+                nts = filterByLabel "nmod" ts
+            aus' = if length aus > length ats then aus else []
+              where
+                aus = filterByLabel "amod" us
+                ats = filterByLabel "amod" ts 
 
 {- Propagation functions -}
 
