@@ -30,8 +30,7 @@
 %\setlength\titlebox{<dim>}
 %
 % and set <dim> to something 5cm or larger.
-% TODO: title
-\title{Instructions for *ACL Proceedings}
+\title{Syntax-Based Concept Alignment for Domain-Specific Machine Translation}
 
 % Author information can be set in various styles:
 % For several authors from the same institution:
@@ -67,6 +66,14 @@
 \end{abstract}
 
 \section{Introduction}
+Grammar-based systems such as GF \cite{TODO:} have been successfully employed in domain-specific Machine Translation (MT). 
+What makes these systems well suited to the task is the fact that, when we constrain ourselves to a specific domain, where precision is most often more important than coverage, they can provide strong guarantees in terms of grammatical correctness. 
+
+Nevertheless, lexical exactness is, in this context, just as important as grammaticality. An important part of the design of the Controlled Natural Language (CNL) the grammar in such a system describes becomes, then, the creation of a translation lexicon. In many cases, this is done for the most part manually, resulting in a time consuming task requiring significant linguistic knowledge. When the grammar is designed based on a parallel corpus of example sentences, it is possible to automate part of this process by means of statistical word and phrase alignment techniques. None of them is, however, suitable for the common case in which only a limited number of example sentences is available.
+
+In this paper, we propose an alternative approach to the automation of this task. While still being data-driven, our method is grammar-based and, as such, capable of extracting meaningful correspondences even from individual sentence pairs. 
+
+A further advantage of performing the syntactic analysis of the sentences is that we do not have to choose whether to focus on the word or phrase level. Instead, we can simultaneously operate at different levels of abstraction, thus extracting both single- and multiword -even non-contiguous- correspondences. For this reason, we refer to the task our system attempts to automate as \textit{Concept Alignment} (CA). We call \textit{concepts} the abstract units of translation, composed of any number of words, the system identifies, and represent them as \textit{alignments}, i.e. pairs of semantically equivalent concrete expressions.
 
 \section{Methodology}
 
