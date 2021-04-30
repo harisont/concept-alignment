@@ -108,20 +108,20 @@ m `combineMeta` n = M {
   sentIds = sentIds m `S.union` sentIds n
 }
 
--- TODO: docs
+-- | Insert a new alignment combining metadata if an equivalent one is already
+-- present
 insert' :: (AlignedTrees,Meta) -> M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta 
 insert' (at,m) = M.insertWith combineMeta at m
 
+-- | Perform the union of two maps combining the metadata of equivalent
+-- alignments
 union' :: M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta 
 union' = M.unionWith combineMeta
 
+-- | Perform the union of n maps combining the metadata of equivalent
+-- alignments
 unions' :: [M.Map AlignedTrees Meta] -> M.Map AlignedTrees Meta
 unions' = M.unionsWith combineMeta
-  
--- | Linearize a UD tree ignoring initial whitespace
--- TODO: move to gfud
-linearize :: UDTree -> String
-linearize = dropWhile (== ' ') . prUDTreeString
 
 -- | Type of manual annotations.
 -- An alignment can be incorrect (-), correct in the specific context where it 
@@ -212,7 +212,7 @@ alignSent :: M.Map AlignedTrees Meta   -- ^ a map of known alignments (e.g.
                                        -- be performed 
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
           -> M.Map AlignedTrees Meta   -- ^ a map of alignments
-alignSent as cs p cl ex s@(s1,s2) = if ex then extra else basic --TODO: extra `union` basic?
+alignSent as cs p cl ex s@(s1,s2) = if ex then extra else extra `S.union` basic
   where 
     basic = if cl then alignClauses (t,u) else alignSent' cs (t,u)
     extra = alignRest basic -- alignments obtained "by exclusion"
@@ -229,8 +229,8 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else basic --TODO: extra `u
         (False,True) -> insert' (alignment2keyval h) (insert' (alignment2keyval a) as) `union'` as'
         (False,False) -> insert' (alignment2keyval a) as `union'` as'
         -- using a gf-ud pattern: ignore head alignment altogether
-        (True,_) -> if isJust m 
-          then insert' (alignment2keyval $ fromJust m) (as `union'` as')
+        (True,_) -> if alignPattern (fromJust p) a
+          then insert' (alignment2keyval a) as `union'` as'
           else as `union'` as'
       else M.empty
       where 
@@ -240,8 +240,7 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else basic --TODO: extra `u
             sentIds = S.singleton id 
           }
         }
-        h = alignHeads a -- TODO: add HEAD to reasons in alignHead
-        m = alignPattern (fromJust p) a
+        h = alignHeads a
         -- subtree alignments
         as' = unions' $ map (alignSent' cs) [(t,u) | t <- ts', u <- us']
             where (ts',us') = (sortByLabel ts,sortByLabel us)
@@ -281,13 +280,8 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else basic --TODO: extra `u
             (filter strict cs)
 
     -- check if an alignment matches a certain gf-ud pattern.
-    -- TODO: now it can become a boolean function: no replacement is done
-    alignPattern :: UDPattern -> Alignment -> Maybe Alignment
-    alignPattern p a = 
-      case (ifMatchUDPattern p (sl a),ifMatchUDPattern p (tl a)) of
-        -- only return an alignment if the pattern applies to both members
-        (True,True) -> Just a
-        _ -> Nothing
+    alignPattern :: UDPattern -> Alignment -> Bool
+    alignPattern p a = ifMatchUDPattern p (sl a) && ifMatchUDPattern p (tl a)
 
     -- head alignment: given an alignment, return a new one  
     -- for their "heads", respecting any compounds and aux+verbs (and more?)
@@ -413,6 +407,10 @@ isVerb h = udUPOS h == "VERB" || udUPOS h == "AUX"
 
 {- UD-utils -}
 
+-- | Linearize a UD tree (ignoring initial whitespace)
+linearize :: UDTree -> String
+linearize = dropWhile (== ' ') . prUDTreeString
+
 -- | Check if a sentence contains a clause in passive voice
 isPassive :: UDTree -> Bool
 isPassive s = 
@@ -459,7 +457,6 @@ alignment2sentencePair a =
   (udTree2adjustedSentence $ sl a, udTree2adjustedSentence $ tl a)
   where 
     udTree2adjustedSentence = adjustUDIds . udTree2sentence . createRoot
--- TODO: add each sentence its metadata in udCommentLines
 
 
 {- Selection of alignments for MT -}
