@@ -98,6 +98,9 @@ initMeta = M {
   sentIds = S.empty
 }
 
+-- | Map of alignments, to be used only internally to facilitate combining
+-- equivalent alignments
+type AlignmentMap = M.Map AlignedTrees Meta
 
 {- Helper functions for alignment maps-}
 
@@ -110,17 +113,17 @@ m `combineMeta` n = M {
 
 -- | Insert a new alignment combining metadata if an equivalent one is already
 -- present
-insert' :: (AlignedTrees,Meta) -> M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta 
+insert' :: (AlignedTrees,Meta) -> AlignmentMap -> AlignmentMap 
 insert' (at,m) = M.insertWith combineMeta at m
 
 -- | Perform the union of two maps combining the metadata of equivalent
 -- alignments
-union' :: M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta 
+union' :: AlignmentMap -> AlignmentMap -> AlignmentMap 
 union' = M.unionWith combineMeta
 
 -- | Perform the union of n maps combining the metadata of equivalent
 -- alignments
-unions' :: [M.Map AlignedTrees Meta] -> M.Map AlignedTrees Meta
+unions' :: [AlignmentMap] -> AlignmentMap
 unions' = M.unionsWith combineMeta
 
 -- | Type of manual annotations.
@@ -200,7 +203,7 @@ align as cs p cl ex (s:ss) = align (S.fromList $ map keyval2alignment (M.toList 
   where as' = M.fromListWith combineMeta (S.toList $ S.map alignment2keyval as)
 
 -- | Sentence-level alignment function. Can be use independently of align   
-alignSent :: M.Map AlignedTrees Meta   -- ^ a map of known alignments (e.g. 
+alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g. 
                                        -- from statistical tools)
           -> [Criterion]               -- ^ a list of criteria (sorted by 
                                        -- priority)
@@ -211,8 +214,8 @@ alignSent :: M.Map AlignedTrees Meta   -- ^ a map of known alignments (e.g.
                                        -- alignment "by exclusion" should also 
                                        -- be performed 
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
-          -> M.Map AlignedTrees Meta   -- ^ a map of alignments
-alignSent as cs p cl ex s@(s1,s2) = if ex then extra else extra `S.union` basic
+          -> AlignmentMap              -- ^ a map of alignments
+alignSent as cs p cl ex s@(s1,s2) = if ex then extra else extra `M.union` basic
   where 
     basic = if cl then alignClauses (t,u) else alignSent' cs (t,u)
     extra = alignRest basic -- alignments obtained "by exclusion"
@@ -222,7 +225,7 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else extra `S.union` basic
     (t,u) = (udSentence2tree s1, udSentence2tree s2)
 
     -- the list of criteria is needed because of how alignClause works
-    alignSent' :: [Criterion] -> (UDTree,UDTree) ->M.Map AlignedTrees Meta
+    alignSent' :: [Criterion] -> (UDTree,UDTree) -> AlignmentMap
     alignSent' cs (t@(RTree n ts),u@(RTree m us)) = if (not . null) matchingCs
       then case (isJust p,headAlign (head matchingCs)) of
         -- not using a gf-ud pattern
@@ -249,7 +252,7 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else extra `S.union` basic
           map snd (filter fst (zip [f t u | f <- map func cs] cs))
 
     -- call alignSent' on all pairs of clauses found in t and u
-    alignClauses :: (UDTree,UDTree) ->M.Map AlignedTrees Meta
+    alignClauses :: (UDTree,UDTree) -> AlignmentMap
     alignClauses (t,u) = 
         unions' $ map (alignSent' (cs ++ [clause])) clausePairs
       where 
@@ -262,7 +265,7 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else extra `S.union` basic
 
     -- call alignSent' on all pairs of unaligned nominals + modifiers
     -- ("alignment by exclusion")
-    alignRest :: M.Map AlignedTrees Meta -> M.Map AlignedTrees Meta
+    alignRest :: AlignmentMap -> AlignmentMap
     alignRest as = 
       unions' $ map (alignSent' cs') nomPairs
         where
