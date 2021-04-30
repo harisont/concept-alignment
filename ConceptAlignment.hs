@@ -316,13 +316,11 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra else basic --TODO: extra `u
         cts = filterByLabel "compound" ts
         cus = filterByLabel "compound" us
     
-        -- TODO: add other reasons
         initHeadAlignment tu = a { 
           meta = (meta a) { 
-            reasons = S.singleton HEAD,
-            sentIds = S.singleton id } 
+            reasons = S.singleton HEAD `S.union` (reasons $ meta a)
+          } 
         }
-          where a = initAlignment tu
     
         -- given two lists of subtrees, select those that, in the second,
         -- could correspond to a compound construction in the first, i.e.
