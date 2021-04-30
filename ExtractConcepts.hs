@@ -81,7 +81,7 @@ sortByConfidence = sortOn (\a ->
                         let rs = S.toList (reasons $ meta a) \\ [HEAD, PREV] 
                         in (
                             -(length rs), 
-                            -(nOccurrences $ meta a), 
+                            -(length $ sentIds $ meta a), 
                             tail rs
                           )) 
 

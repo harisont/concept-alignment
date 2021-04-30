@@ -54,7 +54,6 @@ prAlignment a = prTrees a
                 ++ "    --"
                 ++ " reasons: " ++ showSet (reasons $ meta a)
                 ++ " sentence IDs: " ++ showSet (sentIds $ meta a)
-                ++ " n. occurrences: " ++ show (nOccurrences $ meta a)
   where 
     prTrees a = linearize (sl a) ++ " ||| " ++ linearize (tl a)
     showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
@@ -89,16 +88,14 @@ instance Ord AlignedTrees where
 -- | The metadata of an alignment are:
 data Meta = M {
   reasons :: S.Set Reason,  -- ^ reasons for alignment
-  sentIds :: S.Set String,  -- ^ ids of the sentences it was inferred from
-  nOccurrences :: Int       -- ^ total number of occurrences
+  sentIds :: S.Set String   -- ^ ids of the sentences it was inferred from
 } deriving (Show,Read,Eq,Ord)
 
 -- | Initialize metadata with default vals
 initMeta :: Meta
 initMeta = M {
   reasons = S.empty,
-  sentIds = S.empty,
-  nOccurrences = 1
+  sentIds = S.empty
 }
 
 
@@ -108,8 +105,7 @@ initMeta = M {
 combineMeta :: Meta -> Meta -> Meta
 m `combineMeta` n = M {
   reasons = reasons m `S.union` reasons n,
-  sentIds = sentIds m `S.union` sentIds n,
-  nOccurrences = nOccurrences m + nOccurrences n
+  sentIds = sentIds m `S.union` sentIds n
 }
 
 -- TODO: docs
