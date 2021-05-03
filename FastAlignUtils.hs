@@ -5,10 +5,11 @@ import Data.List
 import Data.List.Split
 import qualified Data.Set as S
 import qualified Data.Map as M
+import RTree
 import UDConcepts
 import ConceptAlignment
 
--- parse a string in pharaoh format to a list of one-to-many indices
+-- | Parse a string in pharaoh format to a list of one-to-many indices
 -- correspondences 
 parsePh :: String -> [[(Int,[Int])]]
 parsePh s = map (oneToMany . map toIdxPair . words) (lines s)
@@ -18,31 +19,31 @@ parsePh s = map (oneToMany . map toIdxPair . words) (lines s)
             where [i,j] = splitOn "-" p
         oneToMany = M.toList . M.fromListWith (++)
 
--- parse a bitext in fast_align format to a list of pairs of sentences
+-- | Parse a bitext in fast_align format to a list of pairs of sentences
 parseBi :: String -> [(String, String)]
 parseBi s = [(head s',last s') | s' <- map (splitOn " ||| ") (lines s)]
 
--- given a list of (target, language) sentences and a list of alignment
+-- | Given a list of (target, language) sentences and a list of alignment
 -- indices, return the corresponding pairs of (multi)words as 
--- LinAlignments
-phToLas :: [(String,String)] -> [[(Int,[Int])]] -> [LinAlignment]
-phToLas ss is = 
-    map 
-        (\(lts,(r,o)) -> LAlignment lts (S.toList r) o) 
-        (M.toList . M.fromListWith combineVals $ phToLas' ss is)
-  where 
-    phToLas' _ [] = [] -- length is supposed to be the same though
-    phToLas' [] _ = []
-    phToLas' (s:ss) (ps:pss) = phToLa s ps ++ phToLas' ss pss
-        where
-            phToLa _ [] = []
-            phToLa (s,t) ((i,js):ps) = 
-                (lt,(S.singleton FAST,1)):phToLa (s,t) ps
-                where 
-                    lt = (filter (/= '\n') one,filter (/= '\n') many) 
-                    one = words s !! i
-                    many = unlines $ reverse $ 
-                           intersperse " " [words t !! j | j <- js]
+-- a set of Alignments
+phFileToAlignments :: [(String,String)] -> [[(Int,[Int])]] -> AlignmentMap
+phFileToAlignments _ [] = M.empty -- length is supposed to be the same though
+phFileToAlignments [] _ = M.empty
+phFileToAlignments (s:ss) (ps:pss) = phSentToAlignment s ps `union'` phFileToAlignments ss pss
+    where
+        phSentToAlignment :: (String,String) -> [(Int,[Int])] -> AlignmentMap
+        phSentToAlignment _ [] = M.empty
+        phSentToAlignment (src,trg) ((i,js):ps) = a `insert'` phSentToAlignment (src,trg) ps
+            where 
+                a = alignment2keyval $ (initAlignment $ AT (t,u)) { 
+                        meta = initMeta {
+                            reasons = S.singleton FAST
+                        }
+                }
+                (t,u) = (mockUDTree one,mockUDTree many) 
+                mockUDTree x = RTree ((initUDWord 1) { udFORM = filter (/= '\n') x }) []
+                one = words src !! i
+                many = unlines $ reverse $ intersperse " " [words trg !! j | j <- js]
 
 -- | CoNLL-U aligned strings to fast-align bitext conversion (useful to feed 
 --   fast_aling the same tokens)
