@@ -11,7 +11,7 @@ import System.Exit
 import UDConcepts
 import UDPatterns
 import ConceptAlignment
---import FastAlignUtils
+import FastAlignUtils
 import Criteria 
 import ArgvParse
 
@@ -25,13 +25,14 @@ main = do
         ts <- parseUDFile src
         us <- parseUDFile trg
         let tus = zip ts us -- let tus = take 50 $ zip ts us
-        let smtAs = S.empty -- <- getSmtAlignments flags src trg
+        smtAs <- getSmtAlignments flags src trg
+        let smtAs' = S.fromList $ map keyval2alignment (M.toList smtAs)
         let segment = Clauses `elem` flags
         let byExcl = Rest `elem` flags
         let fp = listToMaybe [path | Path path <- flags] 
         let fp' = fromJust fp
         r <- getPattern flags
-        let as = align smtAs criteria r segment byExcl tus
+        let as = align smtAs' criteria r segment byExcl tus
         let m = listToMaybe [read mmax :: Int | MaxSize mmax <- flags]
         let as' = if All `elem` flags then as else selectForMT m as
         let as'' = sortByConfidence (S.toList as') 
@@ -54,18 +55,16 @@ main = do
   where 
     insertLang :: FilePath -> String -> FilePath
     insertLang fp l = dropExtension fp ++ l ++ takeExtension fp
-    getSmtAlignments = undefined
-    --getSmtAlignments :: [Flag] -> FilePath -> FilePath -> IO [LinAlignment]
-    --getSmtAlignments flags src trg = case [path | Pharaoh path <- flags] of
-    --  [] -> return []
-    --  [path] -> do
-    --    indices <- readFile path >>= return . parsePh
-    --    srcConllu <- readFile src
-    --    trgConllu <- readFile trg
-    --    let bitext = take 100 $ parseBi $ conllu2bi (srcConllu,trgConllu)
-    --    print $ ltrees $ phToLas bitext indices !! 5
-    --    return $ phToLas bitext indices
-    --  _ -> undefined
+    getSmtAlignments :: [Flag] -> FilePath -> FilePath -> IO AlignmentMap
+    getSmtAlignments flags src trg = case [path | Pharaoh path <- flags] of
+      [] -> return M.empty
+      [path] -> do
+        indices <- readFile path >>= return . parsePh
+        srcConllu <- readFile src
+        trgConllu <- readFile trg
+        let bitext = parseBi $ conllu2bi (srcConllu,trgConllu)
+        return $ phFileToAlignments bitext indices
+      _ -> undefined
     getPattern :: [Flag] -> IO (Maybe UDPattern)
     getPattern flags = do
           let rp = listToMaybe [p | Pattern p <- flags] 
