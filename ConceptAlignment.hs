@@ -215,7 +215,7 @@ alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g.
                                        -- be performed 
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
           -> AlignmentMap              -- ^ a map of alignments
-alignSent as cs p cl ex s@(s1,s2) = if ex then extra else extra `M.union` basic
+alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
   where 
     basic = if cl then alignClauses (t,u) else alignSent' cs (t,u)
     extra = alignRest basic -- alignments obtained "by exclusion"

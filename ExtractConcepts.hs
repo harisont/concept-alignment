@@ -75,7 +75,7 @@ main = do
               return $ Just (read patternText :: UDPattern)
             else return Nothing
 
--- | Sort alignments by how likely theyare to be correct (kinda). 
+-- | Sort alignments by how likely they are to be correct (kinda). 
 sortByConfidence :: [Alignment] -> [Alignment]
 sortByConfidence = sortOn (\a -> 
                         let rs = S.toList (reasons $ meta a) \\ [HEAD, PREV] 
