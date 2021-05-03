@@ -33,8 +33,8 @@ main = do
         r <- getPattern flags
         let as = align smtAs criteria r segment byExcl tus
         let m = listToMaybe [read mmax :: Int | MaxSize mmax <- flags]
-        let as' = if All `elem` flags then as else as --TODO: selectForMT m as
-        let as'' = {-TODO: sortByConfidence $-} S.toList as' 
+        let as' = if All `elem` flags then as else selectForMT m as
+        let as'' = sortByConfidence (S.toList as') 
         if Linearize `elem` flags
           then 
             if isJust fp 
