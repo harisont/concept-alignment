@@ -469,28 +469,27 @@ alignment2sentencePair a =
 -- - remove redundant alignments (i.e. alignments that can be inferred
 --   from their sub-alignments)
 -- - optionally, remove alignments where the size of both trees is > n
---selectForMT :: Maybe Int -> [(Alignment,Info)] -> [(Alignment,Info)]
---selectForMT mmax as = nubBy 
---                  (\(a,_) (b,_) -> b `contains` a && isPerfectShallow b) 
---                  (reverse $ sort as'')
---  where 
---    as' = filter (\(a,_) -> hasContent a) as -- remove function-only stuff
---      where hasContent (A (t,u)) = (not . null) (contentTags t) 
---                                || (not . null) (contentTags u)
---    as'' = case mmax of
---      (Just m) -> 
---        filter (\(A (t,u),_) -> sizeRTree t <= m || sizeRTree u <= m) as'
---      Nothing -> as'
+selectForMT :: Maybe Int -> S.Set Alignment -> S.Set Alignment
+selectForMT mmax as = S.fromList $ nubBy 
+                  (\a b -> b `contains` a && isPerfectShallow b) 
+                  (reverse $ sort as''')
+  where 
+    as' = S.toList as
+    as'' = filter (hasContent . trees) as' -- remove function-only stuff
+      where hasContent (AT (t,u)) = (not . null) (contentTags t) 
+                                 || (not . null) (contentTags u)
+    as''' = case mmax of
+      (Just m) -> 
+        filter (\a -> sizeRTree (sl a) <= m || sizeRTree (tl a) <= m) as''
+      Nothing -> as''
 
 -- | Check if an alignment is perfect, i.e. ig the structure of the two trees
 -- is the same
---isPerfect :: Alignment -> Bool
---isPerfect (A (t,u)) = abstractUDTree t == abstractUDTree u 
+isPerfect :: Alignment -> Bool
+isPerfect a = abstractUDTree (sl a) == abstractUDTree (tl a) 
 
 -- | Check the top-level structure of the two trees composing an alignment
 -- is the same
---isPerfectShallow :: Alignment -> Bool
---isPerfectShallow (A (t,u)) 
---  = root t' == root u' 
---  && map root (childrenRTree t') == map root (childrenRTree u') 
---  where (t',u') = (abstractUDTree t,abstractUDTree u)
+isPerfectShallow :: Alignment -> Bool
+isPerfectShallow a = root t' == root u' && map root (childrenRTree t') == map root (childrenRTree u') 
+  where (t',u') = (abstractUDTree $ sl a,abstractUDTree $ tl a)
