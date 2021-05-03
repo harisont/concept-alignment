@@ -16,7 +16,7 @@ executable extract-concepts
   other-modules:
     ConceptAlignment,
     Criteria,
-    --FastAlignUtils,
+    FastAlignUtils,
     ArgvParse
   build-depends:
     base,
