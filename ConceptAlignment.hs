@@ -14,59 +14,16 @@ import UDPatterns
 
 -- | An alignment is a pair of corresponding UD (sub)trees associated to some 
 -- metadata 
-data Alignment = A {
-  trees :: AlignedTrees,    -- ^ pair of UD subtrees
-  meta :: Meta              -- ^ metadata
-} deriving (Show,Read,Eq,Ord)
-
--- | Initialize a potential alignment given just the pair of trees
-initAlignment :: AlignedTrees -> Alignment
-initAlignment tu = A {
-  trees = tu,
-  meta = initMeta
-}
-
--- | Convert an alignment into a (key,value) pair, where the key is the tree
--- pair and the "value" is the metadata
-alignment2keyval :: Alignment -> (AlignedTrees,Meta)
-alignment2keyval a = (trees a,meta a)
-
--- | Convert a (key,value) pair, where the key is the tree pair and the 
--- "value" is the metadata, into an Alignment
-keyval2alignment :: (AlignedTrees,Meta) -> Alignment
-keyval2alignment (k,v) = A {
-  trees = k,
-  meta = v
-}
-
--- | Left (source language) tree of an alignment
-sl :: Alignment -> UDTree
-sl a = let (AT (t,u)) = trees a in t
-
--- | Right (target language) tree of an alignment
-tl :: Alignment -> UDTree
-tl a = let (AT (t,u)) = trees a in u
-
--- | prAlignment is used instead of show for inspecting the alignments in an
--- easier way, e.g. in EvAlign and for debugging
-prAlignment :: Alignment -> String
-prAlignment a = prTrees a 
-                ++ "    --"
-                ++ " reasons: " ++ showSet (reasons $ meta a)
-                ++ " sentence IDs: " ++ showSet (sentIds $ meta a)
-  where 
-    prTrees a = linearize (sl a) ++ " ||| " ++ linearize (tl a)
-    showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
-
--- | Check if an alignment "contains" another;
--- used both in pruning and selection of alignments for MT
-contains :: Alignment -> Alignment -> Bool
-a `contains` b = (sl b `isSubRTree` sl a) && (tl b `isSubRTree` tl a)
+type Alignment = (AlignedTrees,Meta) 
 
 -- | AlignedTrees basically represents a pair of UD trees, but it is a newtype
 -- due to the custom implementation of (==) 
 newtype AlignedTrees = AT (UDTree,UDTree)
   deriving (Show,Read)
+
+-- | Return the aligned trees of an alignment, just like when it was a record type
+trees :: Alignment -> AlignedTrees
+trees (tu,_) = tu
 
 -- | Two pairs of aligned trees are considered equal whenever their
 -- linearizations are the same
@@ -91,6 +48,10 @@ data Meta = M {
   sentIds :: S.Set String   -- ^ ids of the sentences it was inferred from
 } deriving (Show,Read,Eq,Ord)
 
+-- | Return the metadata of an alignment, just like when it was a record type
+meta :: Alignment -> Meta
+meta (_,m) = m
+
 -- | Initialize metadata with default vals
 initMeta :: Meta
 initMeta = M {
@@ -98,8 +59,35 @@ initMeta = M {
   sentIds = S.empty
 }
 
--- | Map of alignments, to be used only internally to facilitate combining
--- equivalent alignments
+-- | Initialize a potential alignment given just the pair of trees
+initAlignment :: AlignedTrees -> Alignment
+initAlignment tu = (tu,initMeta)
+
+-- | Left (source language) tree of an alignment
+sl :: Alignment -> UDTree
+sl ((AT (t,_)),_) = t
+
+-- | Right (target language) tree of an alignment
+tl :: Alignment -> UDTree
+tl ((AT (_,u)),_) = u
+
+-- | prAlignment is used instead of show for inspecting the alignments in an
+-- easier way, e.g. in EvAlign and for debugging
+prAlignment :: Alignment -> String
+prAlignment a = prTrees a 
+                ++ "    --"
+                ++ " reasons: " ++ showSet (reasons $ meta a)
+                ++ " sentence IDs: " ++ showSet (sentIds $ meta a)
+  where 
+    prTrees a = linearize (sl a) ++ " ||| " ++ linearize (tl a)
+    showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
+
+-- | Check if an alignment "contains" another;
+-- used both in pruning and selection of alignments for MT
+contains :: Alignment -> Alignment -> Bool
+a `contains` b = (sl b `isSubRTree` sl a) && (tl b `isSubRTree` tl a)
+
+-- | Map of alignments
 type AlignmentMap = M.Map AlignedTrees Meta
 
 {- Helper functions for alignment maps-}
@@ -199,8 +187,8 @@ align :: S.Set Alignment           -- ^ a set of known alignments (e.g. from
       -> [(UDSentence,UDSentence)] -- ^ the list of sentences to align 
       -> S.Set Alignment           -- ^ a set of alignments
 align as _ _ _ _ [] = as
-align as cs p cl ex (s:ss) = align (S.fromList $ map keyval2alignment (M.toList $ alignSent as' cs p cl ex s)) cs p cl ex ss
-  where as' = M.fromListWith combineMeta (S.toList $ S.map alignment2keyval as)
+align as cs p cl ex (s:ss) = align (S.fromList $ M.toList $ alignSent as' cs p cl ex s) cs p cl ex ss
+  where as' = M.fromListWith combineMeta (S.toList as)
 
 -- | Sentence-level alignment function. Can be use independently of align   
 alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g. 
@@ -229,20 +217,18 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
     alignSent' cs (t@(RTree n ts),u@(RTree m us)) = if (not . null) matchingCs
       then case (isJust p,headAlign (head matchingCs)) of
         -- not using a gf-ud pattern
-        (False,True) -> insert' (alignment2keyval h) (insert' (alignment2keyval a) as) `union'` as'
-        (False,False) -> insert' (alignment2keyval a) as `union'` as'
+        (False,True) -> insert' h (insert' a as) `union'` as'
+        (False,False) -> insert' a as `union'` as'
         -- using a gf-ud pattern: ignore head alignment altogether
         (True,_) -> if alignPattern (fromJust p) a
-          then insert' (alignment2keyval a) as `union'` as'
+          then insert' a as `union'` as'
           else as `union'` as'
       else M.empty
       where 
-        a = (initAlignment $ AT (t,u)) { 
-          meta = initMeta {
+        a = (AT (t,u), initMeta {
             reasons = S.unions $ map reas matchingCs,
             sentIds = S.singleton id 
-          }
-        }
+          })
         h = alignHeads a
         -- subtree alignments
         as' = unions' $ map (alignSent' cs) [(t,u) | t <- ts', u <- us']
@@ -313,11 +299,9 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
         cts = filterByLabel "compound" ts
         cus = filterByLabel "compound" us
     
-        initHeadAlignment tu = a { 
-          meta = (meta a) { 
+        initHeadAlignment tu = (tu, (meta a) { 
             reasons = S.singleton HEAD `S.union` (reasons $ meta a)
-          } 
-        }
+          })
     
         -- given two lists of subtrees, select those that, in the second,
         -- could correspond to a compound construction in the first, i.e.

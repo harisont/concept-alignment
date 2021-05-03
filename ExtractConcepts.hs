@@ -26,7 +26,7 @@ main = do
         us <- parseUDFile trg
         let tus = zip ts us -- let tus = take 50 $ zip ts us
         smtAs <- getSmtAlignments flags src trg
-        let smtAs' = S.fromList $ map keyval2alignment (M.toList smtAs)
+        let smtAs' = S.fromList $ M.toList smtAs
         let segment = Clauses `elem` flags
         let byExcl = Rest `elem` flags
         let fp = listToMaybe [path | Path path <- flags] 
