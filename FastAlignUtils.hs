@@ -45,7 +45,7 @@ phFileToAlignments (s:ss) (ps:pss) =
         many = unlines $ reverse $ intersperse " " [words trg !! j | j <- js]
 
 -- | CoNLL-U aligned strings to fast-align bitext conversion (useful to feed 
---   fast_aling the same tokens)
+--   fast_align the same tokens)
 conllu2bi :: (String,String) -> String
 conllu2bi (c1,c2) = unlines $ zipWith (\s1 s2 -> s1 ++ " ||| " ++ s2) ts1 ts2
   where

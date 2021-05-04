@@ -87,7 +87,7 @@ prAlignment a = prTrees a
 contains :: Alignment -> Alignment -> Bool
 a `contains` b = (sl b `isSubRTree` sl a) && (tl b `isSubRTree` tl a)
 
--- | Map of alignments
+-- | Map of alignments (used internally to simplify combining metadata)
 type AlignmentMap = M.Map AlignedTrees Meta
 
 {- Helper functions for alignment maps-}
@@ -175,7 +175,7 @@ clause = C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
 {- Alignment functions -}
 
 -- | Align a list of pairs of / corresponding / dependency trees   
-align :: S.Set Alignment           -- ^ a set of known alignments (e.g. from 
+align :: [Alignment]               -- ^ a set of known alignments (e.g. from 
                                    -- statistical tools)
       -> [Criterion]               -- ^ a list of criteria (sorted by 
                                    -- priority)
@@ -185,10 +185,11 @@ align :: S.Set Alignment           -- ^ a set of known alignments (e.g. from
       -> Bool                      -- ^ a flag indicating whether alignment  
                                    -- "by exclusion" should also be performed 
       -> [(UDSentence,UDSentence)] -- ^ the list of sentences to align 
-      -> S.Set Alignment           -- ^ a set of alignments
+      -> [Alignment]               -- ^ a set of alignments, implemented as
+                                   -- a list to avoid unnecessary conversions
 align as _ _ _ _ [] = as
-align as cs p cl ex (s:ss) = align (S.fromList $ M.toList $ alignSent as' cs p cl ex s) cs p cl ex ss
-  where as' = M.fromListWith combineMeta (S.toList as)
+align as cs p cl ex (s:ss) = align (M.toList $ alignSent as' cs p cl ex s) cs p cl ex ss
+  where as' = M.fromListWith combineMeta as
 
 -- | Sentence-level alignment function. Can be use independently of align   
 alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g. 
@@ -453,19 +454,18 @@ alignment2sentencePair a =
 -- - remove redundant alignments (i.e. alignments that can be inferred
 --   from their sub-alignments)
 -- - optionally, remove alignments where the size of both trees is > n
-selectForMT :: Maybe Int -> S.Set Alignment -> S.Set Alignment
-selectForMT mmax as = S.fromList $ nubBy 
+selectForMT :: Maybe Int -> [Alignment] -> [Alignment]
+selectForMT mmax as = nubBy 
                   (\a b -> b `contains` a && isPerfectShallow b) 
-                  (reverse $ sort as''')
+                  (reverse $ sort as'')
   where 
-    as' = S.toList as
-    as'' = filter (hasContent . trees) as' -- remove function-only stuff
+    as' = filter (hasContent . trees) as -- remove function-only stuff
       where hasContent (AT (t,u)) = (not . null) (contentTags t) 
                                  || (not . null) (contentTags u)
-    as''' = case mmax of
+    as'' = case mmax of
       (Just m) -> 
-        filter (\a -> sizeRTree (sl a) <= m || sizeRTree (tl a) <= m) as''
-      Nothing -> as''
+        filter (\a -> sizeRTree (sl a) <= m || sizeRTree (tl a) <= m) as'
+      Nothing -> as'
 
 -- | Check if an alignment is perfect, i.e. ig the structure of the two trees
 -- is the same

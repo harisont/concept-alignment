@@ -26,16 +26,15 @@ main = do
         us <- parseUDFile trg
         let tus = zip ts us -- let tus = take 50 $ zip ts us
         smtAs <- getSmtAlignments flags src trg
-        let smtAs' = S.fromList $ M.toList smtAs
         let segment = Clauses `elem` flags
         let byExcl = Rest `elem` flags
         let fp = listToMaybe [path | Path path <- flags] 
         let fp' = fromJust fp
         r <- getPattern flags
-        let as = align smtAs' criteria r segment byExcl tus
+        let as = align smtAs criteria r segment byExcl tus
         let m = listToMaybe [read mmax :: Int | MaxSize mmax <- flags]
         let as' = if All `elem` flags then as else selectForMT m as
-        let as'' = sortByConfidence (S.toList as') 
+        let as'' = sortByConfidence as' 
         if Linearize `elem` flags
           then 
             if isJust fp 
@@ -55,15 +54,15 @@ main = do
   where 
     insertLang :: FilePath -> String -> FilePath
     insertLang fp l = dropExtension fp ++ l ++ takeExtension fp
-    getSmtAlignments :: [Flag] -> FilePath -> FilePath -> IO AlignmentMap
+    getSmtAlignments :: [Flag] -> FilePath -> FilePath -> IO [Alignment]
     getSmtAlignments flags src trg = case [path | Pharaoh path <- flags] of
-      [] -> return M.empty
+      [] -> return []
       [path] -> do
         indices <- readFile path >>= return . parsePh
         srcConllu <- readFile src
         trgConllu <- readFile trg
         let bitext = parseBi $ conllu2bi (srcConllu,trgConllu)
-        return $ phFileToAlignments bitext indices
+        return $ M.toList $ phFileToAlignments bitext indices
       _ -> undefined
     getPattern :: [Flag] -> IO (Maybe UDPattern)
     getPattern flags = do
