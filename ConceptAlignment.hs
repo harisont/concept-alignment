@@ -21,7 +21,8 @@ type Alignment = (AlignedTrees,Meta)
 newtype AlignedTrees = AT (UDTree,UDTree)
   deriving (Show,Read)
 
--- | Return the aligned trees of an alignment, just like when it was a record type
+-- | Return the aligned trees of an alignment, just like when it was a record 
+-- type
 trees :: Alignment -> AlignedTrees
 trees (tu,_) = tu
 
@@ -65,11 +66,11 @@ initAlignment tu = (tu,initMeta)
 
 -- | Left (source language) tree of an alignment
 sl :: Alignment -> UDTree
-sl ((AT (t,_)),_) = t
+sl (AT (t,_),_) = t
 
 -- | Right (target language) tree of an alignment
 tl :: Alignment -> UDTree
-tl ((AT (_,u)),_) = u
+tl (AT (_,u),_) = u
 
 -- | prAlignment is used instead of show for inspecting the alignments in an
 -- easier way, e.g. in EvAlign and for debugging
@@ -165,7 +166,8 @@ data Criterion = C {
 -- | Special criterion necessary for effective clause segmentation
 -- (that's why it is defined here and not in module Criteria)
 clause :: Criterion
-clause = C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
+clause = 
+  C (\t u -> divClause t u || divClause u t) (S.singleton CL) True False
   where 
     -- a clause of a certain type is translated as a clause of another type 
     divClause :: UDTree -> UDTree -> Bool
@@ -188,7 +190,8 @@ align :: [Alignment]               -- ^ a set of known alignments (e.g. from
       -> [Alignment]               -- ^ a set of alignments, implemented as
                                    -- a list to avoid unnecessary conversions
 align as _ _ _ _ [] = as
-align as cs p cl ex (s:ss) = align (M.toList $ alignSent as' cs p cl ex s) cs p cl ex ss
+align as cs p cl ex (s:ss) = 
+  align (M.toList $ alignSent as' cs p cl ex s) cs p cl ex ss
   where as' = M.fromListWith combineMeta as
 
 -- | Sentence-level alignment function. Can be use independently of align   
@@ -204,7 +207,8 @@ alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g.
                                        -- be performed 
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
           -> AlignmentMap              -- ^ a map of alignments
-alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
+alignSent as cs p cl ex s@(s1,s2) = 
+  if ex then extra `M.union` basic else basic
   where 
     basic = if cl then alignClauses (t,u) else alignSent' cs (t,u)
     extra = alignRest basic -- alignments obtained "by exclusion"
@@ -232,7 +236,7 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
           })
         h = alignHeads a
         -- subtree alignments
-        as' = unions' $ map (alignSent' cs) [(t,u) | t <- ts', u <- us']
+        as' = unions' $ [alignSent' cs (t,u) | t <- ts', u <- us']
             where (ts',us') = (sortByLabel ts,sortByLabel us)
                     where sortByLabel = sortOn (udSimpleDEPREL . root)
         matchingCs = 
@@ -264,7 +268,8 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
           (nts,nus) = (sortNs $ nommods t, sortNs $ nommods u)
           sortNs = sortOn (\(RTree n ts) -> 
             (udSimpleDEPREL n,dependencyDistance n))
-          (las,ras) = (map (\((AT (t,u)),v) -> t) (M.toList as), map (\((AT (t,u)),v) -> u) (M.toList as))
+          (las,ras) = (map (\(AT (t,u),v) -> t) (M.toList as), 
+                       map (\(AT (t,u),v) -> u) (M.toList as))
           cs' = map 
             (\(C f _ h s) -> C f (S.singleton REST) h s) 
             (filter strict cs)
@@ -280,11 +285,11 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
       -- if there are compound constructions, look for their counterparts and
       -- align accordingly
       | (not . null) cts = 
-          initHeadAlignment $ AT (RTree n cts, RTree m (compCounterparts ts us))
+          initHeadAlignment $ AT (RTree n cts, RTree m (compCountps ts us))
       | (not . null) cus = 
-          initHeadAlignment $ AT (RTree n (compCounterparts us ts), RTree m cus)
-      -- if the roots are verbs (to avoid messing with copulas) and only one of
-      -- them has 1+ auxiliaries, align verb | verb + auxiliaries
+          initHeadAlignment $ AT (RTree n (compCountps us ts), RTree m cus)
+      -- if the roots are verbs (to avoid messing with copulas) and only one
+      -- of them has 1+ auxiliaries, align verb | verb + auxiliaries
       | all isVerb [n,m] && (not . null) ats && null aus = 
           initHeadAlignment $ AT (RTree n ats, RTree m [])
       | all isVerb [n,m] && null ats && (not . null) aus = 
@@ -301,13 +306,13 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
         cus = filterByLabel "compound" us
     
         initHeadAlignment tu = (tu, (meta a) { 
-            reasons = S.singleton HEAD `S.union` (reasons $ meta a)
+            reasons = S.singleton HEAD `S.union` reasons (meta a)
           })
     
         -- given two lists of subtrees, select those that, in the second,
         -- could correspond to a compound construction in the first, i.e.
-        compCounterparts :: [UDTree] -> [UDTree] -> [UDTree]
-        compCounterparts ts us = cus ++ fus' ++ nus' ++ aus'
+        compCountps :: [UDTree] -> [UDTree] -> [UDTree]
+        compCountps ts us = cus ++ fus' ++ nus' ++ aus'
           where
             cus = filterByLabel "compound" us
             fus' = if length fus > length fts then fus else []
@@ -328,12 +333,14 @@ alignSent as cs p cl ex s@(s1,s2) = if ex then extra `M.union` basic else basic
 -- | Generic (not optimized for same text in n languages) propagation function
 propagate :: [Criterion]                 -- ^ a list of criteria 
                                          -- (sorted by priority)
-          -> Bool                        -- ^ -- ^ a flag indicating whether clause 
+          -> Bool                        -- ^ a flag indicating whether clause 
                                          -- segmentation should be performed
-          -> Bool                        -- ^ a flag indicating whether alignment
-                                         -- "by exclusion" should also be performed 
-          -> ([UDSentence],[UDSentence]) -- ^ a pair of lists of UD sentences (the
-                                         -- sentences to propagate on) in L1, L2
+          -> Bool                        -- ^ a flag indicating whether 
+                                         -- alignment "by exclusion" should 
+                                         -- also be performed 
+          -> ([UDSentence],[UDSentence]) -- ^ a pair of lists of UD sentences 
+                                         -- (the sentences to propagate on) in
+                                         -- L1, L2
           -> UDTree                      -- ^ a previously extracted L1 concept
           -> Maybe Alignment             -- ^ an alignment, if found
 propagate cs segment byExcl ([],[]) _ = Nothing 
@@ -343,7 +350,8 @@ propagate cs segment byExcl (t:ts,u:us) c =
     as = M.toList $ alignSent M.empty cs Nothing segment byExcl (t,u)
     as' = case (c `isSubUDTree'` t', c `isHeadSubUDTree` t') of
       (True,_) -> sortOnDepth as
-      (_,True) -> sortOnDepth $ filter (\a -> HEAD `S.member` (reasons $ meta a)) as
+      (_,True) -> sortOnDepth $ 
+                    filter (\a -> HEAD `S.member` reasons (meta a)) as
       (False,False) -> []
     in case find (\a -> c =~ sl a) as' of
       Nothing -> propagate cs segment byExcl (ts,us) c
@@ -476,5 +484,7 @@ isPerfect a = abstractUDTree (sl a) == abstractUDTree (tl a)
 -- | Check the top-level structure of the two trees composing an alignment
 -- is the same
 isPerfectShallow :: Alignment -> Bool
-isPerfectShallow a = root t' == root u' && map root (childrenRTree t') == map root (childrenRTree u') 
+isPerfectShallow a = 
+  root t' == root u' 
+  && map root (childrenRTree t') == map root (childrenRTree u') 
   where (t',u') = (abstractUDTree $ sl a,abstractUDTree $ tl a)
