@@ -3,6 +3,8 @@
 This repository contains the code, [report](final_report/synbased_ca_for_mt.pdf) and presentation [slides](presentation/presentation.pdf) of my Master's thesis project (Göteborgs Univeristet, A.Y. 2020-21).
 
 ---
+
+> __Warning__: due to some major changes that will enable us to implement additional debugging and grammar generation functionalities, `evalign` does not work (and is not compiled) in the current version of the `master` branch. If you need to test or debug extraction and propagation, use [`stable`](https://github.com/harisont/concept-alignment/tree/stable) until further notice.
 ## Installation
 
 To compile the CA module, the Haskell Stack is recommended. To build
@@ -13,7 +15,7 @@ executables:
 
 -   `extract-concepts` (for CE)
 -   `propagate-concepts` (for CP)
--   `evalign`, a script for evaluating CP and CE
+-   ~~`evalign`, a script for evaluating CP and CE~~
 -   `generate-grammar`, to automatically generate a GF grammar from the alignments extraced via CE and/or CP
 -   `translate`, to perform simple MT experiments
 
@@ -57,30 +59,6 @@ stack exec -- propagate-concepts SL_concepts.conllu SL.conllu TL.conllu
 All `extract-concepts` options that are also relevant for CP (i.e. all
 of them excepts `–maxsize` and `pharaoh`) are also valid for this second
 executable.
-
-### `evalign`
-
-The evaluation script `evalign` can be run in three different "modes":
-
-1.  single-file mode (`stack exec – evalign linearized.txt`):
-    given a pre-annotated linearized file, it prints out basic statistics about
-    precision, recall and amount of reusable alignments.
-2.  extraction mode
-    (`stack exec – evalign extraction old.txt new.txt`):
-    given an annotated and a new, possibly yet-to-annotate file
-    containing linearized alignments, it allows interactive minimal
-    annotation of the latter (if needed) and, on top of printing out the
-    basic statistics, it compares the new alignments to the old ones,
-    telling how many correct and incorrect alignments were lost and/or
-    found
-3.  propagation mode
-    (`stack exec – evalign propagation new.txt new.txt`): similar to
-    extraction interactive mode, excepts that the statistics are
-    CP-specific (percentage of successfully propagated alignments,
-    number of errors introduced by CP etc.).
-
-The command line option `–reasons` can be added when criterion-wise
-statistics are needed.
 
 ### `generate-grammar`
 

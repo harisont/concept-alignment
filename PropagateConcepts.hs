@@ -19,8 +19,8 @@ main = do
             then putStrLn help >> exitSuccess
             else do
                 cs <- conlluFile2UDTrees old
-                ts <- conlluFile2UDTrees src
-                us <- conlluFile2UDTrees trg
+                ts <- parseUDFile src
+                us <- parseUDFile trg
                 let segment = Clauses `elem` flags
                 let byExcl = Rest `elem` flags
                 let fp = listToMaybe [path | Path path <- flags] 
@@ -30,22 +30,19 @@ main = do
                 if Linearize `elem` flags
                     then 
                         if isJust fp 
-                            then writeFile fp' (unlines $ map (maybe "" (show . toLinAlignment)) as) 
-                            else mapM_ (putStrLn . maybe "" (show . toLinAlignment)) as
+                            then writeFile fp' (unlines $ map (maybe "" prAlignment) as) 
+                            else mapM_ (putStrLn . maybe "" prAlignment) as
                     else 
                         if isJust fp 
                             then do
-                                let numberedAs = [1..] `zip` map maybeFst as
-                                writeFile fp' (unlines [prUDSentence (fst x) (snd $ alignment2sentencePair $ fromJust (snd x)) | x <- numberedAs, isJust (snd x)])
-                            else mapM_ print (filter isJust (map maybeFst as)) 
+                                let numberedAs = [1..] `zip` as
+                                writeFile fp' (unlines [prUDSentence (fst na) (snd $ alignment2sentencePair $ fromJust (snd na)) | na <- numberedAs, isJust (snd na)])
+                            else mapM_ print (filter isJust as) 
         _ -> do
             putStrLn "Wrong number of arguments."
             putStrLn help
             exitWith (ExitFailure 1)
     where
-        maybeFst :: Maybe (a,b) -> Maybe a
-        maybeFst Nothing = Nothing 
-        maybeFst (Just (a,_)) = Just a  
         -- use original label
         unadjust :: UDTree -> UDTree
         unadjust (RTree n ts) = RTree n { 
