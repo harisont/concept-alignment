@@ -187,13 +187,13 @@ isConllu p = takeExtension p == ".conllu"
 -- the lists in the resulting sentences are also aligned implicitly) 
 getAlignments :: [[UDSentence]] -> [[UDSentence]]
 getAlignments ss =  
-  transpose $ mapMaybe getAlignment [(o + 1)..(o + maximum (map length ss))]
+  transpose $ mapMaybe getAlignment ids
     where
-      getAlignment :: Int -> Maybe [UDSentence]
-      getAlignment i = 
-        let as = map (find (\s -> sentId s == i)) ss
+      ids = nub $ map sentId (concat ss)
+      getAlignment :: String -> Maybe [UDSentence]
+      getAlignment id = 
+        let as = map (find (\s -> sentId s == id)) ss
         in if all isJust as then Just $ map fromJust as else Nothing
-      o = 1000000 -- numbering offset (cf. prUDSentence in UDConcepts)
 
 -- | Like UDAnnotations.getEnv, but uses pgf instead of paths
 -- (this is a bad solution but I don't necessarily want to rely on the pgf
