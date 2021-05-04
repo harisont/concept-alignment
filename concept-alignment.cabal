@@ -63,14 +63,14 @@ executable propagate-concepts
 --  ghc-options: -main-is EvAlign
 --  default-language: Haskell2010
 --
---executable translate
---  main-is: Translate.hs
---  build-depends:
---    base,
---    gf
---  ghc-options: -main-is Translate
---  default-language: Haskell2010
---
+executable translate
+  main-is: Translate.hs
+  build-depends:
+    base,
+    gf
+  ghc-options: -main-is Translate
+  default-language: Haskell2010
+
 --executable generate-grammar
 --  main-is: GenerateGrammar.hs
 --  other-modules: ArgvParse
