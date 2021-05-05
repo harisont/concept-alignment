@@ -81,17 +81,35 @@ While still being data-driven, our method is grammar-based and, as such, capable
 A further advantage of performing syntactic analysis is that we do not have to choose \textit{a priori} whether to focus on the word or phrase level. 
 Instead, we can simultaneously operate at different levels of abstraction, thus extracting both single- and multiword, even non-contiguous, correspondences. 
 
-For this reason, we refer to the task our system attempts to automate as \textit{Concept Alignment} (CA). We call \textit{concepts} the abstract units of translation, composed of any number of words, the system identifies, and represent them as \textit{alignments}, i.e. pairs of semantically equivalent concrete expressions.
+For this reason, we refer to the task our system attempts to automate as \textit{Concept Alignment} (CA). 
 
 This paper is structured as follows. 
-Section \ref{methodology} starts by giving an overview of our approach to CA to then focus on our algorithm for extracting correspondences.
+Section \ref{methodology} starts by giving an overview of our approach to CA, comparing it to related work, to then focus on our algorithm for extracting correspondences.
 It is concluded with a description of our method for converting the alignments obtained in this way to a GF translation lexicon.
 After that, Section \ref{evaluation} presents the results of our first evaluation of the system.
 Finally, Section \ref{conclusions} consists of a discussion of such results and some ideas for future work. 
 
 \section{Methodology} \label{methodology}
+The objective of CA is to find semantical correspondences between parts of multilingual parallel texts. 
+We call \textit{concepts} the abstract units of translation, composed of any number of words, identified through this process, and represent them as \textit{alignments}, i.e. tuples of equivalent concrete expressions in different languages.
 
-%overview 
+The basic use case for CA, which we refer to specifically as \textit{Concept Extraction} (CE), is the generation of a translation lexicon from a parallel text. This can be directly compared to the numerous existing word and phrase alignment techniques. 
+
+An interesting and less studied variant of CA is \textit{Concept Propagation} (CP), useful for cases where a set of concepts is already known and the goal is to identify the expressions corresponding to each of them in a new language, potentially even working with a different text in the same domain.
+In this paper, however, we focus on CE, and restrict its application to bilingual corpora. 
+
+As stated in the Introduction, most existing extraction solutions are based on statistical approaches and are, as a consequence, unsuitable for small datasets. 
+Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{TODO:}, but have historically suffered from the inconsistencies between the various constituency grammar formalisms used to define grammars for the different languages and from the insufficient degree of robustness of existing parses.
+
+This work is a new attempt in the same direction, enabled by two interlingually oriented grammar formalisms developed over the course of the last 25 years: Universal Dependencies (UD) \cite{TODO:} and Grammatical Framework (GF) \cite{TODO:}.
+
+While both formalisms, the former a dependency and the latter a constituency grammar, independently solve the former issue, UD is especially appealing since dependency trees are an easier target for parsing. 
+As a consequence, several robust dependency parsers, such as \cite{TODO: UDPipe} and \cite{TODO: Standford} are available.
+
+UD alone would then be sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a ready-to-use, morphologically aware translation lexicon. This is where GF comes into play: after correspondences are inferred from a parallel text, our proposed system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiment using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL) \cite{TODO:}. 
+This is made possible by \texttt{gf-ud}, a conversion tool described in \cite{TODO:} and \cite{TODO:}.
+
+% system overview
 
 \subsection{Extracting concepts} 
 
