@@ -82,7 +82,8 @@ executable generate-grammar
     directory,
     containers,
     process,
-    pretty
+    pretty,
+    split
   ghc-options: -main-is GenerateGrammar
   default-language: Haskell2010
 
