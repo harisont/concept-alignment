@@ -457,11 +457,15 @@ abstractUDTree = mapRTree udSimpleDEPREL
 {- Alignments to CoNLL-U files -}
 
 -- | convert an alignment into a pair of CoNNL-U sentences
-alignment2sentencePair :: Alignment -> (UDSentence, UDSentence)
+alignment2sentencePair :: Alignment -> (UDSentence,UDSentence)
 alignment2sentencePair a = 
-  (udTree2adjustedSentence $ sl a, udTree2adjustedSentence $ tl a)
+  (addMetaAsComment $ udTree2adjustedSentence $ sl a, 
+  addMetaAsComment $ udTree2adjustedSentence $ tl a)
   where 
     udTree2adjustedSentence = adjustUDIds . udTree2sentence . createRoot
+    addMetaAsComment s = s {
+      udCommentLines = ["# " ++ (prMeta $ meta a)]
+    } 
 
 
 {- Selection of alignments for MT -}
