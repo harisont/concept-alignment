@@ -30,8 +30,12 @@ main = do
                 if Linearize `elem` flags
                     then 
                         if isJust fp 
-                            then writeFile fp' (unlines $ map (maybe "" prAlignment) as) 
-                            else mapM_ (putStrLn . maybe "" prAlignment) as
+                            then writeFile fp' (unlines $ map 
+                                        (maybe "" prLinearizedAlignment) 
+                                        as) 
+                            else mapM_ 
+                                    (putStrLn . maybe "" prLinearizedAlignment) 
+                                    as
                     else 
                         if isJust fp 
                             then do

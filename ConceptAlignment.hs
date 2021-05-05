@@ -16,50 +16,6 @@ import UDPatterns
 -- metadata 
 type Alignment = (AlignedTrees,Meta) 
 
--- | AlignedTrees basically represents a pair of UD trees, but it is a newtype
--- due to the custom implementation of (==) 
-newtype AlignedTrees = AT (UDTree,UDTree)
-  deriving (Show,Read)
-
--- | Return the aligned trees of an alignment, just like when it was a record 
--- type
-trees :: Alignment -> AlignedTrees
-trees (tu,_) = tu
-
--- | Two pairs of aligned trees are considered equal whenever their
--- linearizations are the same
-instance Eq AlignedTrees where
-  AT (t1,u1) == AT (t2,u2) = linearize t1 == linearize t2 
-                          && linearize u1 == linearize u2
-
--- | Aligned trees can be ordered based on:
--- 1. size of their left tree
--- 2. size of their right tree
--- 3. "linearization" of their left tree (alphabetically)
--- 4. "linearization" of their right tree (alphabetically)
-instance Ord AlignedTrees where
-  a <= b = k a <= k b
-    where 
-      k x = (depthRTree sla,depthRTree tla,linearize sla,linearize tla)
-        where AT (sla,tla) = x
-
--- | The metadata of an alignment are:
-data Meta = M {
-  reasons :: S.Set Reason,  -- ^ reasons for alignment
-  sentIds :: S.Set String   -- ^ ids of the sentences it was inferred from
-} deriving (Show,Read,Eq,Ord)
-
--- | Return the metadata of an alignment, just like when it was a record type
-meta :: Alignment -> Meta
-meta (_,m) = m
-
--- | Initialize metadata with default vals
-initMeta :: Meta
-initMeta = M {
-  reasons = S.empty,
-  sentIds = S.empty
-}
-
 -- | Initialize a potential alignment given just the pair of trees
 initAlignment :: AlignedTrees -> Alignment
 initAlignment tu = (tu,initMeta)
@@ -72,21 +28,73 @@ sl (AT (t,_),_) = t
 tl :: Alignment -> UDTree
 tl (AT (_,u),_) = u
 
--- | prAlignment is used instead of show for inspecting the alignments in an
--- easier way, e.g. in EvAlign and for debugging
-prAlignment :: Alignment -> String
-prAlignment a = prTrees a 
-                ++ "    --"
-                ++ " reasons: " ++ showSet (reasons $ meta a)
-                ++ " sentence IDs: " ++ showSet (sentIds $ meta a)
-  where 
-    prTrees a = linearize (sl a) ++ " ||| " ++ linearize (tl a)
-    showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
+-- | Use instead of show for inspecting the alignments in an easier way, e.g. 
+-- in EvAlign and for debugging
+prLinearizedAlignment :: Alignment -> String
+prLinearizedAlignment (at,m) = 
+  prLinearizedAlignedTrees at ++ "    --" ++ prMeta m
 
 -- | Check if an alignment "contains" another;
 -- used both in pruning and selection of alignments for MT
 contains :: Alignment -> Alignment -> Bool
 a `contains` b = (sl b `isSubRTree` sl a) && (tl b `isSubRTree` tl a)
+
+-- | Return the aligned trees of an alignment, just like when it was a record 
+-- type
+trees :: Alignment -> AlignedTrees
+trees (tu,_) = tu
+
+-- | Two pairs of aligned trees are considered equal whenever their
+-- linearizations are the same
+instance Eq AlignedTrees where
+  AT (t1,u1) == AT (t2,u2) = linearize t1 == linearize t2 
+                          && linearize u1 == linearize u2
+
+
+-- | AlignedTrees basically represents a pair of UD trees, but it is a newtype
+-- due to the custom implementation of (==) 
+newtype AlignedTrees = AT (UDTree,UDTree)
+  deriving (Show,Read)
+
+-- | Use instead of show to inspect an alignment's trees in their linearized
+-- form
+prLinearizedAlignedTrees :: AlignedTrees -> String
+prLinearizedAlignedTrees (AT (t,u)) = linearize t ++ " ||| " ++ linearize u
+
+-- | Aligned trees can be ordered based on:
+-- 1. size of their left tree
+-- 2. size of their right tree
+-- 3. "linearization" of their left tree (alphabetically)
+-- 4. "linearization" of their right tree (alphabetically)
+instance Ord AlignedTrees where
+  a <= b = k a <= k b
+    where 
+      k x = (depthRTree sla,depthRTree tla,linearize sla,linearize tla)
+        where AT (sla,tla) = x
+
+-- | Return the metadata of an alignment, just like when it was a record type
+meta :: Alignment -> Meta
+meta (_,m) = m
+
+-- | The metadata of an alignment are:
+data Meta = M {
+  reasons :: S.Set Reason,  -- ^ reasons for alignment
+  sentIds :: S.Set String   -- ^ ids of the sentences it was inferred from
+} deriving (Show,Read,Eq,Ord)
+
+-- | Initialize metadata with default vals
+initMeta :: Meta
+initMeta = M {
+  reasons = S.empty,
+  sentIds = S.empty
+}
+
+-- | Renders metadata as a human-friendly string
+prMeta :: Meta -> String
+prMeta m = "reasons: " ++ showSet (reasons m)
+      ++ " sentence IDs: " ++ showSet (sentIds m)
+  where 
+    showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
 
 -- | Map of alignments (used internally to simplify combining metadata)
 type AlignmentMap = M.Map AlignedTrees Meta
