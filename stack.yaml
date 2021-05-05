@@ -12,7 +12,7 @@ extra-deps:
 - cgi-3001.3.0.3 # dependency of gf
 - multiset-0.3.4.3
 - github: harisont/gf-ud
-  commit: 04d2097d3d80f576c0dc255554d06cc137eb57f2
+  commit: f81ee3edd79b7994209a7b7181618050e24ca039
 
 flags:
      # this excludes PGF2 module in gf package
