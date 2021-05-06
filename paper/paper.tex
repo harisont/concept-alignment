@@ -25,6 +25,8 @@
 % and will typically save some space.
 \usepackage{microtype}
 
+\usepackage{graphicx}
+
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
@@ -95,21 +97,35 @@ We call \textit{concepts} the abstract units of translation, composed of any num
 
 The basic use case for CA, which we refer to specifically as \textit{Concept Extraction} (CE), is the generation of a translation lexicon from a parallel text. This can be directly compared to the numerous existing word and phrase alignment techniques. 
 
+% potentially move to future work directly
 An interesting and less studied variant of CA is \textit{Concept Propagation} (CP), useful for cases where a set of concepts is already known and the goal is to identify the expressions corresponding to each of them in a new language, potentially even working with a different text in the same domain.
-In this paper, however, we focus on CE, and restrict its application to bilingual corpora. 
+While our system implements basic CP functionalities, however, in this paper we focus on CE and restrict its application to bilingual corpora. 
 
 As stated in the Introduction, most existing extraction solutions are based on statistical approaches and are, as a consequence, unsuitable for small datasets. 
 Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{TODO:}, but have historically suffered from the inconsistencies between the various constituency grammar formalisms used to define grammars for the different languages and from the insufficient degree of robustness of existing parses.
 
-This work is a new attempt in the same direction, enabled by two interlingually oriented grammar formalisms developed over the course of the last 25 years: Universal Dependencies (UD) \cite{TODO:} and Grammatical Framework (GF) \cite{TODO:}.
+This work is a new attempt in the same direction, enabled by two multilinguality-oriented grammar formalisms developed over the course of the last 25 years: Universal Dependencies (UD) \cite{TODO:} and Grammatical Framework (GF) \cite{TODO:}.
 
 While both formalisms, the former a dependency and the latter a constituency grammar, independently solve the former issue, UD is especially appealing since dependency trees are an easier target for parsing. 
 As a consequence, several robust dependency parsers, such as \cite{TODO: UDPipe} and \cite{TODO: Standford} are available.
 
-UD alone would then be sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a ready-to-use, morphologically aware translation lexicon. This is where GF comes into play: after correspondences are inferred from a parallel text, our proposed system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiment using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL) \cite{TODO:}. 
+UD parsing alone would then be sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a ready-to-use, morphologically-aware translation lexicon. This is where GF comes into play: after correspondences are inferred from a parallel text, our proposed system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiment using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL) \cite{TODO:}. 
 This is made possible by \texttt{gf-ud}, a conversion tool described in \cite{TODO:} and \cite{TODO:}.
 
-% system overview
+Concretely, the system we propose requires the following elements, whose reciprocal relations are shown in Figure \ref{overview}: \smallskip
+
+\begin{itemize}
+  \item a UD parser
+  \item an alignment module based on dependency tree comparison
+  \item a program, based on \texttt{gf-ud}, that converts the alignments into GF grammar rules and uses them to construct a translation lexicon
+\end{itemize} \smallskip
+
+\begin{figure}[h]
+%  \centering
+  \includegraphics[width=0.45\textwidth]{figures/overview.png}
+  \caption[System overview]{System overview. Parts in grey are currently at the prototype stage and will not be further discussed in this paper.} \label{elems}
+%  \label{overview}
+\end{figure}
 
 \subsection{Extracting concepts} 
 
