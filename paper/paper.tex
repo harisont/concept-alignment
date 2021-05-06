@@ -120,18 +120,33 @@ Concretely, the system we propose requires the following elements, whose recipro
   \item a program, based on \texttt{gf-ud}, that converts the alignments into GF grammar rules and uses them to construct a translation lexicon
 \end{itemize} \smallskip
 
+% TODO: replace CE with CA and omit CP entirely?
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.45\textwidth]{figures/overview.png}
   \caption[System overview]{System overview. Parts in grey are currently at the prototype stage and will not be further discussed in this paper.} \label{elems}
-%  \label{overview}
+  \label{overview}
 \end{figure}
 
 \subsection{Extracting concepts} 
-% algorithm description (generic on criteria, with heads, iteratively)
-% pseudocode
+The core part of the system outlined above is of course the alignment module. In this section, we present our method for extracting alignments from parallel bilingual UD treebanks, which can be obtained from sentence-aligned texts with any UD parser.
 
-\subsubsection{Alignment criteria}
+The basic extraction algorithm, whose pseudocode is shown in Figure \ref{TODO}, takes as input a list of priority-sorted \textit{alignment criteria}, rules to determine whether two dependency trees should be aligned with each other which we will discuss in greater detail in Section \ref{criteria}, and a pair of UD trees corresponding to the sentences to align.
+From an implementation point of view, UD trees are, as in \texttt{gf-ud}, rose trees where each node represents a token,  obtained from the CoNLL-U files produced by the UD parser.
+
+% TODO: add figure comapring tree representations
+
+As a first step, the program checks whether the two full sentence trees can be aligned with each other, i.e. if they match any of the alignment criteria. If this is the case, they are added to a collection of alignments, also represented as a pair of UD trees associated with some metadata, which is what the function will return after aligning all the dependency subtrees. % TODO: explain or omit metadata!
+
+Depending on which alignment criteria they match, the head of the two trees may or may not also be added to such collection. This is important... % TODO:
+
+The same procedure is applied recursively to all pairs of immediate subtrees of each sentence, until the leaves are reached or alignment is no longer possible due to lack of matching criteria.  % TODO: explain & motivate sorting -> maybe say more about UD before?
+
+% TODO: pseudocode
+
+When working on corpora consisting of multiple sentences, this algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be reused when working on the following ones and to keep track of the number of occurrences of each alignment throughout the entire text.
+
+\subsubsection{Alignment criteria} \label{criteria}
 % label matching
 % pos equivalence
 % known divergence -> cite Dorr, few examples
@@ -145,6 +160,7 @@ Concretely, the system we propose requires the following elements, whose recipro
 \subsection{Generating grammar rules}
 
 \section{Evaluation} \label{evaluation}
+% we use udpipe
 
 \section{Conclusions} \label{conclusions}
 % tangible output and were it is
