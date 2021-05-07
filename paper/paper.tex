@@ -175,9 +175,12 @@ If many distinctions of this kind are specific to particular language pairs or e
 % TODO: add examle (Herb?)
 
 \paragraph{Known alignment}
-% example application: SMT integration
+Another case in which it is trivially desirable for two subtrees in matching context to be aligned is when an equivalent alignment is already known, for instance due to a previous iteration of the extraction algorithm. 
+When referred to pairs of alignments, the term \textit{equivalent} indicates that the two alignments, linearized, correspond to the same string.
 
-% how tracking them is useful (but maybe in evaluation?)
+At a first glance, this might seem a criterion with no practical applications. 
+However, it is particularly useful when, instead of starting with an empty set of correspondences, we initialize the program with some alignments that are either inserted manually or, most interestingly, obtained with some other alignment technique. 
+For instance, in this way it is possible to combine the system proposed in this paper in combination with a statistical tool and give more credit to the correspondences identified by both systems.
 
 \subsubsection{Pattern matching}
 % look for specific UD patterns
