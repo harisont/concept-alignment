@@ -27,6 +27,21 @@
 
 \usepackage{graphicx}
 
+\usepackage{amsthm}
+\newtheoremstyle{indented}% name of the style to be used
+  {5pt}% measure of space to leave above the theorem. E.g.: 3pt
+  {5pt}% measure of space to leave below the theorem. E.g.: 3pt
+  {\itshape}% name of font to use in the body of the theorem
+  { }% measure of space to indent
+  {\bfseries}% name of head font
+  { }% punctuation between head and body
+  { }% space after theorem head; " " = normal interword space
+  {\thmname{#1}\thmnote{ (#3)}}
+
+\theoremstyle{indented}
+
+\newtheorem{definition}{Definition}
+
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
@@ -147,10 +162,37 @@ The same procedure is applied recursively to all pairs of immediate subtrees of 
 When working on corpora consisting of multiple sentences, this algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be reused when working on the following ones and to keep track of the number of occurrences of each alignment throughout the entire text.
 
 \subsubsection{Alignment criteria} \label{criteria}
-% label matching
-% pos equivalence
-% known divergence -> cite Dorr, few examples
-% known alignment -> SMT integration
+While alignment criteria are customizable, to better understand the extraction algorithm described in the above we dedicate this section to describing the ones that are currently used by default.
+
+\paragraph{Matching UD labels}
+The most obvious, but also most effective idea is to determine alignability based on comparing the dependency labels of the candidate UD tree pair. 
+In particular, according to this idea, two subtrees, in \textit{matching context}, i.e. attached to aligned heads constitute an alignment if their roots share the same dependency label. 
+Intuitively, this means that they are in the same relation with their heads.
+
+Note that, since the root of US trees is always attached to a a fake node with an arc labelled \texttt{root}, this criterion also makes it so that full sentences are always considered to align with each other, something which is desirable since we assume the parallel texts that are fed to our program to be sentence-aligned.
+
+\paragraph{Part-Of-Speech equivalence}
+CoNNL-U files provide information not only on the syntactic role of the tokens a sentence is composed of, but also on their grammatical categories, represented as Universal Part-Of-Speech (POS) tags. 
+Intuitively, if the words corresponding to the nodes two trees in matching contexts are composed of have the same POS tags, those two trees are generally more likely to correspond to each other than if not. 
+As a consequence, a useful relation to define between dependency trees is that of \textit{POS-equivalence}:
+
+\begin{definition}
+  Two dependency trees $t$, $u$ are \normalfont{POS-equivalent} (and, as such, will be aligned) if $M_1 = M_2 \neq \emptyset$, where $M_i$ is defined as the multiset of POS tags of all the \normalfont{meaning-carrying} \textit{(see below) word nodes of $t_i$}. 
+\end{definition}
+
+The definition specifies that the two multisets should not contain the POS tags of all the words in the sentence but rather only those of the \textit{meaning-carrying} ones, referring to words belonging to a particular set of classes. 
+Words that should generally be taken into account, in fact, correspond roughly to content words (cf. Section \ref{upos}), but this term was deliberately avoided in Definition \ref{poseq} due to the fact that it can be useful also to include some function words, for instance pronouns and some kinds of determiners.
+In particular, the current implementation considers as meaning-carrying all words that belong to an open class - defined as in the UD documentation \cite{uddocs} - and numerals, but this set of tags has been obtained empirically working with English-Italian and might not be ideal for all language pairs.
+On the other hand, words belonging to other classes, such as auxiliary verbs, adpositions and conjunctions can and should be in most cases ignored as they are often omitted or rendered with words with different POS tags when the sentence is translated to another language, especially if the two languages in the pair at hand differ significantly. \smallskip
+
+Applied alone, this criterion can be used to capture correspondences that would otherwise be missed, thus increasing recall, but a decrease in precision is also to be expected. Perhaps more interestingly, however, another way to apply this criterion is in conjunction with other ones, and in particular together with UD label matching (cf. Criterion \ref{udmatch}), in context where high precision is more important than recall. We will get back to combining criteria in Section \ref{ceres}.
+% combination
+
+\paragraph{Known translation divergence}
+% Dorr
+
+\paragraph{Known alignment}
+% example application: SMT integration
 
 % how tracking them is useful (but maybe in evaluation?)
 
