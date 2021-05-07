@@ -183,7 +183,20 @@ However, it is particularly useful when, instead of starting with an empty set o
 For instance, in this way it is possible to combine the system proposed in this paper in combination with a statistical tool and give more credit to the correspondences identified by both systems.
 
 \subsubsection{Pattern matching}
-% look for specific UD patterns
+So far, we described how CE can be used in a setting where the objective is to generate a comprehensive translation lexicon based on set of example sentence pairs.
+We pointed out that the program can be configured so to prioritize precision or coverage, but never restricted our search to a particular type of alignments.
+Nonetheless, there can be cases in which only certain syntactic structures are of interest: for instance, for whatever reason we might be looking for adverbs or noun phrases exclusively.
+
+To handle these situations, the CE module can filter the results based on a \texttt{gf-ud} pattern.
+Pattern matching in \texttt{gf-ud} %TODO:
+
+Combining pattern matching with pattern replacement, for instance by pruning the UD trees extracted by the alignment module, allows us even to extract correspondences that, given the structure of UD trees, cannot be identified by CE alone. 
+To give an example that turned out to be useful in practice, a possibility is to extract verb phrases only, by looking for full clauses and pruning the subtree corresponding to the subject. 
+More advanced replacements are also possible: instead of simply pruning clauses to extract the verb phrases they contain, we can perform some actual replacement to obtain \textit{predication patterns}, such as
+
+$$\langle X tells Y Z, X dice Z a Y\rangle$$.
+
+% TODO: reformulate and add possiby graphical example
 
 \subsection{Generating grammar rules}
 
