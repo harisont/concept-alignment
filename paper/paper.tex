@@ -168,7 +168,11 @@ Applied alone, this criterion can be used to capture correspondences that would 
 However, since alignment criteria are defined as boolean functions, it is easy to combine them so to apply them simultaneously: combining these first two criteria, for instance, is useful in cases where precision is more important than recall.
 
 \paragraph{Known translation divergence}
-% Dorr
+Parallel texts often present significant, systematic cross-linguistic grammatical distinctions. 
+When this is the case, it is often straightforward to define alignment criteria based on recognizing the corresponding patterns.
+If many distinctions of this kind are specific to particular language pairs or even stylistical, some of them occur in independently of what languages are involved and have nothing to do with idiomatic usage or aspectual, discourse, domain or word knowledge. Drawing inspiration from \cite{TODO:} and \cite{TODO:}, we refer to them distinctions as \textit{translation divergences} and handle some with the alignment criteria that used by default.
+
+% TODO: add examle (Herb?)
 
 \paragraph{Known alignment}
 % example application: SMT integration
