@@ -284,7 +284,7 @@ tree2rules env ltss = BuiltRules {
     -- construct function name (e.g. come_komma_Utt) using the lemmas in all
     -- n langs and the category in the first language
     fun = 
-      mkFun (concatMap (init . partsOfFun) (concatMap (lexitems . snd) lts))
+      mkFun (concat $ concatMap (map (\x -> if show x == "__" then [""] else init $ partsOfFun x)) (intersperse [mkCId "__"] (map (lexitems . snd) lts)))
              (returnType $ fst (signature firstlang firsttree))
 
     signature :: Language -> Tree -> (Signature,Int)
@@ -323,7 +323,7 @@ prBuiltRules br = unlines $ [
   unwords ["oper",fun,"=","mk"++show cat, word fun,";","--",show lang] | (lang,funcats) <- unknowns br, (fun,cat) <- funcats
   ]
  where
-  fullname br = intercalate "_" (ids br) ++ "_" ++ show (funname br)
+  fullname br = intercalate "_" (ids br) ++ "__" ++ show (funname br)
   word f = "\"" ++ takeWhile (/='_') f ++ "\""
   cats = nub (map (snd . snd) lins)
   mark c s = if all (==c) cats then s else "--- " ++ s -- comment out rule if the signature is not the same in both languages (for the moment at least)
