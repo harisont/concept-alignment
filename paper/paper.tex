@@ -174,7 +174,7 @@ If many distinctions of this kind are specific to particular language pairs or e
 
 % TODO: add examle (Herb?)
 
-\paragraph{Known alignment}
+\paragraph{Known alignment} \label{ka}
 Another case in which it is trivially desirable for two subtrees in matching context to be aligned is when an equivalent alignment is already known, for instance due to a previous iteration of the extraction algorithm. 
 When referred to pairs of alignments, the term \textit{equivalent} indicates that the two alignments, linearized, correspond to the same string.
 
@@ -372,9 +372,32 @@ Such word is in fact often used alone to replace longer expressions such as ``\t
 Another interesting example is the alignment $\langle$\textit{``class'', ``classe''}$\rangle$, which causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which (within the same domain!) \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.
 
 \section{Conclusions} \label{conclusions}
-% tangible output and were it is on github
-% summary of process and discussions
-\subsection{Future work}
+We presented a syntax-based alignment method with a focus on its usage for domain-specific translation lexica generation.
+
+Compared to the existing statistical tools, our system has the following advantages:
+\begin{itemize}
+  \item it performs consistently well even on extremely small parallel corpora
+  \item it is able to simultaneously extract correspondences between individual words, multiword expressions and full phrases, even when their constituents are discontinuous
+  \item in conjunction with \texttt{gf-ud} pattern matching, it can be used to extract specific types of correspondences, such as predication patterns  
+  \item it can automatically generate compilable, morphology-aware GF translation lexica
+  \item it can be configured to easily handle systmatic language-pair specific translation divergences.
+\end{itemize}
+
+The tangible fruit of this work are a Haskell library and a number of executables offering an easy to use and configure interface to perform CE, lexicon generation and a variety of kinds of evaluations. The source code, which also implements a preliminary implementation of CP not discussed in depth in this paper, is available at \url{github.com/harisont/concept-alignment}.
+
+\subsection{Current and future work}
+Our results, while encouraging, suggest that there is still much room for improvement in many different directions.
+
+An obvious possible development is to improve the current implementation of CP, optimizing it for its two different use cases: propagating alignments to a new language looking for correspondences in a different text in the same domain and using a translation of the same text they were obtained from. 
+An alternative to the latter is to generalize CE to $n$ languages, instead of limiting it to bilingual cases.
+
+For cases where a relatively large amount of data is available, using our system in conjunction with a statistical tool seems promising. 
+As discussed in Section \ref{ka}, some integration between our system and other sources of alignment is already supported, and it is possible to keep track of the reason why a particular correspondence was extracted. 
+This could be further developed in the direction of an actual hybrid system. 
+A first attempt in this direction is the development of a simple conversion tool between the ``pharaoh format'' used by tools such as \texttt{fast\_align} and the format we use to represent alignments, available in the same repository.
+
+Finally, since the freedom that generally characterizes human translation and the quality of currently available UD parsers make the expectation of maximizing both alignment precision and recall unrealistic, it seems logical to develop tools to make it easier to postprocess automatically generated lexica.
+With respects to this, current work is represented by a synoptic CoNLL-U, available at \url{github.com/DigitalGrammarsAB/synoptic-conllu-viewer}, which makes it possible to inspect the UD trees a grammar rule was derived from.
 
 % TODO: see why it does not compile
 % Entries for the entire Anthology, followed by custom entries
