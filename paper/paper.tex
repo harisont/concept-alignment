@@ -27,6 +27,8 @@
 
 \usepackage{graphicx}
 
+\usepackage{todonotes}
+
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
@@ -76,15 +78,14 @@ What makes these systems well suited to the task is the fact that, when we const
 Nevertheless, lexical exactness is, in this context, just as important as grammaticality. 
 An important part of the design of the Controlled Natural Language (CNL) the grammar in such a system describes becomes, then, the creation of a translation lexicon. 
 In many cases, this is done for the most part manually, resulting in a time consuming task requiring significant linguistic knowledge. 
-When the grammar is designed based on a parallel corpus of example sentences, it is possible to automate part of this process by means of statistical word and phrase alignment techniques \cite{TODO: a lot}. 
-None of them is, however, suitable for the common case in which only a limited number of example sentences is available.
+When the grammar is designed based on a corpus of parallel example sentences, it is possible to automate part of this process by means of statistical word and phrase alignment techniques \cite{TODO: a lot}. 
+None of them is, however, suitable for the common case in which only a limited number of example data is available.
 
 In this paper, we propose an alternative approach to the automation of this task. 
 While still being data-driven, our method is grammar-based and, as such, capable of extracting meaningful correspondences even from individual sentence pairs. 
 
 A further advantage of performing syntactic analysis is that we do not have to choose \textit{a priori} whether to focus on the word or phrase level. 
 Instead, we can simultaneously operate at different levels of abstraction, thus extracting both single- and multiword, even non-contiguous, correspondences. 
-
 For this reason, we refer to the task our system attempts to automate as \textit{Concept Alignment} (CA). 
 
 This paper is structured as follows. 
@@ -97,21 +98,22 @@ Finally, Section \ref{conclusions} consists of a discussion of such results and 
 The objective of CA is to find semantical correspondences between parts of multilingual parallel texts. 
 We call \textit{concepts} the abstract units of translation, composed of any number of words, identified through this process, and represent them as \textit{alignments}, i.e. tuples of equivalent concrete expressions in different languages.
 
-The basic use case for CA, which we refer to specifically as \textit{Concept Extraction} (CE), is the generation of a translation lexicon from a parallel text. This can be directly compared to the numerous existing word and phrase alignment techniques. 
+The basic use case for CA, which we refer to specifically as \textit{Concept Extraction} (CE), is the generation of a translation lexicon from a multilingual parallel text. This can be directly compared to the numerous existing word and phrase alignment techniques. 
 
 % potentially move to future work directly
 An interesting and less studied variant of CA is \textit{Concept Propagation} (CP), useful for cases where a set of concepts is already known and the goal is to identify the expressions corresponding to each of them in a new language, potentially even working with a different text in the same domain.
 While our system implements basic CP functionalities, however, in this paper we focus on CE and restrict its application to bilingual corpora. 
 
 As stated in the Introduction, most existing extraction solutions are based on statistical approaches and are, as a consequence, unsuitable for small datasets. 
-Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{TODO:}, but have historically suffered from the inconsistencies between the various constituency grammar formalisms used to define grammars for the different languages and from the insufficient degree of robustness of existing parses.
+Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{TODO:}, but have historically suffered from the inconsistencies between the various formalisms used to define the grammars for different languages and from the insufficient degree of robustness of existing parses.
 
 This work is a new attempt in the same direction, enabled by two multilinguality-oriented grammar formalisms developed over the course of the last 25 years: Universal Dependencies (UD) \cite{TODO:} and Grammatical Framework (GF) \cite{TODO:}.
 
-While both formalisms, the former a dependency and the latter a constituency grammar, independently solve the former issue, UD is especially appealing since dependency trees are an easier target for parsing. 
+While both formalisms, the former a dependency and the latter a constituency grammar\todo{too quick, say more about both}, independently solve the former issue, UD is especially appealing since dependency trees are an easier target for parsing. 
 As a consequence, several robust dependency parsers, such as \cite{TODO: UDPipe} and \cite{TODO: Standford} are available.
 
-UD parsing alone would then be sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a ready-to-use, morphologically-aware translation lexicon. This is where GF comes into play: after correspondences are inferred from a parallel text, our proposed system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiment using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL) \cite{TODO:}. 
+UD parsing alone would then be sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a morphologically-aware translation lexicon for a generative grammar. 
+This is where GF comes into play: after correspondences are inferred from a parallel text, our proposed system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiments using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL) \cite{TODO:}. \todo{say what the RGL is} 
 This is made possible by \texttt{gf-ud}, a conversion tool described in \cite{TODO:} and \cite{TODO:}.
 
 Concretely, the system we propose requires the following elements, whose reciprocal relations are shown in Figure \ref{overview}: \smallskip
@@ -119,7 +121,7 @@ Concretely, the system we propose requires the following elements, whose recipro
 \begin{itemize}
   \item a UD parser
   \item an alignment module based on dependency tree comparison
-  \item a program, based on \texttt{gf-ud}, that converts the alignments into GF grammar rules and uses them to construct a translation lexicon
+  \item a program, based on \texttt{gf-ud}, that converts the alignments into GF grammar rules and uses them to construct a translation lexicon.
 \end{itemize} \smallskip
 
 % TODO: replace CE with CA and omit CP entirely?
@@ -133,16 +135,20 @@ Concretely, the system we propose requires the following elements, whose recipro
 \subsection{Extracting concepts} 
 The core part of the system outlined above is of course the alignment module. In this section, we present our method for extracting alignments from parallel bilingual UD treebanks, which can be obtained from sentence-aligned texts with any UD parser.
 
-The basic extraction algorithm, whose pseudocode is shown in Figure \ref{TODO}, takes as input a list of priority-sorted \textit{alignment criteria}, rules to determine whether two dependency trees should be aligned with each other which we will discuss in greater detail in Section \ref{criteria}, and a pair of UD trees corresponding to the sentences to align.
-From an implementation point of view, UD trees are, as in \texttt{gf-ud}, rose trees where each node represents a token,  obtained from the CoNLL-U files produced by the UD parser.
+The pseudocode of the basic extraction algorithm is shown in Figure \ref{TODO}\todo{add pseudocode}.
+The input is a list of priority-sorted \textit{alignment criteria}, i.e.rules to determine whether two dependency trees should be aligned with each other, which will be discussed in greater detail in Section \ref{criteria}, and UD tree representation of the pair of sentences to align.
+From an implementation point of view, UD trees are, as in \texttt{gf-ud}, rose trees where each node represents a token, obtained from the CoNLL-U files produced by the UD parser.
 
+\todo{add figure with the various tree representations?}
 % TODO: add figure comparing tree representations
 
-As a first step, the program checks whether the two full sentence trees can be aligned with each other, i.e. if they match any of the alignment criteria. If this is the case, they are added to a collection of alignments, also represented as a pair of UD trees associated with some metadata, which is what the function will return after aligning all the dependency subtrees. % TODO: explain or omit metadata!
+As a first step, the program checks whether the two full sentence trees can be aligned with each other, i.e. if they match any of the alignment criteria. 
+If this is the case, they are added to a collection of alignments, which are also represented as a pair of UD trees associated with some metadata. \todo{explain what metadata?}
+Such collection is what the function will return after aligning all the dependency subtrees. % TODO: explain or omit metadata!
 
-Depending on which alignment criteria they match, the head of the two trees may or may not also be added to such collection. This is important... % TODO:
+Depending on which alignment criteria they match, the head of the two trees may or may not also be added to such collection. This is important... \todo{explain why}% TODO:
 
-The same procedure is applied recursively to all pairs of immediate subtrees of each sentence, until the leaves are reached or alignment is no longer possible due to lack of matching criteria.  % TODO: explain & motivate sorting -> maybe say more about UD before?
+The same procedure is applied recursively to all pairs of immediate subtrees of each sentence, until the leaves are reached or alignment is no longer possible due to a lack of matching criteria.  % TODO: explain & motivate sorting -> maybe say more about UD before?
 
 % TODO: pseudocode
 
@@ -153,26 +159,26 @@ While alignment criteria are customizable, to better understand the extraction a
 
 \paragraph{Matching UD labels}
 The most obvious, but also most effective idea is to determine alignability based on comparing the dependency labels of the candidate UD tree pair. 
-In particular, according to this idea, two subtrees, in \textit{matching context}, i.e. attached to aligned heads constitute an alignment if their roots share the same dependency label. 
+In particular, according to this idea, two subtrees in \textit{matching context}, i.e. attached to aligned heads, constitute an alignment if their roots share the same dependency label. 
 Intuitively, this means that they are in the same relation with their heads.
 
-Note that, since the root of US trees is always attached to a a fake node with an arc labelled \texttt{root}, this criterion also makes it so that full sentences are always considered to align with each other, something which is desirable since we assume the parallel texts that are fed to our program to be sentence-aligned.
+Note that, since the root of UD trees is always attached to a a fake node with an arc labelled \texttt{root}, this criterion also makes it so that full sentences are always considered to align with each other, something which is desirable since we assume the parallel texts that are fed to our program to be sentence-aligned.
 
 \paragraph{Part-Of-Speech equivalence}
-CoNNL-U files provide information not only on the syntactic role of the tokens a sentence is composed of, but also on their grammatical categories, represented as Universal Part-Of-Speech (POS) tags. 
+CoNNL-U files provide information not only on the syntactic role of the tokens a sentence is composed of, but also on their grammatical categories, represented as Universal Part-Of-Speech (POS) tags \cite{TODO:}. 
 Intuitively, if the nodes of two trees in matching contexts have the same POS tags, the two trees are more likely to correspond to each other than if not. 
 
-This is especially true if focus, for instance, solely on the open class words (in the current implementation, defined as in the UD documentation \cite{TODO:}), thus ignoring prepositions, determiners, auxiliary verbs and all other function words, which tend to behave differently across different languages.
+This is especially true if we focus, for instance, solely on the open class words (in the current implementation, defined as in the UD documentation \cite{TODO:}), thus ignoring prepositions, determiners, auxiliary verbs and all other function words, which tend to behave differently across different languages.
 
 As a consequence, a useful relation to define between dependency trees is that of \textit{POS-equivalence}: two dependency trees $t$, $u$ are POS-equivalent if $M_1 = M_2 \neq \emptyset$, where $M_i$ is defined as the multiset of POS tags of all the open class word nodes of $t_i$. 
 
-Applied alone, this criterion can be used to capture correspondences that would be missed by only matching UD labels, thus increasing recall, but a decrease in precision is also to be expected. 
+Applied as a backup for label matchin, this criterion can be used to capture correspondences that would otherwise be missed, thus increasing recall, but a decrease in precision is also to be expected. 
 However, since alignment criteria are defined as boolean functions, it is easy to combine them so to apply them simultaneously: combining these first two criteria, for instance, is useful in cases where precision is more important than recall.
 
 \paragraph{Known translation divergence}
 Parallel texts often present significant, systematic cross-linguistic grammatical distinctions. 
 When this is the case, it is often straightforward to define alignment criteria based on recognizing the corresponding patterns.
-If many distinctions of this kind are specific to particular language pairs or even stylistical, some of them occur in independently of what languages are involved and have nothing to do with idiomatic usage or aspectual, discourse, domain or word knowledge. Drawing inspiration from \cite{TODO:} and \cite{TODO:}, we refer to them distinctions as \textit{translation divergences} and handle some with the alignment criteria that used by default.
+If many distinctions of this kind are specific to particular language pairs or even stylistical, some of them occur independently of what languages are involved and have nothing to do with idiomatic usage or aspectual, discourse, domain or word knowledge. Drawing inspiration from \cite{TODO:} and \cite{TODO:}, we refer to them as \textit{translation divergences} and handle the most common ones via alignment criteria that are used by default. \todo{add a few examples (<= one per type of divergence)}
 
 % TODO: add examle (Herb?)
 
@@ -187,14 +193,14 @@ For instance, in this way it is possible to combine the system proposed in this 
 \subsubsection{Pattern matching}
 So far, we described how CE can be used in a setting where the objective is to generate a comprehensive translation lexicon based on set of example sentence pairs.
 We pointed out that the program can be configured so to prioritize precision or coverage, but never restricted our search to a particular type of alignments.
-Nonetheless, there can be cases in which only certain syntactic structures are of interest: for instance, for whatever reason we might be looking for adverbs or noun phrases exclusively.
+Nonetheless, there can be cases in which only certain syntactic structures are of interest: for instance, we might be looking for adverbs or noun phrases exclusively.
 
 To handle these situations, the CE module can filter the results based on a \texttt{gf-ud} pattern.
-Pattern matching in \texttt{gf-ud} %TODO:
+Pattern matching in \texttt{gf-ud}...\todo{explain briefly how it works. Maybe Aarne can do that?}
 
 Combining pattern matching with pattern replacement, for instance by pruning the UD trees extracted by the alignment module, allows us even to extract correspondences that, given the structure of UD trees, cannot be identified by CE alone. 
 To give an example that turned out to be useful in practice, a possibility is to extract verb phrases only, by looking for full clauses and pruning the subtree corresponding to the subject. 
-More advanced replacements are also possible: instead of simply pruning clauses to extract the verb phrases they contain, we can perform some actual replacement to obtain \textit{predication patterns}, such as
+\todo{rephrase explanation and reformat example}More advanced replacements are also possible: instead of simply pruning clauses to extract the verb phrases they contain, we can perform some actual replacement to obtain \textit{predication patterns}, such as
 
 $$\langle X tells Y Z, X dice Z a Y\rangle$$.
 
@@ -202,12 +208,11 @@ $$\langle X tells Y Z, X dice Z a Y\rangle$$.
 
 \subsection{Generating grammar rules}
 The CE module described so far outputs pairs of UD trees. 
-While converting them to GF Abstract Syntax Trees (ASTs) is the \texttt{gf-ud}'s core functionality, to build a compilable GF translation lexicon it is necessary to turn such trees into grammar rules.
+While converting them to GF Abstract Syntax Trees (ASTs) is \texttt{gf-ud}'s core functionality, to build a compilable GF translation lexicon it is necessary to turn such trees into grammar rules.
 
 In order to do that, our grammar generation module requires a morphological dictionary of the languages at hand and an \textit{extraction grammar}. 
-What we refer to as an extraction grammar is of course a GF grammar, whose
-objective is to define the set of basic categories and syntactic rules the entries of the automatically generated lexicon is going to use.
-
+What we refer to as an extraction grammar is of course a GF grammar, whose objective is to define the set of basic categories and syntactic rules the entries of the automatically generated lexicon is going to use.
+ \todo{not sure how important this section is and what (if anything) to add to it}
 % TODO: designed for the grammar generation step to produce grammar rules corresponding to simple concepts such as basic categories, noun phrases, verb phrases etc.,
 
 
@@ -215,11 +220,12 @@ objective is to define the set of basic categories and syntactic rules the entri
 % TODO: move around things to have something here (or outline structure of the section)
 \subsection{Data}
 Because we want part of our evaluation to be independent from the quality of UD parsing, some of the experiments are carried out using manually annotated data. 
-To this purpose, we use a 100-sentences subset of the Parallel UD (PUD) corpus, a set of handcrafted\footnote{Annotation is sometimes semi-automatic, but all treebanks are at least manually checked.} multilingual treebanks in CoNLL-U format created for the CoNLL 2017 shared task on Multilingual Parsing from Raw Text to Universal Dependencies \cite{TODO:}.
+To this purpose, we use a 100-sentences subset of the Parallel UD (PUD) corpus, a set of 1000 handcrafted\footnote{Annotation is sometimes semi-automatic, but all treebanks are at least manually checked.}\todo{not even, I fear. Check this} multilingual treebanks in CoNLL-U format created for the CoNLL 2017 shared task on Multilingual Parsing from Raw Text to Universal Dependencies \cite{TODO:}.
 PUD treebanks are available in over 20 languages, of which we selected English, Italian and Swedish. 
 Using this data limits the amount of alignment errors that are due annotation issues to a minimum, even though a small number of inconsistencies and imprecisions is present even in this corpus.
 
-When it comes to testing the program on raw text, we use two bilingual sentence-aligned corpora consisting of course plans from the Department of Mathematics and Computer Science of the University of Perugia (for English-Italian) and from the Department of Computer Science and Engineering (CSE) shared between the University of Gothenburg and the Chalmers University of Technology (for English-Swedish). For brevity, we will refer to these two datasets as to the DMI and the CSE corpora.
+When it comes to testing the program on raw text, we use two bilingual sentence-aligned corpora consisting of course plans from the Department of Mathematics and Computer Science of the University of Perugia (for English-Italian) and from the Department of Computer Science and Engineering (CSE) shared between the University of Gothenburg and the Chalmers University of Technology (for English-Swedish). 
+For brevity, we will refer to these two datasets as to the DMI and the CSE corpora, or collectively as to the course plans datasets.
 This data, available in the project repository, was collected and sentence-aligned specifically for this work and a related Bachelor's thesis project \cite{TODO:}.
 When using raw text, our parser of choice is UDPipe \cite{TODO:}. 
 In particular, we use the ParTUT English and Italian models for the DMI corpus and models trained on the bilingual LinES English-Swedish treebank for the CSE corpus \cite{TODO:}.
@@ -241,15 +247,14 @@ For measuring the performance of our system, while precision and recall are two 
   \item the ratio between such number and the total number of alignments extracted.
  \end{itemize}
 
-However, since some alignments are only correct in the specific context of the sentence pair in which they occur, we make a further distinction between correct alignments that are relevant for a translation lexicon, marked as \texttt{+} in the following tables, and alignments that are useful for comparing the sentences but should not be used for MT, marked as \texttt{=} instead. % TODO: boat/train example 
+However, since some alignments are only correct in the specific context of the sentence pair in which they occur, we make a further distinction between correct alignments that are relevant for a translation lexicon, marked as \texttt{+} in the following tables, and alignments that are useful for comparing the sentences but should not be used for MT, marked as \texttt{=} instead. \todo{add example (e.g. boat/train)} % TODO: boat/train example 
 Incorrect correspondences are marked as \texttt{-}. 
 
 \subsubsection{Results on manually annotated treebanks} 
-In Table \ref{pud_fast}, we compare the results obtained with our grammar-based module to those obtained statistically on the PUD treebanks. 
+In Table \ref{pud_fast}\todo{position properly; run and add en-sv}, we compare the results obtained with our grammar-based module to those obtained statistically on the PUD treebanks. 
 
 Of course, \texttt{fast\_align} does not make use of the information present in the CoNLL-U files excepts with regards to tokenization. 
 On the other hand, the relatively large size of the PUD treebanks makes it possible to also train the statistical tool on the full dataset instead of just using the chosen 100-sentences subset, allowing for a fairer comparison. 
-
 In both cases, \texttt{fast\_align} is run with 10 iterations in EM training, symmetrizing the alignments found by running the program in both directions.
 
 % TODO: position properly
@@ -274,7 +279,7 @@ While \texttt{fast\_align} is designed to align every word in the text (or expli
 The course plan corpora are significantly harder to work with, both for our CE module and \texttt{fast\_align}.
 In the former case, the additional challenge is relying on the quality of automatic parsing, while \texttt{fast\_align} suffers from the small size of the datasets, which are fed in their entirety to both systems.
 
-The results of this comparison are summarized in Table \ref{raw_fast}.
+The results of this comparison are summarized in Table \ref{raw_fast}\todo{position properly; run experiments (this is new) and add actual results}.
 
 %TODO: position properly
 %TODO: run experiments & update data
@@ -289,13 +294,16 @@ The results of this comparison are summarized in Table \ref{raw_fast}.
  \end{table*}
 
  % TODO: discussion
+\todo{add results discussion}
+
+\todo{in case there's room maybe add criterion-specific stats}
 
 % TODO: PUD: incl. reason-wise?)
 
 \subsection{MT experiments}
 The second set of experiments has the objective of assessing the quality of the final output of the system we propose: GF translation lexica. 
 Because we are focussing on using CA in the context of domain-specific MT, in this case we do not make use of the PUD treebanks, where sentences come from a variety of different sources, but rather of the two course plans corpora. 
-For this evaluation, we do not construct a grammar specific to the course plans domain: it is sufficient to extend the extraction grammar itself with preexisting syntax rules defined in the RGL, so to allow for more variation. % TODO: is RGL mentioned above? 
+For this evaluation, we do not construct a grammar specific to the course plans domain: it is sufficient to extend the extraction grammar itself with preexisting syntax rules defined in the RGL, so to allow for more variation. 
 
 The idea is to automatically translate a set of English sentences to Italian and Swedish, ask native speakers of the target languages to produce a set of reference translations, and compare them to the original machine-generated ones by computing BLEU scores.
 
@@ -306,7 +314,7 @@ Reference translations are obtained by asking two native speakers of Italian and
 Participants were instructed to only make the minimal changes necessary to obtain, starting from the automatic tranlsations generated by our system, a set of grammatically and semantically correct translations. 
 This is important to get meaningful results, as if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading.
 
-\subsubsection{Experimental results}
+\subsubsection{Experimental results} 
 Corpus-level BLEU scores for the automatic translations of the 50+50 sentences of the testing corpora generated as described in the above are summarized in Table \ref{tableu}.
 
 Following conventions, we report the cumulative $n$-gram scores for values of $n$ from 1 to 4 (BLEU-1 to BLEU-4). 
@@ -339,8 +347,7 @@ Nonetheless, it is worth noticing that this is one of the many cases in which th
 This suggest that, in contexts where higher precision is necessary, there are simple improvements that can be done either in the choice of the alignment criteria or at a later stage, in terms alignment selection. 
 In other contexts, it can be more practical to aim for higher coverage and not perform any automatic selection, leaving lexicon refinements to a human, possibly with the help of the postprocessing tools that are currently under development \cite{TODO:}.
 
-% TODO: decide if to leave or remove
-Furthermore, a problem with using the BLEU score as the only evaluation metric is the fact that it makes no distinction between content and function words, thus not allowing an evaluation focused specifically on the extracted concepts. 
+Furthermore, \todo{from here on nothing is absolutely vital in this section. It can be shortened or removed if necessary to make room for something else}a problem with using the BLEU score as the only evaluation metric is the fact that it makes no distinction between content and function words, thus not allowing an evaluation focused specifically on the extracted concepts. 
 The small size of the corpus, however, allows for some error analysis. 
 While postprocessing the automatic translations, the participants were asked to indicate what kind of errors they encountered in each sentence (grammatical, semantical or both). 
 Their observations are summarized in Table \ref{obs}.
@@ -374,7 +381,7 @@ Such word is in fact often used alone to replace longer expressions such as ``\t
 Another interesting example is the alignment $\langle$\textit{``class'', ``classe''}$\rangle$, which causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which (within the same domain!) \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.
 
 \section{Conclusions} \label{conclusions}
-We presented a syntax-based alignment method with a focus on its usage for domain-specific translation lexica generation.
+We presented a syntax-based alignment method with a focus on its applications in domain-specific translation lexica generation.
 
 Compared to the existing statistical tools, our system has the following advantages:
 \begin{itemize}
@@ -385,21 +392,21 @@ Compared to the existing statistical tools, our system has the following advanta
   \item it can be configured to easily handle systmatic language-pair specific translation divergences.
 \end{itemize}
 
-The tangible fruit of this work are a Haskell library and a number of executables offering an easy to use and configure interface to perform CE, lexicon generation and a variety of kinds of evaluations. The source code, which also implements a preliminary implementation of CP not discussed in depth in this paper, is available at \url{github.com/harisont/concept-alignment}.
+The tangible fruit of this work are a Haskell library and a number of executables offering an easy to use and configure interface to perform CE, lexicon generation and a variety of kinds of evaluations. The source code, which also implements a preliminary implementation of CP not discussed in depth in this paper, is available at \url{github.com/harisont/concept-alignment}\todo{maybe I should mention this in the introduction?}.
 
 \subsection{Current and future work}
 Our results, while encouraging, suggest that there is still much room for improvement in many different directions.
 
-An obvious possible development is to improve the current implementation of CP, optimizing it for its two different use cases: propagating alignments to a new language looking for correspondences in a different text in the same domain and using a translation of the same text they were obtained from. 
+An obvious possible development is to improve the current implementation of CP, optimizing it for its two different use cases: propagating alignments to a new language looking for correspondences in a different text in the same domain and using a translation of the same text they were obtained from. \todo{simplify part on CP scenarios}
 An alternative to the latter is to generalize CE to $n$ languages, instead of limiting it to bilingual cases.
 
 For cases where a relatively large amount of data is available, using our system in conjunction with a statistical tool seems promising. 
-As discussed in Section \ref{ka}, some integration between our system and other sources of alignment is already supported, and it is possible to keep track of the reason why a particular correspondence was extracted. 
+As discussed in Section \ref{ka}, some integration between our system and other sources of alignments is already supported, and it is possible to keep track of the reason why a particular correspondence was extracted. 
 This could be further developed in the direction of an actual hybrid system. 
 A first attempt in this direction is the development of a simple conversion tool between the ``pharaoh format'' used by tools such as \texttt{fast\_align} and the format we use to represent alignments, available in the same repository.
 
 Finally, since the freedom that generally characterizes human translation and the quality of currently available UD parsers make the expectation of maximizing both alignment precision and recall unrealistic, it seems logical to develop tools to make it easier to postprocess automatically generated lexica.
-With respects to this, current work is represented by a synoptic CoNLL-U, available at \url{github.com/DigitalGrammarsAB/synoptic-conllu-viewer}, which makes it possible to inspect the UD trees a grammar rule was derived from.
+With respects to this, current work is represented by a synoptic CoNLL-U viewer, available at \url{github.com/DigitalGrammarsAB/synoptic-conllu-viewer}, which makes it possible to inspect the UD trees a grammar rule was derived from. \todo{remove this part if the tool is not made public, or maybe regardless}
 
 % TODO: see why it does not compile
 % Entries for the entire Anthology, followed by custom entries
