@@ -206,6 +206,8 @@ In order to do that, our grammar generation module requires a morphological dict
 What we refer to as an extraction grammar is of course a GF grammar, whose
 objective is to define the set of basic categories and syntactic rules the entries of the automatically generated lexicon is going to use.
 
+% TODO: designed for the grammar generation step to produce grammar rules corresponding to simple concepts such as basic categories, noun phrases, verb phrases etc.,
+
 
 \section{Evaluation} \label{evaluation}
 % TODO: move around things to have something here (or outline structure of the section)
@@ -237,11 +239,11 @@ For measuring the performance of our system, while precision and recall are two 
   \item the ratio between such number and the total number of alignments extracted.
  \end{itemize}
 
-However, since some alignments are only correct in the specific context of the sentence pair in which they occur, we make a further distinction between correct alignments that are relevant for a translation lexicon, marked as \texttt{+} in Section \ref{ceres}'s tables, and alignments that are useful for comparing the sentences but should not be used for MT, marked as \texttt{=} instead. % TODO: boat/train example 
+However, since some alignments are only correct in the specific context of the sentence pair in which they occur, we make a further distinction between correct alignments that are relevant for a translation lexicon, marked as \texttt{+} in the following tables, and alignments that are useful for comparing the sentences but should not be used for MT, marked as \texttt{=} instead. % TODO: boat/train example 
 Incorrect correspondences are marked as \texttt{-}. 
 
-\subsubsection{Results on manually annotated treebanks} \label{ceres}
-In table \ref{pud_fast}, we compare the results obtained with our grammar-based module to those obtained statistically on the PUD treebanks. 
+\subsubsection{Results on manually annotated treebanks} 
+In Table \ref{pud_fast}, we compare the results obtained with our grammar-based module to those obtained statistically on the PUD treebanks. 
 
 Of course, \texttt{fast\_align} does not make use of the information present in the CoNLL-U files excepts with regards to tokenization. 
 On the other hand, the relatively large size of the PUD treebanks makes it possible to also train the statistical tool on the full dataset instead of just using the chosen 100-sentences subset, allowing for a fairer comparison. 
@@ -266,12 +268,11 @@ In both cases, \texttt{fast\_align} is run with 10 iterations in EM training, sy
 
 While \texttt{fast\_align} is designed to align every word in the text (or explicitly state that a word has no counterpart in its translation) and, consequently, extracts around twice as many correspondences as our CE module, the percentage of correct correspondences is definitely in favor of our system, even though \texttt{fast\_align} gets significantly more precise when trained on the full, 1000-sentence dataset. 
 
-\subsubsection{Results on raw text}
-
+\subsubsection{Results on raw text} \label{raw}
 The course plan corpora are significantly harder to work with, both for our CE module and \texttt{fast\_align}.
 In the former case, the additional challenge is relying on the quality of automatic parsing, while \texttt{fast\_align} suffers from the small size of the datasets, which are fed in their entirety to both systems.
 
-The results of this comparison are summarized in table \ref{raw_fast}.
+The results of this comparison are summarized in Table \ref{raw_fast}.
 
 %TODO: position properly
 %TODO: run experiments & update data
@@ -292,17 +293,83 @@ The results of this comparison are summarized in table \ref{raw_fast}.
 \subsection{MT experiments}
 The second set of experiments has the objective of assessing the quality of the final output of the system we propose: GF translation lexica. 
 Because we are focussing on using CA in the context of domain-specific MT, in this case we do not make use of the PUD treebanks, where sentences come from a variety of different sources, but rather of the two course plans corpora. 
-For a this evaluation, we do not construct a grammar specific to the course plans domain: it is sufficient to extend the extraction grammar itself, designed for the grammar generation step to produce grammar rules corresponding to simple concepts such as basic categories, noun phrases, verb phrases etc., with preexisting syntax rules defined in the RGL, so to allow for more variation. % TODO: is RGL mentioned above? 
+For this evaluation, we do not construct a grammar specific to the course plans domain: it is sufficient to extend the extraction grammar itself with preexisting syntax rules defined in the RGL, so to allow for more variation. % TODO: is RGL mentioned above? 
 
-The basic idea behind the experiments whose results are presented in the following section is to automatically translate a set of English sentences to Italian and Swedish, ask native speakers of the target languages to produce a set of reference translations, and compare them to the original machine-generated ones by computing the BLEU score.
+The idea is to automatically translate a set of English sentences to Italian and Swedish, ask native speakers of the target languages to produce a set of reference translations, and compare them to the original machine-generated ones by computing BLEU scores.
 
 Due to the small size of the datasets and, as a consequence, the low coverage of the extracted lexicon, we generate the sentences to translate directly in the GF shell, making use of its random AST generation functionality but at the same time filtering out semantically implausible sentences to facilitate the task of the human translators.
 The results of this process are two small testing corpora, each consisting of 50 sentences in English, generated using the abstract syntax and the English concrete syntax of the DMI and the CSE grammar respectively. 
 
-The reference translations were obtained by asking two native speakers of Italian and Swedish to compare the original English sentences to their automatically translated counterparts and correct the latter.
-In order to obtain more meaningful BLEU scores, participants were instructed to only make the minimal changes necessary to obtain, starting from the automatic tranlsations generated by our system, a set of grammatically and semantically correct translations.
+Reference translations are obtained by asking two native speakers of Italian and Swedish to compare the original English sentences to their automatically translated counterparts and correct the latter.
+Participants were instructed to only make the minimal changes necessary to obtain, starting from the automatic tranlsations generated by our system, a set of grammatically and semantically correct translations. 
+This is important to get meaningful results, as if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading.
 
 \subsubsection{Experimental results}
+Corpus-level BLEU scores for the automatic translations of the 50+50 sentences of the testing corpora generated as described in the above are summarized in Table \ref{tableu}.
+
+Following conventions, we report the cumulative $n$-gram scores for values of $n$ from 1 to 4 (BLEU-1 to BLEU-4). 
+However, being a significant portion of the sentences of length 4 or less, we also report BLEU-1 to BLEU-3 scores, BLEU-1 to BLEU-2 scores and scores obtained considering unigrams only. 
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|ll}
+  \textbf{}            & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
+  \textbf{BLEU-1 to 4} & 55         & 61         \\ 
+  \textbf{BLEU-1 to 3} & 63         & 68         \\ 
+  \textbf{BLEU-1 to 2} & 70         & 74          \\
+  \textbf{BLEU-1}      & 79         & 81         \\ 
+  \end{tabular}
+  \caption[BLEU scores for automatic translations based on the course plans grammars]{BLEU scores obtained by comparing one candidate automatic translation per sentence to a reference translation obtained by making the necessary corrections to the automatically generated ones. Both the initial English sentences and their automatic translations were generated using the two course plans grammars.}
+  \label{tableu}
+\end{table}
+
+These synthetic figures are useful to give an idea of the general quality of the translations: overall, although with relatively low scores, English-to-Swedish translation works significantly better than English-to-Italian. 
+Looking back at the results reported in Section \ref{raw}, the reason for this is not immediately clear, as the difference in precision between the two language pairs is negligible on the course plans corpora.
+
+Looking at sentence-level scores can, however, be more insightful. 
+For both corpora, scores assigned to individual segments range from the minimum possible value of 0 to the perfect score of 100, which indicates a perfect correspondence between the automatic and the reference translation.
+
+Examples of sentences that were assigned a perfect BLEU-1 to 4 score are ``\textit{the library provides useful textbooks}'' (translated to Italian as ``\textit{la biblioteca fornisce libri utili}'') in the DMI corpus and ``\textit{this lab is more difficult than the exam}'' (whose Swedish translation is ``\textit{den här laborationen är svårare än tentamen}'') in the CSE corpus. \smallskip
+
+On the other hand, it is easy for shorter sentences to be assigned the minimum BLEU-1 to 4 score even when they only contain a single grammatical or semantic error. 
+This is the case, for instance, of the sentence ``\textit{the test is oral}'', whose last word, ``\textit{oral}'' is translated as ``\textit{dura}'' (``\textit{hard}'') instead of ``\textit{orale}'' due to an alignment error. 
+Nonetheless, it is worth noticing that this is one of the many cases in which the correct alignment $\langle$``\textit{oral}'',``\textit{orale}''$\rangle$ is also identified by the CE module, but hidden by the fact that, for simplicity, we only take into account the first translation candidate.
+This suggest that, in contexts where higher precision is necessary, there are simple improvements that can be done either in the choice of the alignment criteria or at a later stage, in terms alignment selection. 
+In other contexts, it can be more practical to aim for higher coverage and not perform any automatic selection, leaving lexicon refinements to a human, possibly with the help of the postprocessing tools that are currently under development \cite{TODO:}.
+
+% TODO: decide if to leave or remove
+Furthermore, a problem with using the BLEU score as the only evaluation metric is the fact that it makes no distinction between content and function words, thus not allowing an evaluation focused specifically on the extracted concepts. 
+The small size of the corpus, however, allows for some error analysis. 
+While postprocessing the automatic translations, the participants were asked to indicate what kind of errors they encountered in each sentence (grammatical, semantical or both). 
+Their observations are summarized in Table \ref{obs}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|ll}
+  \textbf{}                                                                   \textbf{type of errors}                 & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
+  \begin{tabular}[c]{@{}l@{}}\textbf{semantical}\end{tabular}               & 23 (46\%)    & 23 (46\%)    \\ 
+  \begin{tabular}[c]{@{}l@{}}\textbf{grammatical}\end{tabular}             & 10 (20\%)      & 3 (6\%)      \\ 
+  \begin{tabular}[c]{@{}l@{}}\textbf{semantical and} \\ \textbf{grammatical}\end{tabular} & 3 (6\%)      & 4 (8\%)      \\ 
+  \end{tabular}
+  \caption[Types of errors encountered in the automatically translated sentences]{Number of automatically translated sentences containing only semantical, only grammatical and both semantical and grammatical errors in the two synthetic course plans corpora.}
+  \label{obs}
+\end{table}
+
+Interestingly, while most errors are due to wrong alignments, the main difference between two corpora lies in the number of translations that only contain grammatical errors, which explains the significant difference observed in the cumulative BLEU scores shown in Table \ref{tableu}.
+
+In Italian, grammar errors often involve contractions such as ``\textit{del}'' (``\textit{di}'' + ``\textit{il}'', in English ``\textit{of the}''), some of which are systematically rendered as two separate words due to UDPipe tokenization.
+Another common case is that of wrong (or at least very confusing) adjective collocation, such as in the translation ``\textit{il libro presenta una tecnica con miglioramenti vari utile}'' (``\textit{the textbook presents a useful technique with various improvements}''), where the adjective ``\textit{utile}'' (``\textit{useful}''), referred to ``\textit{technique}'' (``\textit{tecnica}'') is placed far from such noun, making the sentence hard to interpret\footnote{The manually postprocessed translation is ``\textit{il libro presenta una utile tecnica con miglioramenti vari}''.}.
+Grammatical errors in Swedish are less common and, apart from long adjectives never being turned to the comparative degree periphrastically (e.g. ``\textit{relevant\underline{are}}'' instead of ``\textit{mer relevant}''), less systematic. 
+Only in one case, for instance, gender is incorrect (``\textit{programbibliotek\underline{en}}''). 
+All of these grammatical errors are easy to handle when writing a domain-specific grammar or, for instance in the case of misgendered nouns, by making small adjustments to the morphological dictionaries. 
+
+Some errors regarding the extracted concepts are also interesting to analyze.
+In English-Swedish, while several compounds, such as $\langle$\textit{``computer science'', ``datavetenskap''}$\rangle$, are aligned correctly, there are cases in which a single-root noun is translated as a compound (e.g. $\langle$ \textit{``theory'', ``automatateori''} $\rangle$). 
+This is not necessarily an actual alignment error, as it might well be the case that the English version of the text was being less specific than its Swedish counterpart, thus producing an alignment that, during evaluation, would have been marked as ``correct but not relevant for a translation lexicon'' (\texttt{=}). 
+``Reasonable'' alignment errors appear in the DMI corpus sentences too. 
+The English phrase ``\textit{attendance of lessons}'', for instance, becomes simply ``\textit{frequenza}'' in the Italian translation. 
+Such word is in fact often used alone to replace longer expressions such as ``\textit{frequenza delle lezioni}'', just like in English ``\textit{of lessons}'' can be omitted when what must be attended is evident from the context.
+Another interesting example is the alignment $\langle$\textit{``class'', ``classe''}$\rangle$, which causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which (within the same domain!) \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.
 
 \section{Conclusions} \label{conclusions}
 % tangible output and were it is on github
