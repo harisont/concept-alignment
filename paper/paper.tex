@@ -209,12 +209,17 @@ objective is to define the set of basic categories and syntactic rules the entri
 
 \section{Evaluation} \label{evaluation}
 \subsection{Data}
-% PUD treebanks
-% plans (+UDPipe)
-% langs
+Because we want part of our evaluation to be independent from the quality of UD parsing, some of the experiments are carried out using manually annotated data. 
+To this purpose, we use a 100-sentences subset of the Parallel UD (PUD) corpus, a set of handcrafted\footnote{Annotation is sometimes semi-automatic, but all treebanks are at least manually checked.} multilingual treebanks in CoNLL-U format created for the CoNLL 2017 shared task on Multilingual Parsing from Raw Text to Universal Dependencies \cite{TODO:}.
+PUD treebanks are available in over 20 languages, of which we selected English, Italian and Swedish. 
+Using this data limits the amount of alignment errors that are due annotation issues to a minimum, even though a small number of inconsistencies and imprecisions is present even in this corpus.
+
+When it comes to testing the program on raw text, we use two bilingual sentence-aligned corpora consisting of course plans from the Department of Mathematics and Computer Science of the University of Perugia (for English-Italian) and from the Department of Computer Science and Engineering (CSE) shared between the University of Gothenburg and the Chalmers University of Technology (for English-Swedish). For brevity, we will refer to these two datasets as to the DMI and the CSE corpora.
+This data, available in the project repository, was collected and sentence-aligned specifically for this work and a related Bachelor's thesis project \cite{TODO:}.
+When using raw text, our parser of choice is UDPipe \cite{TODO:}. 
+In particular, we use the ParTUT English and Italian models for the DMI corpus and models trained on the bilingual LinES English-Swedish treebank for the CSE corpus \cite{TODO:}.
 
 \subsection{Evaluating CE} % TODO: find better title?
-\subsubsection{Experimental setup} % TODO: find better title?
 % metrics & methods
 \subsubsection{Results}
 % PUD (incl. reason-wise?): independent, comparison with SMT
@@ -222,7 +227,7 @@ objective is to define the set of basic categories and syntactic rules the entri
 \subsubsection{Discussion}
 
 \subsection{MT experiments}
-\subsubsection{Experimental setup}
+% metrics & methods
 \subsubsection{Results}
 \subsubsection{Discussion}
 
