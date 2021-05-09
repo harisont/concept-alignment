@@ -134,7 +134,7 @@ The core part of the system outlined above is of course the alignment module. In
 The basic extraction algorithm, whose pseudocode is shown in Figure \ref{TODO}, takes as input a list of priority-sorted \textit{alignment criteria}, rules to determine whether two dependency trees should be aligned with each other which we will discuss in greater detail in Section \ref{criteria}, and a pair of UD trees corresponding to the sentences to align.
 From an implementation point of view, UD trees are, as in \texttt{gf-ud}, rose trees where each node represents a token,  obtained from the CoNLL-U files produced by the UD parser.
 
-% TODO: add figure comapring tree representations
+% TODO: add figure comparing tree representations
 
 As a first step, the program checks whether the two full sentence trees can be aligned with each other, i.e. if they match any of the alignment criteria. If this is the case, they are added to a collection of alignments, also represented as a pair of UD trees associated with some metadata, which is what the function will return after aligning all the dependency subtrees. % TODO: explain or omit metadata!
 
@@ -208,6 +208,7 @@ objective is to define the set of basic categories and syntactic rules the entri
 
 
 \section{Evaluation} \label{evaluation}
+% TODO: move around things to have something here (or outline structure of the section)
 \subsection{Data}
 Because we want part of our evaluation to be independent from the quality of UD parsing, some of the experiments are carried out using manually annotated data. 
 To this purpose, we use a 100-sentences subset of the Parallel UD (PUD) corpus, a set of handcrafted\footnote{Annotation is sometimes semi-automatic, but all treebanks are at least manually checked.} multilingual treebanks in CoNLL-U format created for the CoNLL 2017 shared task on Multilingual Parsing from Raw Text to Universal Dependencies \cite{TODO:}.
@@ -218,6 +219,8 @@ When it comes to testing the program on raw text, we use two bilingual sentence-
 This data, available in the project repository, was collected and sentence-aligned specifically for this work and a related Bachelor's thesis project \cite{TODO:}.
 When using raw text, our parser of choice is UDPipe \cite{TODO:}. 
 In particular, we use the ParTUT English and Italian models for the DMI corpus and models trained on the bilingual LinES English-Swedish treebank for the CSE corpus \cite{TODO:}.
+
+% TODO: size
 
 \subsection{Evaluating CE} %TODO: better title?
 While in this work we focus mostly on the MT applications of CA, automatic translation, and much less GF-based domain-specific tranlation, is not the only context in which our system can be put to use. 
@@ -237,16 +240,57 @@ For measuring the performance of our system, while precision and recall are two 
 However, since some alignments are only correct in the specific context of the sentence pair in which they occur, we make a further distinction between correct alignments that are relevant for a translation lexicon, marked as \texttt{+} in Section \ref{ceres}'s tables, and alignments that are useful for comparing the sentences but should not be used for MT, marked as \texttt{=} instead. % TODO: boat/train example 
 Incorrect correspondences are marked as \texttt{-}. 
 
+\subsubsection{Results on manually annotated treebanks} \label{ceres}
+In table \ref{pud_fast}, we compare the results obtained with our grammar-based module to those obtained statistically on the PUD treebanks. 
 
-\subsubsection{Results} \label{ceres}
-% PUD (incl. reason-wise?): independent, comparison with SMT
-% RAW
-\subsubsection{Discussion}
+Of course, \texttt{fast\_align} does not make use of the information present in the CoNLL-U files excepts with regards to tokenization. 
+On the other hand, the relatively large size of the PUD treebanks makes it possible to also train the statistical tool on the full dataset instead of just using the chosen 100-sentences subset, allowing for a fairer comparison. 
+
+In both cases, \texttt{fast\_align} is run with 10 iterations in EM training, symmetrizing the alignments found by running the program in both directions.
+
+%TODO: position properly
+\begin{table*}[h]
+  \centering
+  \small
+  \begin{tabular}{l|lll}
+  %\hline
+   & \textbf{CE} & \textbf{\texttt{fast\_align} 100} & \textbf{\texttt{fast\_align} 1000}\\ \hline
+   \textbf{tot. alignments} & 716 & 1440 & 1435 \\ 
+   \textbf{\texttt{+} and \texttt{=}} & 536 (75\%) & 410 (28\%) & 656 (46\%)\\ 
+   \textbf{\texttt{+}} & 491 (69\%) & 371 (26\%) & 590 (41\%)\\ 
+  \end{tabular}
+  \caption[Comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on PUD data. The middle column shows the results obtained by training \texttt{fast\_align} on the 100-sentence subset fed to the extraction module. On the right, the results obtained by training \texttt{fast\_align} on the full PUD treebanks dataset, discarding the alignments obtained for sentences 101-1000 for the final comparison. Row 1 reports the total number of distinct alignments obtain. Rows 2 and 3 give the percentages of correct alignments, with and without considering sentence pair-specific correspondences as correct.}
+  \label{pud_fast}
+\end{table*}
+
+While \texttt{fast\_align} is designed to align every word in the text (or explicitly state that a word has no counterpart in its translation) and, consequently, extracts around twice as many correspondences as our CE module, the percentage of correct correspondences is definitely in favor of our system, even though \texttt{fast\_align} gets significantly more precise when trained on the full, 1000-sentence dataset. 
+
+\subsubsection{Results on raw text}
+
+The course plan corpora are significantly harder to work with, both for our CE module and \texttt{fast\_align}.
+In the former case, the additional challenge is relying on the quality of automatic parsing, while \texttt{fast\_align} suffers from the small size of the datasets, which are fed in their entirety to both systems.
+
+The results of this comparison are summarized in table \ref{raw_fast}.
+
+%TODO: position properly
+%TODO: run experiments & update data
+\begin{table*}[h]
+  \centering
+  \small
+  \begin{tabular}{l|lll}
+
+  \end{tabular}
+  \caption[Comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on raw data, using the DMI and CSE corpora. Row 1 reports the total number of distinct alignments obtain. Rows 2 and 3 give the percentages of correct alignments, with and without considering sentence pair-specific correspondences as correct.}
+  \label{raw_fast}
+ \end{table*}
+
+ % TODO: discussion
+
+% PUD: incl. reason-wise?)
 
 \subsection{MT experiments}
 % metrics & methods
-\subsubsection{Results}
-\subsubsection{Discussion}
+\subsubsection{Experimental results}
 
 \section{Conclusions} \label{conclusions}
 % tangible output and were it is on github
