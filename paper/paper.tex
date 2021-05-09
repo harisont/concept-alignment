@@ -196,15 +196,40 @@ More advanced replacements are also possible: instead of simply pruning clauses 
 
 $$\langle X tells Y Z, X dice Z a Y\rangle$$.
 
-% TODO: reformulate and add possiby graphical example
+% TODO: reformulate and add possibly graphical example
 
 \subsection{Generating grammar rules}
+The CE module described so far outputs pairs of UD trees. 
+While converting them to GF Abstract Syntax Trees (ASTs) is the \texttt{gf-ud}'s core functionality, to build a compilable GF translation lexicon it is necessary to turn such trees into grammar rules.
+
+In order to do that, our grammar generation module requires a morphological dictionary of the languages at hand and an \textit{extraction grammar}. 
+What we refer to as an extraction grammar is of course a GF grammar, whose
+objective is to define the set of basic categories and syntactic rules the entries of the automatically generated lexicon is going to use.
+
 
 \section{Evaluation} \label{evaluation}
-% we use udpipe
+\subsection{Data}
+% PUD treebanks
+% plans (+UDPipe)
+% langs
+
+\subsection{Evaluating CE} % TODO: find better title?
+\subsubsection{Experimental setup} % TODO: find better title?
+% metrics & methods
+\subsubsection{Results}
+% PUD (incl. reason-wise?): independent, comparison with SMT
+% RAW
+\subsubsection{Discussion}
+
+\subsection{MT experiments}
+\subsubsection{Experimental setup}
+\subsubsection{Results}
+\subsubsection{Discussion}
 
 \section{Conclusions} \label{conclusions}
-% tangible output and were it is
+% tangible output and were it is on github
+% summary of process and discussions
+\subsection{Future work}
 
 % TODO: see why it does not compile
 % Entries for the entire Anthology, followed by custom entries
