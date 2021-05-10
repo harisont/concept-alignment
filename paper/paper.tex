@@ -72,13 +72,13 @@ Addressing both problems, we propose a data-driven, syntax-based approach to the
 \end{abstract}
 
 \section{Introduction}
-Grammar-based translation pipelines such as those based on Grammatical Framework (GF) \cite{dummy} have been successfully employed in domain-specific Machine Translation (MT).  
+Grammar-based translation pipelines such as those based on Grammatical Framework (GF) have been successfully employed in domain-specific Machine Translation (MT) \cite{scaling_up_gf}.  
 What makes these systems well suited to the task is the fact that, when we constrain ourselves to a specific domain, where precision is most often more important than coverage, they can provide strong guarantees in terms of grammatical correctness. 
 
 Nevertheless, lexical exactness is, in this context, just as important as grammaticality. 
 An important part of the design of the Controlled Natural Language (CNL) the grammar in such a system describes becomes, then, the creation of a translation lexicon. 
 In many cases, this is done for the most part manually, resulting in a time consuming task requiring significant linguistic knowledge. 
-When the grammar is designed based on a corpus of parallel example sentences, it is possible to automate part of this process by means of statistical word and phrase alignment techniques \cite{dummy}. 
+When the grammar is designed based on a corpus of parallel example sentences, it is possible to automate part of this process by means of statistical word and phrase alignment techniques \cite{brown-etal-1993-mathematics, och-ney-2000-improved, dyer-etal-2013-simple}. 
 None of them is, however, suitable for the common case in which only a limited number of example data is available.
 
 In this paper, we propose an alternative approach to the automation of this task. 
@@ -105,12 +105,12 @@ An interesting and less studied variant of CA is \textit{Concept Propagation} (C
 While our system implements basic CP functionalities, however, in this paper we focus on CE and restrict its application to bilingual corpora. 
 
 As stated in the Introduction, most existing extraction solutions are based on statistical approaches and are, as a consequence, unsuitable for small datasets. 
-Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{dummy}, but have historically suffered from the inconsistencies between the various formalisms used to define the grammars for different languages and from the insufficient degree of robustness of existing parses.
+Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{tiedemann2011bitext}, but have historically suffered from the inconsistencies between the various formalisms used to define the grammars for different languages and from the insufficient degree of robustness of existing parses.
 
-This work is a new attempt in the same direction, enabled by two multilinguality-oriented grammar formalisms developed over the course of the last 25 years: Universal Dependencies (UD) \cite{dummy} and Grammatical Framework (GF) \cite{dummy}.
+This work is a new attempt in the same direction, enabled by two multilinguality-oriented grammar formalisms developed over the course of the last 25 years: Universal Dependencies (UD) \cite{ws-2019-universal} and Grammatical Framework (GF) \cite{scaling_up_gf}.
 
 While both formalisms, the former a dependency and the latter a constituency grammar\todo{too quick, say more about both}, independently solve the former issue, UD is especially appealing since dependency trees are an easier target for parsing. 
-As a consequence, several robust dependency parsers, such as \cite{dummy} and \cite{dummy} are available.
+As a consequence, several robust dependency parsers, such as \cite{straka-etal-2016-udpipe} and \cite{chen-manning-2014-fast} are available.
 
 UD parsing alone would then be sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a morphologically-aware translation lexicon for a generative grammar. 
 This is where GF comes into play: after correspondences are inferred from a parallel text, our proposed system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiments using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL) \cite{dummy}. \todo{say what the RGL is} 
@@ -406,7 +406,7 @@ With respects to this, current work is represented by a synoptic CoNLL-U viewer,
 
 % TODO: see why it does not compile
 % Entries for the entire Anthology, followed by custom entries
-\bibliography{custom}  
+\bibliography{anthology,custom}  
 \bibliographystyle{acl_natbib} 
 
 \end{document}
