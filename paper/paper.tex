@@ -257,21 +257,17 @@ Of course, \texttt{fast\_align} does not make use of the information present in 
 On the other hand, the relatively large size of the PUD treebanks makes it possible to also train the statistical tool on the full dataset instead of just using the chosen 100-sentences subset, allowing for a fairer comparison. 
 In both cases, \texttt{fast\_align} is run with the recommended parameters.
 
-% TODO: position properly
-% TODO: add english-swedish!
 \begin{table*}[h]
-  \centering
-  \small
-  \begin{tabular}{l|lll}
-  %\hline
-   & \textbf{CE} & \textbf{\texttt{fast\_align} 100} & \textbf{\texttt{fast\_align} 1000}\\ \hline
-   \textbf{tot. alignments} & 716 & 1440 & 1435 \\ 
-   \textbf{\texttt{+} and \texttt{=}} & 536 (75\%) & 410 (28\%) & 656 (46\%)\\ 
-   \textbf{\texttt{+}} & 491 (69\%) & 371 (26\%) & 590 (41\%)\\ 
+  \begin{tabular}{r|c|c|c|c|c|c}
+  \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{CE}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}fast\_align (100)\end{tabular}}} & \multicolumn{2}{c}{\textbf{\begin{tabular}[c]{@{}c@{}}fast\_align (1000)\end{tabular}}} \\ \hline
+  \multicolumn{1}{l|}{}          & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}                              & \textbf{en-sv}                              & \textbf{en-it}                                & \textbf{en-sv} \\ \hline  
+  \textbf{tot. alignments}        & 536             & 638            & 1242                                        & 1044                                        & 1286                                          & 1065          \\ 
+  \textbf{+ and =}                & 392 (73\%)      & 514 (80\%)     & 346 (28\%)                                  & 538 (52\%)                                  & 540 (42\%)                                    & 677 (64\%)    \\ 
+  \textbf{+}                      & 363 (68\%)      & 503 (79\%)     & 316 (25\%)                                  & 525 (50\%)                                  & 510 (40\%)                                    & 666 (63\%)    \\ 
   \end{tabular}
   \caption[Comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on PUD data. The middle column shows the results obtained by training \texttt{fast\_align} on the 100-sentence subset fed to the extraction module. On the right, the results obtained by training \texttt{fast\_align} on the full PUD treebanks dataset, discarding the alignments obtained for sentences 101-1000 for the final comparison. Row 1 reports the total number of distinct alignments obtain. Rows 2 and 3 give the percentages of correct alignments, with and without considering sentence pair-specific correspondences as correct.}
   \label{pud_fast}
-\end{table*}
+  \end{table*}
 
 While \texttt{fast\_align} is designed to align every word in the text (or explicitly state that a word has no counterpart in its translation) and, consequently, extracts around twice as many correspondences as our CE module, the percentage of correct correspondences is definitely in favor of our system, even though \texttt{fast\_align} gets significantly more precise when trained on the full, 1000-sentence dataset. 
 
