@@ -237,8 +237,8 @@ While in this work we focus mostly on the MT applications of CA, automatic trans
 For instance, it is easy to imagine using it to improve the UI of online translation memories or to facilitate reading parallel texts in the context of language learning.
 For this reason, a first set of experiments is aimed at evaluating the alignments obtained with our CA module independently from the subsequent stages of our proposed lexicon generation pipeline.
 
-We assess the correctness of the alignments the CE module is able to extract first from manually annotated data, then from the DMI and CSE corpus, comparing our results with those obtained with a standard statistical tool, \texttt{fast\_align} \cite{dyer-etal-2013-simple}.
-Doing so requires manually labelling the correspondences as either correct or incorrect. 
+We first assess the correctness of the alignments the CE module is able to extract from manually annotated data from the PUD treebanks, comparing our results with those obtained with a standard statistical tool, \texttt{fast\_align} \cite{dyer-etal-2013-simple}. 
+In addition, we try to quantify the impact automatic parsing has on the performance of the CE module by comparing the above results wiht those obtained on the DMI and CSE corpora.
 
 For measuring the performance of our system, while precision and recall are two well-known metrics that would be very well suited to the task, the lack of a gold standard for CE imposes us to approximate them with respectively:
 
