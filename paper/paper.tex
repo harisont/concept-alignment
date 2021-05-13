@@ -258,6 +258,7 @@ On the other hand, the relatively large size of the PUD treebanks makes it possi
 In both cases, \texttt{fast\_align} is run with the recommended parameters.
 
 \begin{table*}[h]
+  \centering
   \begin{tabular}{r|c|c|c|c|c|c}
   \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{CE}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}fast\_align (100)\end{tabular}}} & \multicolumn{2}{c}{\textbf{\begin{tabular}[c]{@{}c@{}}fast\_align (1000)\end{tabular}}} \\ \hline
   \multicolumn{1}{l|}{}          & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}                              & \textbf{en-sv}                              & \textbf{en-it}                                & \textbf{en-sv} \\ \hline  
@@ -277,17 +278,18 @@ In the former case, the additional challenge is relying on the quality of automa
 
 The results of this comparison are summarized in Table \ref{raw_fast}\todo{position properly; run experiments (this is new) and add actual results}.
 
-%TODO: position properly
-%TODO: run experiments & update data
 \begin{table*}[h]
   \centering
-  \small
-  \begin{tabular}{l|lll}
-
+  \begin{tabular}{r|c|c|c|c}
+  \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}PUD (100 sentences)\end{tabular}}} & \multicolumn{2}{c}{\textbf{course plans}}                                                                                                                      \\ \hline
+  \multicolumn{1}{l|}{}          & \textbf{en-it}                               & \textbf{en-sv}                               & \textbf{\begin{tabular}[c]{@{}c@{}}DMI (en-it)\\ (881 sentences)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}CSE (en-sv)\\ (539 sentences)\end{tabular}} \\ \hline
+  \textbf{tot. alignments}        & 1197                                         & 1325                                         & 1823                                                                           & 1950                                                                           \\
+  \textbf{+ and =}                & 916 (77\%)                                   & 1112 (85\%)                                  & 1205 (66\%)                                                                    & 1296 (66\%)                                                                    \\
+  \textbf{+}                      & 880 (74\%)                                   & 1099 (84\%)                                  & 1157 (63\%)                                                                    & 1248 (64\%)                                                                    \\
   \end{tabular}
-  \caption[Comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on raw data, using the DMI and CSE corpora. Row 1 reports the total number of distinct alignments obtain. Rows 2 and 3 give the percentages of correct alignments, with and without considering sentence pair-specific correspondences as correct.}
+  \caption{TODO:}
   \label{raw_fast}
- \end{table*}
+  \end{table*}
 
  % TODO: discussion
 \todo{add results discussion}
