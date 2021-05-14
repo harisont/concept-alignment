@@ -264,13 +264,13 @@ In both cases, \texttt{fast\_align} is run with the recommended parameters and t
 \begin{table*}[h]
   \centering
   \begin{tabular}{r|c|c|c|c|c|c}
-  \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{CE}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}fast\_align (100)\end{tabular}}} & \multicolumn{2}{c}{\textbf{\begin{tabular}[c]{@{}c@{}}fast\_align (1000)\end{tabular}}} \\ \hline
+  \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{CE}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}\texttt{fast\_align} \\(100 sentences)\end{tabular}}} & \multicolumn{2}{c}{\textbf{\begin{tabular}[c]{@{}c@{}}\texttt{fast\_align} \\(full dataset)\end{tabular}}} \\ \hline
   \multicolumn{1}{l|}{}          & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}                              & \textbf{en-sv}                              & \textbf{en-it}                                & \textbf{en-sv} \\ \hline  
-  \textbf{tot. alignments}        & 536             & 638            & 1242                                        & 1044                                        & 1286                                          & 1065          \\ 
-  \textbf{+ and =}                & 392 (73\%)      & 514 (80\%)     & 346 (28\%)                                  & 538 (52\%)                                  & 540 (42\%)                                    & 677 (64\%)    \\ 
-  \textbf{+}                      & 363 (68\%)      & 503 (79\%)     & 316 (25\%)                                  & 525 (50\%)                                  & 510 (40\%)                                    & 666 (63\%)    \\ 
+  \textbf{distinct alignments}        & 536             & 638            & 1242                                        & 1044                                        & 1286                                          & 1065          \\ 
+  \textbf{correct (\texttt{+} and \texttt{=})}                & 392 (73\%)      & 514 (80\%)     & 346 (28\%)                                  & 538 (52\%)                                  & 540 (42\%)                                    & 677 (64\%)    \\ 
+  \textbf{usable in MT (\texttt{+})}                      & 363 (68\%)      & 503 (79\%)     & 316 (25\%)                                  & 525 (50\%)                                  & 510 (40\%)                                    & 666 (63\%)    \\ 
   \end{tabular}
-  \caption[Comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on PUD data. The middle column shows the results obtained by training \texttt{fast\_align} on the 100-sentence subset fed to the extraction module. On the right, the results obtained by training \texttt{fast\_align} on the full PUD treebanks dataset, discarding the alignments obtained for sentences 101-1000 for the final comparison. Row 1 reports the total number of distinct alignments obtain. Rows 2 and 3 give the percentages of correct alignments, with and without considering sentence pair-specific correspondences as correct.}
+  \caption[Word alignment comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on PUD data. The middle column shows the results obtained by training \texttt{fast\_align} on the 100-sentence subset also fed to the extraction module. On the right, the results obtained by training it on the full dataset, discarding the alignments obtained for sentences 101-1000 for the final comparison.}
   \label{pud_fast}
   \end{table*}
 
@@ -282,27 +282,24 @@ In the former case, the additional challenge is relying on the quality of automa
 
 The results of this comparison are summarized and compared with those obtained on the sample of PUD treebanks in Table \ref{raw_fast}.
 
-What is immediately evident, but not unexpected, is a decrease in precision. 
-The percentage of correct alignments, however, stays significantly higher than that obtained with \texttt{fast\_align} in the previous experiment, even when the model was trained on the full PUD corpus: even though percentages seem similar for English-Swedish, it must be taken into account that the CSE corpus is roughly half the size of the PUD corpus.
-
-Results are less encouraging in terms of recall: the number of alignments extracted from the course plans corpora is similar to that obtained from the PUD treebank sample, despite the difference in size. 
-This is explained in part by the presence, in the course plans corpora, of a large amount of very short sentences, and in part by the fact that parse errors introduced by UDPipe make it impossible to align many subsentences without a significant loss in terms of precision.  
-
 \begin{table*}[h]
   \centering
   \begin{tabular}{r|c|c|c|c}
   \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}PUD (100 sentences)\end{tabular}}} & \multicolumn{2}{c}{\textbf{course plans}}                                                                                                                      \\ \hline
-  \multicolumn{1}{l|}{}          & \textbf{en-it}                               & \textbf{en-sv}                               & \textbf{\begin{tabular}[c]{@{}c@{}}DMI (en-it)\\ (881 sentences)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}CSE (en-sv)\\ (539 sentences)\end{tabular}} \\ \hline
-  \textbf{tot. alignments}        & 1197                                         & 1325                                         & 1823                                                                           & 1950                                                                           \\
-  \textbf{+ and =}                & 916 (77\%)                                   & 1112 (85\%)                                  & 1205 (66\%)                                                                    & 1296 (66\%)                                                                    \\
-  \textbf{+}                      & 880 (74\%)                                   & 1099 (84\%)                                  & 1157 (63\%)                                                                    & 1248 (64\%)                                                                    \\
+  \multicolumn{1}{l|}{}          & \textbf{en-it}                               & \textbf{en-sv}                               & \textbf{\begin{tabular}[c]{@{}c@{}}DMI (881 sentences)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}CSE (539 sentences)\end{tabular}} \\ \hline
+  \textbf{disrinct alignments}        & 1197                                         & 1325                                         & 1823                                                                           & 1950                                                                           \\
+  \textbf{correct (\texttt{+} and \texttt{=})}                & 916 (77\%)                                   & 1112 (85\%)                                  & 1205 (66\%)                                                                    & 1296 (66\%)                                                                    \\
+  \textbf{usable in MT (\texttt{+}})                      & 880 (74\%)                                   & 1099 (84\%)                                  & 1157 (63\%)                                                                    & 1248 (64\%)                                                                    \\
   \end{tabular}
-  \caption{TODO:}
+  \caption{Comparison the extraction of alignments of any size from manually annotated PUD treebanks and automatically parsed sentences from the course plans corpora.}
   \label{raw_fast}
   \end{table*}
 
- % TODO: discussion
-\todo{add results discussion}
+What is immediately evident, but not unexpected, is a decrease in precision. 
+The percentage of correct alignments, however, stays significantly higher than that obtained with \texttt{fast\_align} in the previous experiment, even when the model was trained on the full PUD corpus: even though percentages seem similar for English-Swedish, it must be taken into account that the CSE corpus is roughly half the size of the PUD corpus.
+  
+Results are less encouraging in terms of recall: the number of alignments extracted from the course plans corpora is similar to that obtained from the PUD treebank sample, despite the difference in size. 
+This is explained in part by the presence, in the course plans corpora, of a large amount of very short sentences, and in part by the fact that parse errors introduced by UDPipe make it impossible to align many subsentences without a significant loss in terms of precision.  
 
 \subsection{MT experiments} \label{mtexp}
 The second set of experiments has the objective of assessing the quality of the final output of the system we propose: GF translation lexica. 
@@ -326,14 +323,14 @@ However, being a significant portion of the sentences of length 4 or less, we al
 
 \begin{table}[h]
   \centering
-  \begin{tabular}{l|ll}
+  \begin{tabular}{r|cc}
   \textbf{}            & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
   \textbf{BLEU-1 to 4} & 55         & 61         \\ 
   \textbf{BLEU-1 to 3} & 63         & 68         \\ 
   \textbf{BLEU-1 to 2} & 70         & 74          \\
   \textbf{BLEU-1}      & 79         & 81         \\ 
   \end{tabular}
-  \caption[BLEU scores for automatic translations based on the course plans grammars]{BLEU scores obtained by comparing one candidate automatic translation per sentence to a reference translation obtained by making the necessary corrections to the automatically generated ones. Both the initial English sentences and their automatic translations were generated using the two course plans grammars.}
+  \caption[BLEU scores for automatic translations based on the course plans grammars]{BLEU scores for automatic translations based on the course plans grammars.}
   \label{tableu}
 \end{table}
 
@@ -358,13 +355,13 @@ Their observations are summarized in Table \ref{obs}.
 
 \begin{table}[h]
   \centering
-  \begin{tabular}{l|ll}
-  \textbf{}                                                                   \textbf{type of errors}                 & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
+  \begin{tabular}{r|cc}
+  \textbf{}                                                                                    & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
   \begin{tabular}[c]{@{}l@{}}\textbf{semantical}\end{tabular}               & 23 (46\%)    & 23 (46\%)    \\ 
   \begin{tabular}[c]{@{}l@{}}\textbf{grammatical}\end{tabular}             & 10 (20\%)      & 3 (6\%)      \\ 
-  \begin{tabular}[c]{@{}l@{}}\textbf{semantical and} \\ \textbf{grammatical}\end{tabular} & 3 (6\%)      & 4 (8\%)      \\ 
+  \begin{tabular}[c]{@{}l@{}}\textbf{both}\end{tabular} & 3 (6\%)      & 4 (8\%)      \\ 
   \end{tabular}
-  \caption[Types of errors encountered in the automatically translated sentences]{Number of automatically translated sentences containing only semantical, only grammatical and both semantical and grammatical errors in the two synthetic course plans corpora.}
+  \caption[Types of errors encountered in the automatically translated sentences.]{Types of errors encountered in the automatically translated sentences.}
   \label{obs}
 \end{table}
 
