@@ -67,32 +67,34 @@
 \maketitle
 \begin{abstract}
 In grammar-based domain-specific machine translation, constructing high-quality translation lexica is a crucial but time consuming task requiring significant linguistic knowledge. 
-In presence of a corpus of parallel example sentences, statistical word and phrase alignment tools allow to automate part of this process, but are not suitable for small datasets and often fail to identify discontinuous multiword correspondences. 
-Addressing both problems, we propose a data-driven, syntax-based approach to the automation of this task and put it to the test in a simple grammar-based translation pipeline.
+When example parallel sentences are available, statistical alignment tools allow for the automation of part of the process, but are not suitable for small datasets and are limited when it comes to discontinuous multiword correspondences. 
+In addition, lexica generated in this way generally consist in simple word form correspondences that cannot be directly used in MT pipelines.
+Addressing these problems, we propose a data-driven, syntax-based approach to this task and put it to the test in a simple grammar-based translation pipeline.
 \end{abstract}
 
 \section{Introduction}
 Grammar-based translation pipelines such as those based on Grammatical Framework (GF) have been successfully employed in domain-specific Machine Translation (MT) \cite{ranta-etal-2020-abstract}.  
-What makes these systems well suited to the task is the fact that, when we constrain ourselves to a specific domain, where precision is most often more important than coverage, they can provide strong guarantees in terms of grammatical correctness. 
+What makes these systems well suited to the task is the fact that, when we constrain ourselves to a specific domain, where precision is often more important than coverage, they can provide strong guarantees in terms of grammatical correctness. 
 
 Nevertheless, lexical exactness is, in this context, just as important as grammaticality. 
-An important part of the design of the Controlled Natural Language (CNL) the grammar in such a system describes becomes, then, the creation of a translation lexicon. 
-In many cases, this is done for the most part manually, resulting in a time consuming task requiring significant linguistic knowledge. 
+An important part of the design of the Controlled Natural Language (CNL) one such system's grammar describes then becomes the creation of a high-quality translation lexicon. 
+This is often done manually, resulting in a time consuming task requiring significant linguistic knowledge. 
 When the grammar is designed based on a corpus of parallel example sentences, it is possible to automate part of this process by means of statistical word and phrase alignment techniques \cite{brown-etal-1993-mathematics, och-ney-2000-improved, dyer-etal-2013-simple}. 
 None of them is, however, suitable for the common case in which only a limited amount of example data is available.
 
 In this paper, we propose an alternative approach to the automation of this task. 
-While still being data-driven, our method is grammar-based and, as such, capable of extracting meaningful correspondences even from individual sentence pairs. 
+While still being data-driven, our method is also grammar-based and, as such, capable of extracting meaningful correspondences even from individual sentence pairs. 
 
 A further advantage of performing syntactic analysis is that we do not have to choose \textit{a priori} whether to focus on the word or phrase level. 
-Instead, we can simultaneously operate at different levels of abstraction, thus extracting both single- and multiword, even non-contiguous, correspondences. 
+Instead, we can simultaneously operate at different levels of abstraction, extracting both single- and multiword, even non-contiguous, correspondences. 
 For this reason, we refer to the task our system attempts to automate as \textit{Concept Alignment} (CA). 
 
+Finally, performing morphological analysis allows us to generate translation lexica consisting of complete with grammatical category and inflection information instead of simple correspondences between word forms.
+
 This paper is structured as follows. 
-Section \ref{methodology} starts by giving an overview of our approach to CA, comparing it to related work, to then focus on our algorithm for extracting correspondences.
-It is concluded with a description of our method for converting the alignments obtained in this way to a GF translation lexicon.
-After that, Section \ref{evaluation} presents the results of our first evaluation of the system.
-Finally, Section \ref{conclusions} consists of a discussion of such results and some ideas for future work. 
+Section \ref{methodology} starts by giving an overview of our approach to CA and comparing it to related work to then focus on our algorithm for extracting correspondences.
+After that, Section \ref{evaluation} presents the results obtained in a first evaluation of the system.
+Finally, Section \ref{conclusions} summarizes our conclusions and discusses some ideas for future work. 
 
 \section{Methodology} \label{methodology}
 The objective of CA is to find semantical correspondences between parts of multilingual parallel texts. 
@@ -100,85 +102,84 @@ We call \textit{concepts} the abstract units of translation, composed of any num
 
 The basic use case for CA, which we refer to specifically as \textit{Concept Extraction} (CE), is the generation of a translation lexicon from a multilingual parallel text. This can be directly compared to the numerous existing word and phrase alignment techniques. 
 
-% potentially move to future work directly
 An interesting and less studied variant of CA is \textit{Concept Propagation} (CP), useful for cases where a set of concepts is already known and the goal is to identify the expressions corresponding to each of them in a new language, potentially even working with a different text in the same domain.
 While our system implements basic CP functionalities, however, in this paper we focus on CE and restrict its application to bilingual corpora. 
 
-As stated in the Introduction, most existing extraction solutions are based on statistical approaches and are, as a consequence, unsuitable for small datasets. 
-Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{tiedemann2011bitext}, but have historically suffered from the inconsistencies between the various formalisms used to define the grammars for different languages and from the insufficient degree of robustness of existing parses.
+As stated in the Introduction, most existing extraction solutions are based on statistical approaches and, as a consequence, unsuitable for small datasets. 
+Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{tiedemann2011bitext}, but have historically suffered from the inconsistencies between the formalisms used to define the grammars for the various languages and from the lack of robustness of existing parsers.
 
 This work is a new attempt in the same direction, enabled by two multilinguality-oriented grammar formalisms developed over the course of the last 25 years: Grammatical Framework (GF) \cite{ranta-etal-2020-abstract} and Universal Dependencies (UD) \cite{ws-2019-universal}.
 
-GF is a constituency grammar formalisms and programming language designed with the parallel between programming and natural languages in mind: grammars are represented as pairs of an \textit{abstract syntax}, playing the role of an interlingua, and a set of \textit{concrete syntaxes} capturing the specificities of the various natural languages. 
-In the case of translation, strings in the source language are \textit{parsed} to Abstract Syntax Trees (ASTs) which are then \textit{linearized} to target language strings.
+GF is a constituency grammar formalisms and programming language in which grammars are represented as pairs of an \textit{abstract syntax}, playing the role of an interlingua, and a set of \textit{concrete syntaxes} capturing the specificities of the various natural languages. 
+In the case of translation, similarly to what happens in programming language compilation, strings in the source language are \textit{parsed} to Abstract Syntax Trees (ASTs), which are then \textit{linearized} to target language strings.
 
 UD, on the other hand, is a dependency grammar formalism meant for cross-linguistically consistent grammatical annotation.
-As opposed to constituency, \textit{dependency} is a word-to-word correspondence: each \textit{head} is simply put in relation with the ones that depend on it, called its \textit{dependents}, via directed labelled links, specifying the syntactic relation between them, and the root element of a sentence is attached to a fake node with a link labelled \texttt{root}.
-Importantly for our application, the standard format for UD trees, CoNNL-U, gives information not only on the syntactic role of each word of a sentence, but also on its POS tag, lemma and other morphological features.  
+As opposed to constituency, \textit{dependency} is a word-to-word correspondence: each word is simply put in relation with the one it refers to, called its \textit{head}, via a directed labelled link specifying the syntactic relation between them.
+Importantly for our application, the standard format for UD trees, CoNNL-U, gives information not only on the syntactic role of each word, but also on its POS tag, lemma and morphological features.  
 
-While both formalisms independently solve the former issue, UD is especially appealing since dependency trees are an easier target for parsing. 
-As a consequence, several robust dependency parsers, such as \cite{straka-etal-2016-udpipe} and \cite{chen-manning-2014-fast} are available.
+While both formalisms independently solve the issues related to having to work with grammars that are inconsistent with each other, UD is especially appealing since, dependency trees being an easier target, several robust parsers, such as \cite{straka-etal-2016-udpipe} and \cite{chen-manning-2014-fast} are available.
 
-UD parsing alone would then be sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a morphologically-aware translation lexicon for a generative grammar. 
-This is where GF comes into play: after correspondences are inferred from a parallel text, our proposed system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiments using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL), which covers the morphology and basic syntax of over 30 languages.
+UD parsing alone is sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a morphologically-aware translation lexicon for a generative grammar. 
+This is where GF comes into play: after correspondences are inferred from a parallel text, our system is able to convert them to GF grammar rules.
+These are easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiments using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL), which covers the morphology and basic syntax of over 30 languages.
 This is made possible by \texttt{gf-ud}, a conversion tool described in \cite{kolachina-ranta-2016-abstract} and \cite{ranta-kolachina-2017-universal}.
 
-Concretely, the system we propose consists of the following elements: \smallskip
+Concretely, the system we propose consists of the following elements:
 
-\begin{itemize}
+\begin{itemize} \setlength\itemsep{0.01em}
   \item a UD parser
   \item an alignment module based on dependency tree comparison
   \item a program, based on \texttt{gf-ud}, that converts the alignments into GF grammar rules and uses them to construct a translation lexicon.
-\end{itemize} \smallskip
+\end{itemize}
 
 \subsection{Extracting concepts} 
-The core part of the system outlined above is of course the alignment module. In this section, we present our method for extracting alignments from parallel bilingual UD treebanks, which can be obtained from sentence-aligned texts with any UD parser.
+The core part of the system outlined above is of course the alignment module. 
+In this section, we present our method for extracting alignments from parallel bilingual UD treebanks, which can be obtained from sentence-aligned texts with any UD parser.
 
 The pseudocode of the basic extraction algorithm is shown in Figure \ref{TODO:}\todo{add pseudocode}.
-The input is a list of priority-sorted \textit{alignment criteria}, i.e.rules to determine whether two dependency trees should be aligned with each other, which will be discussed in greater detail in Section \ref{criteria}, and UD tree representation of the pair of sentences to align.
+The input consists of a list of priority-sorted \textit{alignment criteria}, i.e. rules to determine whether two dependency trees should be aligned with each other which will be discussed in greater detail in Section \ref{criteria}, and a pair of sentences to align represented as UD trees.
 From an implementation point of view, UD trees are, as in \texttt{gf-ud}, rose trees where each node represents a token, obtained from the CoNLL-U files produced by the UD parser.
 
 \todo{add figure with the various tree representations?}
 % TODO: add figure comparing tree representations
 
 As a first step, the program checks whether the two full sentence trees can be aligned with each other, i.e. if they match any of the alignment criteria. 
-If this is the case, they are added to a collection of alignments, which are also represented as a pair of UD trees associated with some metadata, such as the id of the sentence they were extracted from.
+If this is the case, they are added to a collection of alignments, which are represented themselves as a pair of UD (sub)trees associated with some metadata, such as the id of the sentence they were extracted from.
 Such collection is what the function will return after aligning all the dependency subtrees.
 
 Depending on which alignment criteria they match, the head of the two trees may or may not also be added to such collection. This is important not to miss one-word correspondences that cannot be captured in any other way, for instance between the root verbs of two full sentences.
 
 The same procedure is applied recursively to all pairs of immediate subtrees of each sentence, until the leaves are reached or alignment is no longer possible due to a lack of matching criteria.
-Subtrees are sorted based on their dependency label so to give higher priority to pairs with the same root label.
+Subtrees are sorted based on their dependency label, so to give higher priority to pairs whose heads have the same label.
 
 % TODO: pseudocode
 
 When working on corpora consisting of multiple sentences, this algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be reused when working on the following ones and to keep track of the number of occurrences of each alignment throughout the entire text.
 
 \subsubsection{Alignment criteria} \label{criteria}
-While alignment criteria are customizable, to better understand the extraction algorithm described in the above we dedicate this section to describing the ones that are currently used by default.
+While alignment criteria are customizable, to better understand the extraction algorithm described in the above, we dedicate this section to describing the ones that the current implementation uses by default.
 
 \paragraph{Matching UD labels}
 The most obvious, but also most effective idea is to determine alignability based on comparing the dependency labels of the candidate UD tree pair. 
-In particular, according to this idea, two subtrees in \textit{matching context}, i.e. attached to aligned heads, constitute an alignment if their roots share the same dependency label. 
-Intuitively, this means that they are in the same relation with their heads.
+In particular, according to this idea, two subtrees in \textit{matching context}, i.e. attached to aligned heads, constitute an alignment if their roots share the same dependency label, meaning that they are in the same syntactic relation with their heads.
 
 Note that, since the root of UD trees is always attached to a a fake node with an arc labelled \texttt{root}, this criterion also makes it so that full sentences are always considered to align with each other, something which is desirable since we assume the parallel texts that are fed to our program to be sentence-aligned.
 
 \paragraph{Part-Of-Speech equivalence}
-CoNNL-U files provide information not only on the syntactic role of the tokens a sentence is composed of, but also on their grammatical categories, represented as Universal Part-Of-Speech (POS) tags \cite{petrov-etal-2012-universal}. 
+As noted in the above, CoNNL-U files also provide information on the grammatical categories of each word, represented as Universal Part-Of-Speech (POS) tags \cite{petrov-etal-2012-universal}. 
 Intuitively, if the nodes of two trees in matching contexts have the same POS tags, the two trees are more likely to correspond to each other than if not. 
+This is especially true if we focus, for instance, solely on the open class words (defined as in the UD documentation \footnote{\url{universaldependencies.org/u/pos/all.html}}), thus ignoring prepositions, determiners, auxiliary verbs and all other function words, which tend to behave differently across different languages.
 
-This is especially true if we focus, for instance, solely on the open class words (in the current implementation, defined as in the UD documentation \footnote{\url{universaldependencies.org/u/pos/all.html}}), thus ignoring prepositions, determiners, auxiliary verbs and all other function words, which tend to behave differently across different languages.
+A useful relation to define between dependency trees is, then, that of \textit{POS-equivalence}: two dependency trees $t$, $u$ are POS-equivalent if $M_1 = M_2 \neq \emptyset$, where $M_i$ is defined as the multiset of POS tags of all the open class word nodes of $t_i$. 
 
-As a consequence, a useful relation to define between dependency trees is that of \textit{POS-equivalence}: two dependency trees $t$, $u$ are POS-equivalent if $M_1 = M_2 \neq \emptyset$, where $M_i$ is defined as the multiset of POS tags of all the open class word nodes of $t_i$. 
-
-Applied as a backup for label matchin, this criterion can be used to capture correspondences that would otherwise be missed, thus increasing recall, but a decrease in precision is also to be expected. 
-However, since alignment criteria are defined as boolean functions, it is easy to combine them so to apply them simultaneously: combining these first two criteria, for instance, is useful in cases where precision is more important than recall.
+Applied as a backup for label matching, this criterion can be used to capture correspondences that would otherwise be missed, thus increasing recall, but a decrease in precision is also to be expected. 
+However, since alignment criteria are defined as boolean functions, it is easy to combine them so to that they have to apply simultaneously. This can be useful in cases where precision is more important than recall.
 
 \paragraph{Known translation divergence}
 Parallel texts often present significant, systematic cross-linguistic grammatical distinctions. 
 When this is the case, it is often straightforward to define alignment criteria based on recognizing the corresponding patterns.
-If many distinctions of this kind are specific to particular language pairs or even stylistical, some of them occur independently of what languages are involved and have nothing to do with idiomatic usage or aspectual, discourse, domain or word knowledge. Drawing inspiration from \cite{dorr-1994-machine}, we refer to them as \textit{translation divergences} and handle the most common ones via alignment criteria that are used by default. \todo{add a few examples (<= one per type of divergence)}
+If many distinctions of this kind are specific to particular language pairs or even stylistical, some of them occur independently of what languages are involved and do not depend on idiomatic usage nor aspectual, discourse, domain or word knowledge. 
+Drawing inspiration from \cite{dorr-1994-machine}, we refer to them as \textit{translation divergences} and handle some of the most common ones explicitly. \todo{add a few examples (<= one per type of divergence)}
 
 % TODO: add examle (Herb?)
 
@@ -196,15 +197,14 @@ We pointed out that the program can be configured so to prioritize precision or 
 Nonetheless, there can be cases in which only certain syntactic structures are of interest: for instance, we might be looking for adverbs or noun phrases exclusively.
 
 To handle these situations, the CE module can filter the results based on a \texttt{gf-ud} pattern.
-Pattern matching in \texttt{gf-ud}...\todo{explain briefly how it works. Maybe Aarne can do that?}
+\texttt{gf-ud} supports in fact both simple pattern matching, which is integrated in the CE module itself, and pattern replacement\footnote{documentation is available at \url{github.com/GrammaticalFramework/gf-ud}}.
+Combining them, for instance by pruning the UD trees extracted by the alignment module, allows us even to extract correspondences that, given the structure of UD trees, cannot be identified by CE alone. 
 
-Combining pattern matching with pattern replacement, for instance by pruning the UD trees extracted by the alignment module, allows us even to extract correspondences that, given the structure of UD trees, cannot be identified by CE alone. 
-To give an example that turned out to be useful in practice, a possibility is to extract verb phrases only, by looking for full clauses and pruning the subtree corresponding to the subject. 
-\todo{rephrase explanation and reformat example}More advanced replacements are also possible: instead of simply pruning clauses to extract the verb phrases they contain, we can perform some actual replacement to obtain \textit{predication patterns}, such as
+To give a practically useful example, a possibility is to extract verb phrases only, by looking for full clauses and pruning the subtree corresponding to the subject. 
+More advanced replacements are also possible: instead of simply removing subjects, we can perform some actual replacement to obtain \textit{predication patterns}, i.e. correspondences such as the following English-Italian one:
 
-$$\langle X tells Y Z, X dice Z a Y\rangle$$.
-
-% TODO: reformulate and add possibly graphical example
+\smallskip
+$\langle$X \textit{gives} Y Z, X \textit{dà} Z \textit{a} Y$\rangle$.
 
 \subsection{Generating grammar rules}
 The CE module described so far outputs pairs of UD trees. 
@@ -245,7 +245,7 @@ In addition, we try to quantify the impact automatic parsing has on the performa
 
 For measuring the performance of our system, while precision and recall are two well-known metrics that would be very well suited to the task, the lack of a gold standard for CE imposes us to approximate them with respectively:
 
-\begin{itemize}
+\begin{itemize} \setlength\itemsep{0.01em}
   \item the number of correct alignments the program is able to extract
   \item the ratio between such number and the total number of alignments extracted.
  \end{itemize}
@@ -385,7 +385,7 @@ Another interesting example is the alignment $\langle$\textit{``class'', ``class
 We presented a syntax-based alignment method with a focus on its applications in domain-specific translation lexica generation.
 
 Compared to the existing statistical tools, our system has the following advantages:
-\begin{itemize}
+\begin{itemize} \setlength\itemsep{0.1em}
   \item it performs consistently well even on extremely small parallel corpora
   \item it is able to simultaneously extract correspondences between individual words, multiword expressions and full phrases, even when their constituents are discontinuous
   \item in conjunction with \texttt{gf-ud} pattern matching, it can be used to extract specific types of correspondences, such as predication patterns  
