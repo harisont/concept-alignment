@@ -67,9 +67,9 @@
 \maketitle
 \begin{abstract}
 In grammar-based domain-specific machine translation, constructing high-quality translation lexica is a crucial but time consuming task requiring significant linguistic knowledge. 
-When example parallel sentences are available, statistical alignment tools allow for the automation of part of the process, but are not suitable for small datasets and are limited when it comes to discontinuous multiword correspondences. 
-In addition, lexica generated in this way generally consist in simple word form correspondences that cannot be directly used in MT pipelines.
-Addressing these problems, we propose a syntax-based approach to this task and put it to the test in a simple grammar-based translation pipeline.
+With parallel example sentences available, statistical alignment tools can help automate part of the process, but they are not suitable for small datasets and limited when it comes to complex multiword expressions. 
+In addition, mere word form correspondences obtained in this way cannot be used directly.
+Addressing these problems, we propose a syntax-based approach to this task and put it to the test in a simple translation pipeline.
 \end{abstract}
 
 \section{Introduction}
@@ -89,7 +89,7 @@ A further advantage of performing syntactic analysis is that we do not have to c
 Instead, we can simultaneously operate at different levels of abstraction, extracting both single- and multiword, even non-contiguous, correspondences. 
 For this reason, we refer to the task our system attempts to automate as \textit{Concept Alignment} (CA). 
 
-Finally, performing morphological analysis allows us to generate translation lexica consisting of complete with grammatical category and inflection information instead of simple correspondences between word forms.
+Finally, performing morphological analysis allows us to generate translation lexica complete with grammatical category and inflection information instead of simple correspondences between word forms.
 
 This paper is structured as follows. 
 Section \ref{methodology} starts by giving an overview of our approach to CA and comparing it to related work to then focus on our algorithm for extracting correspondences.
@@ -103,9 +103,9 @@ We call \textit{concepts} the abstract units of translation, composed of any num
 The basic use case for CA, which we refer to specifically as \textit{Concept Extraction} (CE), is the generation of a translation lexicon from a multilingual parallel text. This can be directly compared to the numerous existing word and phrase alignment techniques. 
 
 An interesting and less studied variant of CA is \textit{Concept Propagation} (CP), useful for cases where a set of concepts is already known and the goal is to identify the expressions corresponding to each of them in a new language, potentially even working with a different text in the same domain.
-While our system implements basic CP functionalities, however, in this paper we focus on CE and restrict its application to bilingual corpora. 
+While our system does implement basic CP functionalities, however, in this paper we focus on CE and restrict its application to bilingual corpora. 
 
-As stated in the Introduction, most existing extraction solutions are based on statistical approaches and, as a consequence, unsuitable for small datasets. 
+As stated in the Introduction, most existing extraction solutions are based on statistical approaches and are, as a consequence, unsuitable for small datasets. 
 Grammar-based approaches, making use of parallel treebanks and collectively referred to as \textit{tree-to-tree alignment methods}, have also been proposed \cite{tiedemann2011bitext}, but have historically suffered from the inconsistencies between the formalisms used to define the grammars for the various languages and from the lack of robustness of existing parsers.
 
 This work is a new attempt in the same direction, enabled by two multilinguality-oriented grammar formalisms developed over the course of the last 25 years: Grammatical Framework (GF) \cite{ranta-etal-2020-abstract} and Universal Dependencies (UD) \cite{ws-2019-universal}.
@@ -114,34 +114,25 @@ GF is a constituency grammar formalisms and programming language in which gramma
 In the case of translation, similarly to what happens in programming language compilation, strings in the source language are \textit{parsed} to Abstract Syntax Trees (ASTs), which are then \textit{linearized} to target language strings.
 
 UD, on the other hand, is a dependency grammar formalism meant for cross-linguistically consistent grammatical annotation.
-As opposed to constituency, \textit{dependency} is a word-to-word correspondence: each word is simply put in relation with the one it refers to, called its \textit{head}, via a directed labelled link specifying the syntactic relation between them.
+As opposed to constituency, \textit{dependency} is a word-to-word correspondence: each word is put in relation with the one it refers to, called its \textit{head}, via a directed labelled link specifying the syntactic relation between them.
 Importantly for our application, the standard format for UD trees, CoNNL-U, gives information not only on the syntactic role of each word, but also on its POS tag, lemma and morphological features.  
 
 While both formalisms independently solve the issues related to having to work with grammars that are inconsistent with each other, UD is especially appealing since, dependency trees being an easier target, several robust parsers, such as \cite{straka-etal-2016-udpipe} and \cite{chen-manning-2014-fast} are available.
+Alone, UD trees are sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a morphologically-aware translation lexicon for a generative grammar. 
+This is where GF comes into play: after correspondences are inferred from a parallel text, our system is able to convert them to GF grammar rules, easy to embed in a domain-specific grammar but also making it immediate to carry out small-scale translation experiments using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL), which covers the morphology and basic syntax of over 30 languages.
+This is enabled by \texttt{gf-ud}, a conversion tool described in \cite{kolachina-ranta-2016-abstract} and \cite{ranta-kolachina-2017-universal}.
 
-UD parsing alone is sufficient to extract (or propagate) tree-to-tree alignments, but not to automate the generation of a morphologically-aware translation lexicon for a generative grammar. 
-This is where GF comes into play: after correspondences are inferred from a parallel text, our system is able to convert them to GF grammar rules.
-These are easy to embed in a domain-specific grammar but also making it possible to immediately evaluate the system by carrying out small-scale translation experiments using pre-existing grammatical constructions implemented in GF's Resource Grammar Library (RGL), which covers the morphology and basic syntax of over 30 languages.
-This is made possible by \texttt{gf-ud}, a conversion tool described in \cite{kolachina-ranta-2016-abstract} and \cite{ranta-kolachina-2017-universal}.
-
-Concretely, the system we propose consists of the following elements:
-
-\begin{itemize} \setlength\itemsep{0.01em}
-  \item a UD parser
-  \item an alignment module based on dependency tree comparison
-  \item a program, based on \texttt{gf-ud}, that converts the alignments into GF grammar rules and uses them to construct a translation lexicon.
-\end{itemize}
+Concretely, then, the system we propose consists of a UD parser, an alignment module based on UD tree comparison and a program, based on \texttt{gf-ud}, that converts them into the rules of a GF translation lexicon.
 
 \subsection{Extracting concepts} 
 The core part of the system outlined above is of course the alignment module. 
-In this section, we present our method for extracting alignments from parallel bilingual UD treebanks, which can be obtained from sentence-aligned texts with any UD parser.
+In this section, we present our method for extracting alignments from parallel bilingual UD treebanks.
 
 The pseudocode of the basic extraction algorithm is shown in Figure \ref{TODO:}\todo{add pseudocode}.
 The input consists of a list of priority-sorted \textit{alignment criteria}, i.e. rules to determine whether two dependency trees should be aligned with each other which will be discussed in greater detail in Section \ref{criteria}, and a pair of sentences to align represented as UD trees.
-From an implementation point of view, UD trees are, as in \texttt{gf-ud}, rose trees where each node represents a token, obtained from the CoNLL-U files produced by the UD parser.
+From an implementation point of view, UD trees are, rose trees where each node represents a token, obtained from the CoNLL-U files produced by the UD parser.
 
 \todo{add figure with the various tree representations?}
-% TODO: add figure comparing tree representations
 
 As a first step, the program checks whether the two full sentence trees can be aligned with each other, i.e. if they match any of the alignment criteria. 
 If this is the case, they are added to a collection of alignments, which are represented themselves as a pair of UD (sub)trees associated with some metadata, such as the id of the sentence they were extracted from.
@@ -154,7 +145,7 @@ Subtrees are sorted based on their dependency label, so to give higher priority 
 
 % TODO: pseudocode
 
-When working on corpora consisting of multiple sentences, this algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be reused when working on the following ones and to keep track of the number of occurrences of each alignment throughout the entire text.
+When working on multiple sentences, this algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be reused when working on the following ones and to keep track of the number of occurrences of each alignment throughout the entire text.
 
 \subsubsection{Alignment criteria} \label{criteria}
 While alignment criteria are customizable, to better understand the extraction algorithm described in the above, we dedicate this section to describing the ones that the current implementation uses by default.
@@ -162,7 +153,6 @@ While alignment criteria are customizable, to better understand the extraction a
 \paragraph{Matching UD labels}
 The most obvious, but also most effective idea is to determine alignability based on comparing the dependency labels of the candidate UD tree pair. 
 In particular, according to this idea, two subtrees in \textit{matching context}, i.e. attached to aligned heads, constitute an alignment if their roots share the same dependency label, meaning that they are in the same syntactic relation with their heads.
-
 Note that, since the root of UD trees is always attached to a a fake node with an arc labelled \texttt{root}, this criterion also makes it so that full sentences are always considered to align with each other, something which is desirable since we assume the parallel texts that are fed to our program to be sentence-aligned.
 
 \paragraph{Part-Of-Speech equivalence}
@@ -198,10 +188,10 @@ Nonetheless, there can be cases in which only certain syntactic structures are o
 
 To handle these situations, the CE module can filter the results based on a \texttt{gf-ud} pattern.
 \texttt{gf-ud} supports in fact both simple pattern matching, which is integrated in the CE module itself, and pattern replacement\footnote{documentation is available at \url{github.com/GrammaticalFramework/gf-ud}}.
-Combining them, for instance by pruning the UD trees extracted by the alignment module, allows us even to extract correspondences that, given the structure of UD trees, cannot be identified by CE alone. 
+Combining them, for instance by pruning the UD trees extracted by the alignment module, allows us to extract even correspondences that, given the structure of UD trees, cannot be identified by CE alone. 
 
-To give a practically useful example, a possibility is to extract verb phrases only, by looking for full clauses and pruning the subtree corresponding to the subject. 
-More advanced replacements are also possible: instead of simply removing subjects, we can perform some actual replacement to obtain \textit{predication patterns}, i.e. correspondences such as the following English-Italian one:
+To give a practically useful example, a possibility is to extract verb phrases by looking for full clauses and pruning the subtrees corresponding to subjects. 
+It is also possible to perform some actual replacement to obtain \textit{predication patterns}, i.e. correspondences that specify the argument structure of verbs, such as the following English-Italian one:
 
 \smallskip
 $\langle$X \textit{gives} Y Z, X \textit{dà} Z \textit{a} Y$\rangle$.
@@ -234,14 +224,13 @@ In particular, we use the ParTUT English and Italian models for the DMI corpus a
 
 \subsection{Evaluating CE} \label{ceval}
 While we focus mostly on the MT applications of CA, automatic translation, and much less GF-based domain-specific tranlation, is not the only context in which CA can be put to use. 
-For instance, it is easy to imagine using it to improve the UI of online translation memories or to facilitate reading parallel texts in the context of language learning.
-For this reason, a first set of experiments is aimed at evaluating the alignments obtained with our CA module independently from the other stages stages of our proposed lexicon generation pipeline.
+For instance, it is easy to imagine using it to improve the UI of online translation memories.
+For this reason, a first set of experiments is aimed at evaluating the alignments obtained with our CA module independently from the other stages stages of our lexicon generation pipeline.
 
 We first assess the correctness of the alignments the CE module is able to extract from the PUD treebanks, comparing our results with those obtained with a standard statistical tool, \texttt{fast\_align} \cite{dyer-etal-2013-simple}. 
 In addition, we try to quantify the impact automatic parsing has on the performance of the CE module by comparing the above results with those obtained on the DMI and CSE corpora.
 
-For measuring the performance of our system, while precision and recall are two well-known metrics that would be well suited to the task, the lack of a gold standard for CE imposes us to approximate them with the number of correct alignments the program is able to extract and the ratio between such number and the total number of alignments extracted.
-
+While precision and recall are two well-known performance metrics, the lack of a gold standard for CE imposes us to approximate them with the number of correct alignments the program is able to extract and the ratio between such number and the total number of alignments extracted.
 However, since some alignments are only correct in the specific context of the sentence pair in which they occur, we make a further distinction between correct alignments that are relevant for a translation lexicon and alignments that are useful for comparing the sentences but should not be used for MT. 
 
 \subsubsection{Results on manually annotated treebanks} 
@@ -254,14 +243,15 @@ In both cases, \texttt{fast\_align} is run with the recommended parameters and t
 
 \begin{table*}[h]
   \centering
+  \small
   \begin{tabular}{r|c|c|c|c|c|c}
   \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{CE}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}\texttt{fast\_align} \\(100 sentences)\end{tabular}}} & \multicolumn{2}{c}{\textbf{\begin{tabular}[c]{@{}c@{}}\texttt{fast\_align} \\(full dataset)\end{tabular}}} \\ \hline
   \multicolumn{1}{l|}{}          & \textbf{en-it}  & \textbf{en-sv} & \textbf{en-it}                              & \textbf{en-sv}                              & \textbf{en-it}                                & \textbf{en-sv} \\ \hline  
   \textbf{distinct alignments}        & 536             & 638            & 1242                                        & 1044                                        & 1286                                          & 1065          \\ 
-  \textbf{correct (\texttt{+} and \texttt{=})}                & 392 (73\%)      & 514 (80\%)     & 346 (28\%)                                  & 538 (52\%)                                  & 540 (42\%)                                    & 677 (64\%)    \\ 
-  \textbf{usable in MT (\texttt{+})}                      & 363 (68\%)      & 503 (79\%)     & 316 (25\%)                                  & 525 (50\%)                                  & 510 (40\%)                                    & 666 (63\%)    \\ 
+  \textbf{correct}                & 392 (73\%)      & 514 (80\%)     & 346 (28\%)                                  & 538 (52\%)                                  & 540 (42\%)                                    & 677 (64\%)    \\ 
+  \textbf{usable in MT}                      & 363 (68\%)      & 503 (79\%)     & 316 (25\%)                                  & 525 (50\%)                                  & 510 (40\%)                                    & 666 (63\%)    \\ 
   \end{tabular}
-  \caption[Word alignment comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on PUD data. The middle column shows the results obtained by training \texttt{fast\_align} on the 100-sentence subset also fed to the extraction module. On the right, the results obtained by training it on the full dataset, discarding the alignments obtained for sentences 101-1000 for the final comparison.}
+  \caption[Word alignment comparison between our grammar-based CE module and \texttt{fast\_align}]{Comparison between our grammar-based CE module and \texttt{fast\_align} on PUD data training the model on 100 and 1000 sentences and discarding the alignments obtained for sentences 101-1000 in the latter case.}
   \label{pud_fast}
   \end{table*}
 
@@ -274,12 +264,13 @@ A comparison between the results obtained on manually annotated data and the cou
 
 \begin{table*}[h]
   \centering
+  \small
   \begin{tabular}{r|c|c|c|c}
   \multicolumn{1}{l|}{\textbf{}} & \multicolumn{2}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}PUD (100 sentences)\end{tabular}}} & \multicolumn{2}{c}{\textbf{course plans}}                                                                                                                      \\ \hline
   \multicolumn{1}{l|}{}          & \textbf{en-it}                               & \textbf{en-sv}                               & \textbf{\begin{tabular}[c]{@{}c@{}}DMI (881 sentences)\end{tabular}} & \textbf{\begin{tabular}[c]{@{}c@{}}CSE (539 sentences)\end{tabular}} \\ \hline
-  \textbf{disrinct alignments}        & 1197                                         & 1325                                         & 1823                                                                           & 1950                                                                           \\
-  \textbf{correct (\texttt{+} and \texttt{=})}                & 916 (77\%)                                   & 1112 (85\%)                                  & 1205 (66\%)                                                                    & 1296 (66\%)                                                                    \\
-  \textbf{usable in MT (\texttt{+}})                      & 880 (74\%)                                   & 1099 (84\%)                                  & 1157 (63\%)                                                                    & 1248 (64\%)                                                                    \\
+  \textbf{distinct alignments}        & 1197                                         & 1325                                         & 1823                                                                           & 1950                                                                           \\
+  \textbf{correct}                & 916 (77\%)                                   & 1112 (85\%)                                  & 1205 (66\%)                                                                    & 1296 (66\%)                                                                    \\
+  \textbf{usable in MT}                      & 880 (74\%)                                   & 1099 (84\%)                                  & 1157 (63\%)                                                                    & 1248 (64\%)                                                                    \\
   \end{tabular}
   \caption{Comparison the extraction of alignments of any size from manually annotated PUD treebanks and automatically parsed sentences from the course plans corpora.}
   \label{raw_fast}
@@ -303,10 +294,10 @@ Due to the small size of the datasets and the consequent low coverage of the ext
 In order to do that, we make use of GF's random AST generation functionality but at the same time manually select semantically plausible sentences to facilitate the task of the human translators.
 The results of this process are two small testing corpora, one for the DMI and one for the CSE corpus, each consisting of 50 English sentences. 
 
-Reference translations are obtained by asking the participants to compare the original English sentences to their automatically translated counterparts and correct the latter by making the minimal changes necessary to obtain a set of grammatically and semantically correct translations. 
-This is important to get meaningful results, as if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading.
+Reference translations are obtained by asking participants to compare the original English sentences to their automatically translated counterparts and correct the latter by making the minimal changes necessary to obtain a set of grammatically and semantically correct translations. 
+This is important as, if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading.
 
-\subsubsection{Experimental results} 
+\subsubsection{Results} 
 Corpus-level BLEU scores for the automatic translations of the 50+50 sentences of the testing corpora are summarized in Table \ref{tableu}.
 
 Following conventions, we report the cumulative $n$-gram scores for values of $n$ from 1 to 4 (BLEU-1 to BLEU-4). 
@@ -314,6 +305,7 @@ However, being a significant portion of the sentences of length 4 or less, we al
 
 \begin{table}[h]
   \centering
+  \small
   \begin{tabular}{r|cc}
   \textbf{}            & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
   \textbf{BLEU-1 to 4} & 55         & 61         \\ 
@@ -335,17 +327,16 @@ Examples of sentences that were assigned a perfect BLEU-1 to 4 score are ``\text
 
 On the other hand, it is easy for shorter sentences to be assigned the minimum BLEU-1 to 4 score even when they only contain a single grammatical or semantic error. 
 This is the case, for instance, of the sentence ``\textit{the test is oral}'', whose last word, ``\textit{oral}'' is translated as ``\textit{dura}'' (``\textit{hard}'') instead of ``\textit{orale}'' due to an alignment error. 
-Nonetheless, it is worth noticing that this is one of the many cases in which the correct alignment $\langle$``\textit{oral}'',``\textit{orale}''$\rangle$ is also identified by the CE module, but discared as, for simplicity, we only take the first translation candidate into account.
-This suggest that, in contexts where higher precision is necessary, there are simple improvements that can be done either in the choice of the alignment criteria or at a later stage, in terms alignment selection. 
-In other contexts, it can be more practical to aim for higher coverage and not perform any automatic selection, leaving refinements to a human, possibly with the help of postprocessing tools.
+Interestingly, this is one of many cases in which the correct alignment $\langle$``\textit{oral}'',``\textit{orale}''$\rangle$ is also identified by the CE module, but discared as we only take the first translation candidate into account.
 
-Furthermore, \todo{from here on nothing is absolutely vital in this section. It can be shortened or removed if necessary to make room for something else}a problem with using the BLEU score as the only evaluation metric is the fact that it makes no distinction between content and function words, thus not allowing an evaluation focused specifically on the extracted concepts. 
+Furthermore, a problem with using the BLEU score as the only evaluation metric is the fact that it makes no distinction between content and function words, thus not allowing an evaluation focused specifically on the extracted concepts. 
 The small size of the corpus, however, allows for some error analysis. 
-While postprocessing the automatic translations, the participants were asked to indicate what kind of errors they encountered in each sentence (grammatical, semantical or both). 
-Their observations are summarized in Table \ref{obs}.
+From the participants's observations about the kind of errors encountered when manually editing the automatic translation, summarizes in Table \ref{obs}, we can conclude that while most errors are in fact due to wrong alignments, the main difference between two corpora lies in the number of translations that only contain grammatical errors.
+This explains the significant difference observed in the cumulative BLEU scores shown in Table \ref{tableu}.
 
 \begin{table}[h]
   \centering
+  \small
   \begin{tabular}{r|cc}
   \textbf{}                                                                                    & \textbf{DMI (en-it)} & \textbf{CSE (en-sv)} \\ \hline
   \begin{tabular}[c]{@{}l@{}}\textbf{semantical}\end{tabular}               & 23 (46\%)    & 23 (46\%)    \\ 
@@ -355,8 +346,6 @@ Their observations are summarized in Table \ref{obs}.
   \caption[Types of errors encountered in the automatically translated sentences.]{Types of errors encountered in the automatically translated sentences.}
   \label{obs}
 \end{table}
-
-Interestingly, while most errors are in fact due to wrong alignments, the main difference between two corpora lies in the number of translations that only contain grammatical errors, which explains the significant difference observed in the cumulative BLEU scores shown in Table \ref{tableu}.
 
 Among other things, Italian contractions are often handled incorrectly.
 For example, ``\textit{del}'' (``\textit{di}'' + ``\textit{il}'', in English ``\textit{of the}'') is systematically rendered as two separate words due to UDPipe tokenization.
@@ -378,18 +367,17 @@ Compared to the existing statistical tools, our system has the following advanta
   \item it can be configured to easily handle systematic, possibly language-pair or corpus specific translation divergences.
 \end{itemize}
 
-The tangible fruits of this work are a Haskell library and a number of executables offering an easy to use and configure interface to perform CE, lexicon generation and a variety of kinds of evaluations. 
-The source code, which also implements a preliminary implementation of CP not discussed in depth in this paper, is available at \url{github.com/harisont/concept-alignment}
+The tangible fruits of this work are a Haskell library and a number of executables offering a user friendly interface to perform CE, lexicon generation and various kinds of evaluations. 
+The source code, including a preliminary implementation of CP, is available at \url{github.com/harisont/concept-alignment}
 
 \subsection{Current and future work}
 Our results, while encouraging, suggest that there is room for improvement in many different directions.
 
-An obvious possible development is to improve the current implementation of CP, optimizing it for its two different use cases: propagating alignments to a new language looking for correspondences in a different text in the same domain and using a translation of the same text they were obtained from. \todo{simplify part on CP scenarios}
-An alternative to the latter is to generalize CE to $n$ languages, instead of limiting it to bilingual cases.
+An obvious possible development is to improve the current implementation of CP, optimizing it for its different use cases: propagating alignments to a new language looking for correspondences using a translation of the same text they were extracted from or using a different text in the same domain.
+An alternative to the latter is to make CE, now working on bilingual texts, $n$-lingual.
 
-For cases where a relatively large amount of data is available, using our system in conjunction with a statistical tool seems promising. 
-As discussed in Section \ref{ka}, some integration between our system and other sources of alignments is already supported and could be further developed in the direction of an actual hybrid system. 
-A first attempt in this direction is the development of a simple conversion tool between the ``pharaoh format'' used by tools such as \texttt{fast\_align} and the format we use to represent alignments, available in the same repository.
+When large amounts of data ar available, using our system in conjunction with a statistical tool seems promising. 
+As discussed in Section \ref{ka}, this is already partially supported and it could prove useful to develop CA as an actual hybrid system. 
 
 Finally, since the freedom that generally characterizes human translation and the quality of currently available UD parsers make maximizing both alignment precision and recall unrealistic, tools to make it easier to postprocess the automatically generated lexica are under development.
 
