@@ -29,6 +29,12 @@
 
 \usepackage{todonotes}
 
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
 %\setlength\titlebox{<dim>}
@@ -128,22 +134,97 @@ Concretely, then, the system we propose consists of a UD parser, an alignment mo
 The core part of the system outlined above is of course the alignment module. 
 In this section, we present our method for extracting alignments from parallel bilingual UD treebanks.
 
-The pseudocode of the basic extraction algorithm is shown in Figure \ref{TODO:}\todo{add pseudocode}.
+The pseudocode of the basic extraction algorithm is shown below.
+
+\begin{algorithm} 
+  \small
+  \begin{algorithmic}
+  \Procedure{extract}{$criteria$,$(t,u)$}
+    \State $alignments$ = $\emptyset$
+    \If{$(t,u)$ matches any alignment $criteria$}
+        \State $alignments$ += $(t,u)$
+        \For{$(t',u')$ in \textsc{sort}(\textsc{subts}($t$)) $\times$ \textsc{sort}(\textsc{subts}($u$))}
+          \State extract($criteria$,$(t',u')$)
+        \EndFor
+    \EndIf
+    \Return $alignments$
+  \EndProcedure
+  \end{algorithmic}
+  \end{algorithm}
+
 The input consists of a list of priority-sorted \textit{alignment criteria}, i.e. rules to determine whether two dependency trees should be aligned with each other which will be discussed in greater detail in Section \ref{criteria}, and a pair of sentences to align represented as UD trees.
 From an implementation point of view, UD trees are, rose trees where each node represents a token, obtained from the CoNLL-U files produced by the UD parser.
 
-\todo{add figure with the various tree representations?}
+\begin{figure*}[h]
+  \centering
+  \begin{subfigure}{.23\textwidth}
+      \centering
+      \scriptsize
+      \setlength{\unitlength}{0.16mm}
+      \begin{picture}(371.0,130.0)
+          \put(0.0,0.0){this}
+          \put(46.0,0.0){is}
+          \put(83.0,0.0){a}
+          \put(120.0,0.0){dependency}
+          \put(220.0,0.0){tree}
+          \put(0.0,15.0){{\tiny PRON}}
+          \put(46.0,15.0){{\tiny AUX}}
+          \put(83.0,15.0){{\tiny DET}}
+          \put(120.0,15.0){{\tiny NOUN}}
+          \put(220.0,15.0){{\tiny NOUN}}
+          \put(120.0,30.0){\oval(218.63636363636363,133.33333333333334)[t]}
+          \put(10.681818181818187,35.0){\vector(0,-1){5.0}}
+          \put(105.0,99.66666666666667){{\tiny nsubj}}
+          \put(143.0,30.0){\oval(172.27586206896552,100.0)[t]}
+          \put(56.86206896551724,35.0){\vector(0,-1){5.0}}
+          \put(128.0,83.0){{\tiny cop}}
+          \put(161.5,30.0){\oval(134.8102189781022,66.66666666666667)[t]}
+          \put(94.0948905109489,35.0){\vector(0,-1){5.0}}
+          \put(146.5,66.33333333333334){{\tiny det}}
+          \put(180.0,30.0){\oval(97.0,33.333333333333336)[t]}
+          \put(131.5,35.0){\vector(0,-1){5.0}}
+          \put(165.0,49.66666666666667){{\tiny compound}}
+          \put(235.0,130.0){\vector(0,-1){100.0}}
+          \put(240.0,120.0){{\tiny root}}
+      \end{picture}
+  \end{subfigure}
+  \begin{subfigure}{.38\textwidth}
+    \centering
+    \scriptsize
+      \begin{verbatim}
+      1	this	this	PRON	_	_	5	nsubj	_	_
+      2	is	be	AUX	_	_	5	cop	_	_
+      3	a	a	DET	_	_	5	det	_	_
+      4	dependency	dependency	NOUN	_	_	5	
+        compound	_	_
+      5	tree	tree	NOUN	_	_	0	root	_	_
+      \end{verbatim}
+  \end{subfigure}%
+  \begin{subfigure}{.38\textwidth}
+    \centering
+    \scriptsize
+      \begin{verbatim}
+5	tree	tree	NOUN	_	_	0	root	_	_
+  4	dependency	dependency	NOUN	_	_	5	
+    compound	_	_
+  2	is	be	AUX	_	_	5	cop	_	_
+  3	a	a	DET	_	_	5	det	_	_
+  1	this	this	PRON	_	_	5	nsubj	_	_
+      \end{verbatim}
+  \end{subfigure}%
+  \caption[The graphical representation of a UD tree alongside its CoNNL-U and sorted rose tree representation. Optional CoNNL-U fields are left blank.]{The graphical representation of a UD tree alongside its CoNNL-U and rose tree representation. Optional CoNNL-U fields are left blank.}
+\end{figure*}
 
 As a first step, the program checks whether the two full sentence trees can be aligned with each other, i.e. if they match any of the alignment criteria. 
 If this is the case, they are added to a collection of alignments, which are represented themselves as a pair of UD (sub)trees associated with some metadata, such as the id of the sentence they were extracted from.
 Such collection is what the function will return after aligning all the dependency subtrees.
 
-Depending on which alignment criteria they match, the head of the two trees may or may not also be added to such collection. This is important not to miss one-word correspondences that cannot be captured in any other way, for instance between the root verbs of two full sentences.
-
 The same procedure is applied recursively to all pairs of immediate subtrees of each sentence, until the leaves are reached or alignment is no longer possible due to a lack of matching criteria.
 Subtrees are sorted based on their dependency label, so to give higher priority to pairs whose heads have the same label.
 
-% TODO: pseudocode
+A simple but useful refinement is that, depending on which alignment criteria a pair of trees candidate for alignment matches, the heads of the two trees may or may not also be added to the collection of alignments. 
+This is important not to miss one-word correspondences that cannot be captured in any other way, for instance between the root verbs of two full sentences.
+A relevant implementative detail is that, in this context, the head of a tree is not simply defined as its root. Instead, if the root is part of a compound written as two or more separate words or a verb with auxiliaries, the root nodes of the corresponding children are also considered as part of its head.
 
 When working on multiple sentences, this algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be reused when working on the following ones and to keep track of the number of occurrences of each alignment throughout the entire text.
 
