@@ -57,16 +57,14 @@
 %         \AND
 %         Author 2 \\ Address line \\ ... \\ Address line \And
 %         Author 3 \\ Address line \\ ... \\ Address line}
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  \texttt{email@domain} \\}
+\author{Arianna Masciolini \\
+  Digital Grammars \\
+  \texttt{arianna@digitalgrammars.com} \\\And
+  Aarne Ranta \\
+  Department of Computer Science and Engineering, \\
+  University of Gothenburg \\
+  Digital Grammars \\
+  \texttt{aarne.ranta@cse.gu.se} \\}
 
 \begin{document}
 \maketitle
@@ -176,7 +174,7 @@ The rose tree is is easily obtained from the CoNLL-U notation that UD parsers pr
 \begin{figure*}[h]
   \centering
   \scriptsize
-  \begin{subfigure}{.30  \textwidth}
+  \begin{subfigure}{.32  \textwidth}
     \setlength{\unitlength}{0.14mm}
 \begin{picture}(257.0,70.0)
   \put(0.0,0.0){She}
@@ -201,7 +199,7 @@ The rose tree is is easily obtained from the CoNLL-U notation that UD parsers pr
   \put(110.0,0.0){con}
   \put(147.0,0.0){costanza}
   \put(0.0,15.0){{\tiny PRON}}
-  \put(46.0,15.0){{\tiny NOUN}}
+  \put(46.0,15.0){{\tiny VERB}}
   \put(110.0,15.0){{\tiny ADP}}
   \put(147.0,15.0){{\tiny NOUN}}
   \put(33.0,30.0){\oval(39.47826086956522,33.333333333333336)[t]}
@@ -217,7 +215,7 @@ The rose tree is is easily obtained from the CoNLL-U notation that UD parsers pr
   \put(66.0,80.0){{\tiny root}}
 \end{picture}
   \end{subfigure}
-  \begin{subfigure}{.30  \textwidth}
+  \begin{subfigure}{.32  \textwidth}
     \begin{verbatim}
 
 1 She PRON 2 nsubj
@@ -231,7 +229,7 @@ The rose tree is is easily obtained from the CoNLL-U notation that UD parsers pr
 4 costanza NOUN 2 obl
     \end{verbatim}
   \end{subfigure}
-  \begin{subfigure}{.30 \textwidth}
+  \begin{subfigure}{.32 \textwidth}
     \begin{verbatim}
 
 
@@ -245,7 +243,7 @@ The rose tree is is easily obtained from the CoNLL-U notation that UD parsers pr
     3 con ADP 4 case
     \end{verbatim}
   \end{subfigure}
-  \caption{The graphical, simplified CoNNL-U and sorted rose tree representation of a pair of UD sentences. With the default criteria, the resulting alignments are: $\langle$\textit{She studies consistently, Lei studia con costanza}$\rangle$, $\langle$\textit{studies, studia}$\rangle$, $\langle$\textit{she, lei}$\rangle$ and $\langle$\textit{consistently, con costanza}$\rangle$}. 
+  \caption{The graphical, simplified CoNNL-U and sorted rose tree representation of a pair of UD sentences. With the default criteria, the resulting alignments are: $\langle$\textit{She studies consistently, Lei studia con costanza}$\rangle$, $\langle$\textit{studies, studia}$\rangle$, $\langle$\textit{she, lei}$\rangle$ and $\langle$\textit{consistently, con costanza}$\rangle$.}
 \end{figure*}
 
 % algorithm description
@@ -402,8 +400,6 @@ However, the the Italian translation mentions a train (``\textit{treno}'') in th
 \subsubsection{Results on manually annotated treebanks} 
 % table 1
 In Table \ref{pud_fast}, we compare the results obtained with our grammar-based module to those obtained statistically on the PUD treebanks. 
-
-% details
 Of course, \texttt{fast\_align} does not make use of the information present in the CoNLL-U files except with regards to tokenization. 
 On the other hand, the relatively large size of the PUD treebanks makes it possible also to train the statistical tool on the full dataset instead of just using the chosen 100-sentences subset, allowing for a fairer comparison. 
 In both cases, \texttt{fast\_align} is run with the recommended parameters and the CE program is configured only to extract one-to-many and many-to-one word alignments, given that \texttt{fast\_align} does not align larger phrases. 
@@ -438,10 +434,8 @@ The idea is to automatically translate a set of English sentences to Italian and
 Due to the small size of the datasets and the consequently low coverage of the extracted lexicon, we generate the sentences to translate directly in the GF shell rather than trying to parse arbitrary sentences from other course plans. 
 In order to do that, we make use of GF's random AST generation functionality but at the same time manually select semantically plausible sentences to facilitate the task of the human translators.
 The results of this process are two small testing corpora, one for the DMI and one for the CSE corpus, each consisting of 50 English sentences. 
-
-% reference translations
-Reference translations are obtained by asking participants to compare the original English sentences to their automatically translated counterparts and correct the latter by making the minimal changes necessary to obtain a set of grammatically and semantically correct translations. 
-This is important as, if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading.
+Reference translations are obtained by asking participants to compare the original English sentences to their automatically translated counterparts and correct the latter with the minimal changes necessary to obtain a set of grammatically and semantically correct translations. 
+This is important as, if the reference translations are obtained independently, BLEU scores can easily become misleading.
 
 \subsubsection{Results} 
 % scores
@@ -501,7 +495,7 @@ Only in one case, for instance, gender is incorrect (``\textit{programbibliotek\
 These errors are easy to handle when writing a domain-specific grammar or, in cases like the latter, by making small adjustments to the morphological dictionaries. 
 
 % cool alignment errors
-Some errors regarding the extracted concepts are also interesting to analyze: the alignment $\langle$\textit{``class'', ``classe''}$\rangle$, for instance, causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which (within the same domain!) \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.
+Some errors regarding the extracted concepts are also interesting to analyze: the alignment $\langle$\textit{class, classe}$\rangle$, for instance, causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most contexts in which (within the same domain!) \textit{``class''} is not to be intended as a synonym of \textit{``lesson''} but as teaching group.
 
 \section{Conclusions} \label{conclusions}
 % summary
@@ -516,7 +510,8 @@ We have presented a syntax-based alignment method with a focus on its applicatio
 
 % sw
 The tangible fruits of this work are a Haskell library and a number of executables offering a user friendly interface to perform CE, lexicon generation and various kinds of evaluations. 
-The source code, including a preliminary implementation of CP, is available on GitHub\footnote{\url{github.com/harisont/concept-alignment}}. 
+The source code, including a preliminary implementation of CP, is available on GitHub\footnote{link hidden at review time}. % TODO: github.com/harisont/concept-alignment
+The software has already been used to analyse customer-provided data in two commercial projects. % TODO: at Digital Grammars. 
 
 \subsection{Current and future work}
 Our results, while encouraging, suggest that there is room for improvement in many different directions.
