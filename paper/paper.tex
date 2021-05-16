@@ -27,8 +27,6 @@
 
 \usepackage{graphicx}
 
-\usepackage{todonotes}
-
 \usepackage{caption}
 \usepackage{subcaption}
 
@@ -57,7 +55,6 @@
 %         \AND
 %         Author 2 \\ Address line \\ ... \\ Address line \And
 %         Author 3 \\ Address line \\ ... \\ Address line}
-% TODO: authors info
 \author{First Author \\
   Affiliation / Address line 1 \\
   Affiliation / Address line 2 \\
@@ -301,8 +298,6 @@ For instance, \textit{categorial divergences} occur when the POS tag of a word i
 A ubiquitous example of is that of adverbial modifiers (with the UD label \texttt{advmod}) are translated prepositional phrases (with the UD label \texttt{obl}, for \textit{oblique}), such as in the English-Italian pair $\langle$\textit{She studies \textbf{consistently}, Lei studia \textbf{con costanza}}$\rangle$.
 \textit{Structural divergences}, where a direct object in one language is rendered as an oblique in the other, as in the English-Swedish pair $\langle$\textit{I told \textbf{him}, Jag berättade \textbf{för honom}.}$\rangle$), are also frequently encountered.
 
-% TODO: add example (Herb?)
-
 \paragraph{Known alignment} \label{ka}
 % actual KA par
 Another case in which it is trivially desirable for two subtrees in matching context to be aligned is when an equivalent alignment is already known, for instance due to a previous iteration of the extraction algorithm. 
@@ -441,20 +436,23 @@ The results are less encouraging in terms of recall: the number of alignments ex
 This is explained in part by the presence, in the course plans corpora, of a large amount of very short sentences, and in part by the fact that parse errors introduced by UDPipe make it impossible to align many subsentences without a significant loss in terms of precision.  
 
 \subsection{MT experiments} \label{mtexp}
+% genereral idea behind MT experiments
 The second set of experiments has the objective of assessing the quality of the final output of the system we propose: GF translation lexica. 
 Because we are now focussing on using CA in the context of domain-specific MT, we do not make use of the PUD treebanks, where sentences come from a variety of different sources, but just of the course plans corpora. 
 We do not construct a grammar specific to such domain: for small-scale MT experiments, it is sufficient to extend the extraction grammar itself with preexisting syntax rules defined in the RGL. 
 
+% test corpus construction
 The idea is to automatically translate a set of English sentences to Italian and Swedish, ask native speakers of the target languages to produce a set of reference translations, and compare them to the original machine-generated ones by computing BLEU scores.
-
 Due to the small size of the datasets and the consequently low coverage of the extracted lexicon, we generate the sentences to translate directly in the GF shell rather than trying to parse arbitrary sentences other course plans. 
 In order to do that, we make use of GF's random AST generation functionality but at the same time manually select semantically plausible sentences to facilitate the task of the human translators.
 The results of this process are two small testing corpora, one for the DMI and one for the CSE corpus, each consisting of 50 English sentences. 
 
+% reference translations
 Reference translations are obtained by asking participants to compare the original English sentences to their automatically translated counterparts and correct the latter by making the minimal changes necessary to obtain a set of grammatically and semantically correct translations. 
 This is important as, if the reference translations are obtained independently from the automatic ones, BLEU scores can easily become misleading.
 
 \subsubsection{Results} 
+% scores
 Corpus-level BLEU scores for the automatic translations of the 50+50 sentences of the testing corpora are summarized in Table \ref{tableu}. 
 Following conventions, we report the cumulative $n$-gram scores for values of $n$ from 1 to 4 (BLEU-1 to BLEU-4). 
 However, being a significant portion of the sentences of length 4 or less, we also report BLEU-1 to BLEU-3 scores, BLEU-1 to BLEU-2 scores and scores obtained considering unigrams only. 
@@ -473,18 +471,23 @@ However, being a significant portion of the sentences of length 4 or less, we al
   \label{tableu}
 \end{table}
 
+% comment on general results
 These synthetic figures are useful to give an idea of the general quality of the translations: overall, although with relatively low scores, English-to-Swedish translation works significantly better than English-to-Italian. 
 Looking back at the results reported in Section \ref{raw}, the reason for this is not immediately clear, as the difference in precision between the two language pairs is negligible in the course plan corpora.
 
+% individual scores vary widely
 Looking at sentence-level scores can, however, be more insightful. 
 For both corpora, scores assigned to individual segments range from the minimum possible value of 0 to the perfect score of 100, which indicates a perfect correspondence between the automatic and the reference translation.
 
+% 100
 Examples of sentences that were assigned a perfect BLEU-1 to 4 score are ``\textit{the library provides useful textbooks}'' (translated to Italian as ``\textit{la biblioteca fornisce libri utili}'') in the DMI corpus and ``\textit{this lab is more difficult than the exam}'' (whose Swedish translation is ``\textit{den här laborationen är svårare än tentamen}'') in the CSE corpus. \smallskip
 
+% 0
 On the other hand, it is easy for shorter sentences to be assigned the minimum BLEU-1 to 4 score even when they only contain a single grammatical or semantic error. 
 This is the case, for instance, of the sentence ``\textit{the test is oral}'', whose last word, ``\textit{oral}'' is translated as ``\textit{dura}'' (``\textit{hard}'') instead of ``\textit{orale}'' due to an alignment error. 
 Interestingly, this is one of many cases in which the correct alignment $\langle$``\textit{oral}'',``\textit{orale}''$\rangle$ is also identified by the CE module, but discared as we only take the first translation candidate into account.
 
+% BLEU issue
 Furthermore, a problem with using the BLEU score as the only evaluation metric is the fact that it makes no distinction between content and function words, thus not allowing an evaluation focused specifically on the extracted concepts. 
 The small size of the corpus, however, allows for some error analysis. 
 From the participants' observations about the kind of errors encountered when manually editing the automatic translation, summarizes in Table \ref{obs}, we can conclude that while most errors are in fact due to wrong alignments, the main difference between two corpora lies in the number of translations that only contain grammatical errors.
@@ -503,18 +506,19 @@ This explains the significant difference observed in the cumulative BLEU scores 
   \label{obs}
 \end{table}
 
+% common grammar errors
 Among other things, Italian contractions are often handled incorrectly.
 For example, ``\textit{del}'' (``\textit{di}'' + ``\textit{il}'', in English ``\textit{of the}'') is systematically rendered as two separate words due to UDPipe tokenization.
 Grammatical errors in Swedish are less common and less systematic. 
 Only in one case, for instance, gender is incorrect (``\textit{programbibliotek\textbf{en}}''). 
 These errors are easy to handle when writing a domain-specific grammar or, in cases like the latter, by making small adjustments to the morphological dictionaries. 
 
+% cool alignment errors
 Some errors regarding the extracted concepts are also interesting to analyze: the alignment $\langle$\textit{``class'', ``classe''}$\rangle$, for instance, causes the sentence \textit{``I will attend the class''} to be (incorrectly) translated as \textit{``io seguirò la classe''} instead of \textit{``io seguirò la lezione''} even though the correspondence is in fact valid in most of the numerous contexts in which (within the same domain!) \textit{``class''} is not to be intended as a synonym of \textit{``lesson''}.
 
 \section{Conclusions} \label{conclusions}
-We have presented a syntax-based alignment method with a focus on its applications in domain-specific translation lexic generation.
-
-Compared with the existing statistical tools, our system has the following advantages:
+% summary
+We have presented a syntax-based alignment method with a focus on its applications in domain-specific translation lexicon generation. Compared with the existing statistical tools, our system has the following advantages:
 \begin{itemize} \setlength\itemsep{0.1em}
   \item it performs consistently well even on extremely small parallel corpora
   \item it is able to simultaneously extract correspondences between individual words, multiword expressions and full phrases, including discontinuous constituents
@@ -523,18 +527,22 @@ Compared with the existing statistical tools, our system has the following advan
   \item it can be configured to easily handle systematic, possibly language-pair or corpus specific translation divergences.
 \end{itemize}
 
+% sw
 The tangible fruits of this work are a Haskell library and a number of executables offering a user friendly interface to perform CE, lexicon generation and various kinds of evaluations. 
 The source code, including a preliminary implementation of CP, is available at \url{github.com/harisont/concept-alignment}
 
 \subsection{Current and future work}
 Our results, while encouraging, suggest that there is room for improvement in many different directions.
 
+% CP/multilingual CE
 An obvious possible development is to improve the current implementation of concept propagation (CP), optimizing it for its different use cases: propagating alignments to a new language looking for correspondences using a translation of the same text they were extracted from or using a different text in the same domain.
 An alternative to the latter is to make CE, now working on bilingual texts, $n$-lingual.
 
-When large enough amounts of data ar available, using our system in conjunction with a statistical tool seems promising. 
+% hybridization
+When large enough amounts of data are available, using our system in conjunction with a statistical tool seems promising. 
 As discussed in Section \ref{ka}, this is already partially supported and it could prove useful to develop CA as an actual hybrid system. 
 
+% tools
 Finally, since the freedom that generally characterizes human translation and the quality of currently available UD parsers make maximizing both alignment precision and recall unrealistic, tools to make it easier to postprocess the automatically generated lexica are under development.
 
 \bibliography{anthology,custom}  
