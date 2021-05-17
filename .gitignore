@@ -59,5 +59,8 @@ presentation/beamerthememhthm.sty
 # temporary secrets
 grammars/*.gf
 
-# paper template guide
 paper/acl_latex*
+
+# UD treebanks
+data/ud-treebanks-v2.6
+data/PUD_test

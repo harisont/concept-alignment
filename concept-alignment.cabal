@@ -46,23 +46,23 @@ executable propagate-concepts
   ghc-options: -main-is PropagateConcepts
   default-language: Haskell2010
 
-executable evalign
-  main-is: EvAlign.hs
-  other-modules:
-    ConceptAlignment,
-    Criteria,
-    ArgvParse
-  build-depends:
-    base,
-    containers,
-    gf,
-    gf-ud,
-    multiset,
-    split,
-    filepath
-  ghc-options: -main-is EvAlign
-  default-language: Haskell2010
-
+--executable evalign
+--  main-is: EvAlign.hs
+--  other-modules:
+--    ConceptAlignment,
+--    Criteria,
+--    ArgvParse
+--  build-depends:
+--    base,
+--    containers,
+--    gf,
+--    gf-ud,
+--    multiset,
+--    split,
+--    filepath
+--  ghc-options: -main-is EvAlign
+--  default-language: Haskell2010
+--
 executable translate
   main-is: Translate.hs
   build-depends:
@@ -82,7 +82,8 @@ executable generate-grammar
     directory,
     containers,
     process,
-    pretty
+    pretty,
+    split
   ghc-options: -main-is GenerateGrammar
   default-language: Haskell2010
 

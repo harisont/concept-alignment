@@ -22,8 +22,8 @@ main = do
     [src,trg] -> if Help `elem` flags
       then putStrLn help >> exitSuccess
       else do
-        ts <- conlluFile2UDTrees src
-        us <- conlluFile2UDTrees trg
+        ts <- parseUDFile src
+        us <- parseUDFile trg
         let tus = zip ts us -- let tus = take 50 $ zip ts us
         smtAs <- getSmtAlignments flags src trg
         let segment = Clauses `elem` flags
@@ -31,22 +31,22 @@ main = do
         let fp = listToMaybe [path | Path path <- flags] 
         let fp' = fromJust fp
         r <- getPattern flags
-        let as = M.toList $ align smtAs criteria r segment byExcl tus
+        let as = align smtAs criteria r segment byExcl tus
         let m = listToMaybe [read mmax :: Int | MaxSize mmax <- flags]
         let as' = if All `elem` flags then as else selectForMT m as
-        let as'' = sortByConfidence as'
+        let as'' = sortByConfidence as' 
         if Linearize `elem` flags
           then 
             if isJust fp 
-              then writeFile fp' (unlines $ map (show . toLinAlignment) as'') 
-              else mapM_ (print . toLinAlignment) as''
+              then writeFile fp' (unlines $ map prLinearizedAlignment as'') 
+              else mapM_ (putStrLn . prLinearizedAlignment) as''
           else 
             if isJust fp 
               then do
-                let numberedSentPairs = [1..] `zip` map (alignment2sentencePair . fst) as''
+                let numberedSentPairs = [1..] `zip` map alignment2sentencePair as''
                 writeFile (insertLang fp' "SL") (unlines [prUDSentence (fst x) (fst $ snd x) | x <- numberedSentPairs])
                 writeFile (insertLang fp' "TL") (unlines [prUDSentence (fst x) (snd $ snd x) | x <- numberedSentPairs]) 
-              else mapM_ (print . fst) as''
+              else mapM_ print as''
     _ -> do
       putStrLn "Wrong number of arguments."
       putStrLn help
@@ -54,16 +54,15 @@ main = do
   where 
     insertLang :: FilePath -> String -> FilePath
     insertLang fp l = dropExtension fp ++ l ++ takeExtension fp
-    getSmtAlignments :: [Flag] -> FilePath -> FilePath -> IO [LinAlignment]
+    getSmtAlignments :: [Flag] -> FilePath -> FilePath -> IO [Alignment]
     getSmtAlignments flags src trg = case [path | Pharaoh path <- flags] of
       [] -> return []
       [path] -> do
         indices <- readFile path >>= return . parsePh
         srcConllu <- readFile src
         trgConllu <- readFile trg
-        let bitext = take 100 $ parseBi $ conllu2bi (srcConllu,trgConllu)
-        print $ ltrees $ phToLas bitext indices !! 5
-        return $ phToLas bitext indices
+        let bitext = parseBi $ conllu2bi (srcConllu,trgConllu)
+        return $ M.toList $ phFileToAlignments bitext indices
       _ -> undefined
     getPattern :: [Flag] -> IO (Maybe UDPattern)
     getPattern flags = do
@@ -74,13 +73,13 @@ main = do
               return $ Just (read patternText :: UDPattern)
             else return Nothing
 
--- | Sort alignments by how likely theyare to be correct (kinda). 
-sortByConfidence :: [(Alignment,Info)] -> [(Alignment,Info)]
-sortByConfidence = sortOn (\(a,(r,o)) -> 
-                        let rs = (S.toList r) \\ [HEAD, PREV] 
+-- | Sort alignments by how likely they are to be correct (kinda). 
+sortByConfidence :: [Alignment] -> [Alignment]
+sortByConfidence = sortOn (\a -> 
+                        let rs = S.toList (reasons $ meta a) \\ [HEAD, PREV] 
                         in (
                             -(length rs), 
-                            -(o), 
+                            -(length $ sentIds $ meta a), 
                             tail rs
                           )) 
 
