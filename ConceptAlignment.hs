@@ -228,7 +228,9 @@ alignSent as cs p cl ex s@(s1,s2) =
     -- the list of criteria is needed because of how alignClause works
     alignSent' :: [Criterion] -> (UDTree,UDTree) -> AlignmentMap
     alignSent' cs (t@(RTree n ts),u@(RTree m us)) = if (not . null) matchingCs
-      then case (isJust p,headAlign (head matchingCs)) of
+      then case (isJust p,(not . null) ts 
+                          && (not . null) us 
+                          && headAlign (head matchingCs)) of
         -- not using a gf-ud pattern
         (False,True) -> insert' h (insert' a as) `union'` as'
         (False,False) -> insert' a as `union'` as'
