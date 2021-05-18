@@ -246,7 +246,7 @@ alignSent as cs p cl ex s@(s1,s2) =
           })
         h = alignHeads a
         -- subtree alignments
-        as' = unions' $ [alignSent' cs (t,u) | t <- ts', u <- us']
+        as' = prune $ unions' $ [alignSent' cs (t,u) | t <- ts', u <- us']
             where (ts',us') = (sortByLabel ts,sortByLabel us)
                     where sortByLabel = sortOn (udSimpleDEPREL . root)
         matchingCs = 
@@ -337,6 +337,26 @@ alignSent as cs p cl ex s@(s1,s2) =
               where
                 aus = filterByLabel "amod" us
                 ats = filterByLabel "amod" ts 
+    
+-- | Helper function removing the less valid alternative alignments
+prune :: AlignmentMap -> AlignmentMap
+-- two different sorting functions are used one after another so it's 
+-- easier to change the code to use only one of them or change the order 
+-- in which they are applied
+prune m = M.fromList $ nubBy areAlt $ sortByFertility $ sortByReasons $ M.toList m
+  where 
+    -- check if two alignments are alternative to each other comparing THE
+    -- ACTUAL TREES, and not their "linearizations"
+    areAlt a b = sl a == sl b || tl a == tl b
+    -- sort alignments by number of reasons (decreasing order), then by first
+    sortByReasons = sortOn (\a -> 
+      let rs = reasons (meta a)
+          rs' = rs `S.difference` S.fromList [HEAD, PREV, PM] 
+      in (-(length rs'), maximum $ S.elems rs))
+    -- alt. fertility-based sorting strategy
+    -- top alignments are the ones that lead to more sub-alignments
+    sortByFertility as = sortOn (\a -> - (length $ subas a)) as
+      where subas a = filter (\a' -> a `contains` a') as
 
 {- Propagation functions -}
 
