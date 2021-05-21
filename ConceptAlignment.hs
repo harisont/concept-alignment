@@ -152,7 +152,6 @@ data Reason = DIV   -- known interlingual divergence
             | CL    -- due to clause segmentation and alignment
             | REST  -- due to "alignment by exclusion"
             | HEAD  -- composed of the heads of another alignment (alignHeads)
-            | PM    -- obtained via pattern matching/replacement pattern
             | KNOWN -- already found in another sentence or known a priori 
   deriving (Eq,Show,Read,Ord,Enum,Bounded)
 
@@ -221,19 +220,19 @@ alignSent as cs p cl ex (s1,s2) = unions' [as, as', as'']
           then sentId s1 
           else error "unaligned sentences"
     -- "basic" alignment based on sentence/clause recursive alignment
-    as' = if cl then alignClauses as sid cs (t1,t2) else alignSent' as sid cs (t1,t2)
-    as'' = if ex then alignRest sid (t1,t2) cs as' else M.empty
+    as' = if cl then alignClauses p as sid cs (t1,t2) else alignSent' p as sid cs (t1,t2)
+    as'' = if ex then alignRest p sid (t1,t2) cs as' else M.empty
     
 -- the list of criteria is needed because of how alignClause works
-alignSent' :: AlignmentMap -> String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
-alignSent' as sid cs (t@(RTree n ts), u@(RTree m us)) 
+alignSent' :: Maybe UDPattern -> AlignmentMap -> String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+alignSent' p as sid cs (t@(RTree n ts), u@(RTree m us)) 
   -- 1+ criteria match
   | (not . null) cs' = prune as'
-  | AT (t,u) `M.member` as = 
-      (AT (t,u), initMeta {
-            reasons = S.singleton KNOWN,
-            sentIds = S.singleton sid 
-          }) `insert'` as -- TODO: recursion?
+  -- | AT (t,u) `M.member` as = 
+  --     (AT (t,u), initMeta {
+  --           reasons = S.singleton KNOWN,
+  --           sentIds = S.singleton sid 
+  --         }) `insert'` as -- TODO: recursion?
   | otherwise = M.empty
     where
       tu = (AT (t,u), initMeta {
@@ -244,24 +243,27 @@ alignSent' as sid cs (t@(RTree n ts), u@(RTree m us))
       cs' = map snd (filter fst (zip [f t u | f <- map func cs] cs))
       c = head cs' -- the first determines reasons & if heads are aligned
       -- new alignments, subtrees included
-      as' = case (False,headAlign c,False) of -- TODO:
+      as' = case (isJust p,(not . null) ts 
+                            && (not . null) us 
+                            && headAlign (head cs')) of
         -- not using a pattern: add head if necessary
-        (False,True,_) -> h `insert'` (tu `insert'` sas)
-        (False,False,_) -> tu `insert'` sas
+        (False,True) -> h `insert'` (tu `insert'` sas)
+        (False,False) -> tu `insert'` sas
         -- using a pattern: only add alignment if something has changed
-        (True,_,True) -> undefined -- TODO:tup `insert'` sas
-        (True,_,False) -> sas
+        (True,_) -> if alignPattern (fromJust p) tu
+                      then tu `insert'` sas
+                      else sas
         where
           h = alignHeads tu -- heads 
           -- subtree alignments
-          sas = unions' $ map (alignSent' as sid cs) [(t,u) | t <- ts', u <- us']
+          sas = unions' $ map (alignSent' p as sid cs) [(t,u) | t <- ts', u <- us']
             where (ts',us') = (sortByLabel ts,sortByLabel us)
                     where sortByLabel = sortOn (udSimpleDEPREL . root)
 
 -- call alignSent' on all pairs of clauses found in t and u
-alignClauses :: AlignmentMap -> String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
-alignClauses as sid cs (t,u) = 
-    unions' $ map (alignSent' as sid (cs ++ [clause])) clausePairs
+alignClauses :: Maybe UDPattern -> AlignmentMap -> String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+alignClauses p as sid cs (t,u) = 
+    unions' $ map (alignSent' p as sid (cs ++ [clause])) clausePairs
   where 
     clausePairs = [(ct,cu) | ct <- cts, cu <- cus, 
                              length (clauses ct) == length (clauses cu)]
@@ -272,9 +274,9 @@ alignClauses as sid cs (t,u) =
     
 -- call alignSent' on all pairs of unaligned nominals + modifiers
 -- ("alignment by exclusion")
-alignRest :: String -> (UDTree,UDTree) -> [Criterion] -> AlignmentMap -> AlignmentMap
-alignRest sid (t,u) cs as = 
-  unions' $ map (alignSent' as sid cs') nomPairs
+alignRest :: Maybe UDPattern  -> String -> (UDTree,UDTree) -> [Criterion] -> AlignmentMap -> AlignmentMap
+alignRest p sid (t,u) cs as = 
+  unions' $ map (alignSent' p as sid cs') nomPairs
     where
       nomPairs = [(nt,nu) | nt <- nts, nt `notElem` las, 
                             nu <- nus, nu `notElem` ras,
@@ -357,7 +359,7 @@ prune m = M.fromList $ nubBy areAlt $ sortByFertility $ sortByReasons $ M.toList
     -- sort alignments by number of reasons (decreasing order), then by first
     sortByReasons = sortOn (\a -> 
       let rs = reasons (meta a)
-          rs' = rs `S.difference` S.fromList [HEAD, KNOWN, PM] 
+          rs' = rs `S.difference` S.fromList [HEAD, KNOWN] 
       in (-(length rs'), maximum $ S.elems rs))
     -- alt. fertility-based sorting strategy
     -- top alignments are the ones that lead to more sub-alignments
