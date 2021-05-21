@@ -37,7 +37,7 @@ phFileToAlignments (s:ss) (ps:pss) =
     phSentToAlignment (src,trg) ((i,js):ps) = 
         a `insert'` phSentToAlignment (src,trg) ps
       where 
-        a = (AT (t,u),initMeta { reasons = S.singleton FAST })
+        a = (AT (t,u),initMeta { reasons = S.singleton KNOWN })
         (t,u) = (mockUDTree one,mockUDTree many) 
         mockUDTree x = 
             RTree ((initUDWord 1) { udFORM = filter (/= '\n') x }) []

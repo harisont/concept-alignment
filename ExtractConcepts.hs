@@ -76,7 +76,7 @@ main = do
 -- | Sort alignments by how likely they are to be correct (kinda). 
 sortByConfidence :: [Alignment] -> [Alignment]
 sortByConfidence = sortOn (\a -> 
-                        let rs = S.toList (reasons $ meta a) \\ [HEAD, PREV] 
+                        let rs = S.toList (reasons $ meta a) \\ [HEAD, KNOWN] 
                         in (
                             -(length rs), 
                             -(length $ sentIds $ meta a), 

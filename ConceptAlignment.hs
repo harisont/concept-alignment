@@ -153,8 +153,7 @@ data Reason = DIV   -- known interlingual divergence
             | REST  -- due to "alignment by exclusion"
             | HEAD  -- composed of the heads of another alignment (alignHeads)
             | PM    -- obtained via pattern matching/replacement pattern
-            | PREV  -- already found in another sentence 
-            | FAST  -- found by fast_align
+            | KNOWN -- already found in another sentence or known a priori 
   deriving (Eq,Show,Read,Ord,Enum,Bounded)
 
 -- | Data type for alignment criteria. Each criterion is composed of
@@ -222,24 +221,25 @@ alignSent as cs p cl ex (s1,s2) = unions' [as, as', as'']
           then sentId s1 
           else error "unaligned sentences"
     -- "basic" alignment based on sentence/clause recursive alignment
-    as' = if cl then alignClauses sid cs (t1,t2) else alignSent' sid cs (t1,t2)
+    as' = if cl then alignClauses as sid cs (t1,t2) else alignSent' as sid cs (t1,t2)
     as'' = if ex then alignRest sid (t1,t2) cs as' else M.empty
     
 -- the list of criteria is needed because of how alignClause works
-alignSent' :: String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
-alignSent' sid cs (t@(RTree n ts), u@(RTree m us)) 
+alignSent' :: AlignmentMap -> String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+alignSent' as sid cs (t@(RTree n ts), u@(RTree m us)) 
   -- 1+ criteria match
   | (not . null) cs' = prune as'
-  -- TODO:
-  -- | A (t,u) `M.member` as = [
-  --     (A (t,u),(S.singleton PREV,1)), 
-  --     (alignHeads (A (t,u)),(S.fromList [HEAD,PREV], 1))
-  --   ]
-  -- | linearize (A (t,u)) `elem` map ltrees las = [
-  --     (A (t,u),(S.singleton FAST,1))
-  --   ]
+  | AT (t,u) `M.member` as = 
+      (AT (t,u), initMeta {
+            reasons = S.singleton KNOWN,
+            sentIds = S.singleton sid 
+          }) `insert'` as -- TODO: recursion?
   | otherwise = M.empty
     where
+      tu = (AT (t,u), initMeta {
+            reasons = reas c,
+            sentIds = S.singleton sid 
+          }) 
       -- applying criteria 
       cs' = map snd (filter fst (zip [f t u | f <- map func cs] cs))
       c = head cs' -- the first determines reasons & if heads are aligned
@@ -252,20 +252,16 @@ alignSent' sid cs (t@(RTree n ts), u@(RTree m us))
         (True,_,True) -> undefined -- TODO:tup `insert'` sas
         (True,_,False) -> sas
         where
-          tu = (AT (t,u), initMeta {
-            reasons = reas c,
-            sentIds = S.singleton sid 
-          }) 
           h = alignHeads tu -- heads 
           -- subtree alignments
-          sas = unions' $ map (alignSent' sid cs) [(t,u) | t <- ts', u <- us']
+          sas = unions' $ map (alignSent' as sid cs) [(t,u) | t <- ts', u <- us']
             where (ts',us') = (sortByLabel ts,sortByLabel us)
                     where sortByLabel = sortOn (udSimpleDEPREL . root)
 
 -- call alignSent' on all pairs of clauses found in t and u
-alignClauses :: String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
-alignClauses sid cs (t,u) = 
-    unions' $ map (alignSent' sid (cs ++ [clause])) clausePairs
+alignClauses :: AlignmentMap -> String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+alignClauses as sid cs (t,u) = 
+    unions' $ map (alignSent' as sid (cs ++ [clause])) clausePairs
   where 
     clausePairs = [(ct,cu) | ct <- cts, cu <- cus, 
                              length (clauses ct) == length (clauses cu)]
@@ -278,7 +274,7 @@ alignClauses sid cs (t,u) =
 -- ("alignment by exclusion")
 alignRest :: String -> (UDTree,UDTree) -> [Criterion] -> AlignmentMap -> AlignmentMap
 alignRest sid (t,u) cs as = 
-  unions' $ map (alignSent' sid cs') nomPairs
+  unions' $ map (alignSent' as sid cs') nomPairs
     where
       nomPairs = [(nt,nu) | nt <- nts, nt `notElem` las, 
                             nu <- nus, nu `notElem` ras,
@@ -361,7 +357,7 @@ prune m = M.fromList $ nubBy areAlt $ sortByFertility $ sortByReasons $ M.toList
     -- sort alignments by number of reasons (decreasing order), then by first
     sortByReasons = sortOn (\a -> 
       let rs = reasons (meta a)
-          rs' = rs `S.difference` S.fromList [HEAD, PREV, PM] 
+          rs' = rs `S.difference` S.fromList [HEAD, KNOWN, PM] 
       in (-(length rs'), maximum $ S.elems rs))
     -- alt. fertility-based sorting strategy
     -- top alignments are the ones that lead to more sub-alignments
