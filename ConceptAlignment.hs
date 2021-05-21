@@ -215,17 +215,21 @@ alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g.
                                        -- being used as hybrid
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
           -> AlignmentMap              -- ^ a map of alignments
-alignSent as cs p cl ex hy (s1,s2) = unions' [as, as', as'']
+alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
   where
     (t1,t2) = (udSentence2tree s1, udSentence2tree s2)
     sid = if sentId s1 == sentId s2 
           then sentId s1 
           else error "unaligned sentences"
-    -- "basic" alignment based on sentence/clause recursive alignment
-    as' = if cl then alignClauses as cs (t1,t2) else alignSent' as cs (t1,t2)
-    as'' = if ex then alignRest as' cs (t1,t2) else M.empty
+    as' = basic `union'` byExclusion
+      where
+        -- "basic" alignment based on sentence/clause recursive alignment
+        basic = if cl 
+                  then alignClauses as cs (t1,t2) 
+                  else alignSent' as cs (t1,t2)
+        -- alignments "by exclusion"
+        byExclusion = if ex then alignRest basic cs (t1,t2) else M.empty
 
-    alignSent' :: AlignmentMap -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
     alignSent' as cs (t@(RTree n ts), u@(RTree m us)) 
       -- 1+ criteria match
       | (not . null) matchingCs = prune as'
@@ -233,7 +237,7 @@ alignSent as cs p cl ex hy (s1,s2) = unions' [as, as', as'']
           (AT (t,u), initMeta {
                 reasons = S.singleton KNOWN,
                 sentIds = S.singleton sid 
-              }) `insert'` as -- TODO: recursion?
+              }) `insert'` as -- TODO: recursion? optimization via update?
       | otherwise = M.empty
         where
           tu = (AT (t,u), initMeta {
@@ -242,7 +246,7 @@ alignSent as cs p cl ex hy (s1,s2) = unions' [as, as', as'']
               }) 
           -- applying criteria 
           matchingCs = map snd (filter fst (zip [f t u | f <- map func cs] cs))
-          c = head matchingCs -- the first determines reasons & if heads are aligned
+          c = head matchingCs -- 1st determines reasons & if heads are aligned
           -- new alignments, subtrees included
           as' = case (isJust p,(not . null) ts 
                                 && (not . null) us 
@@ -257,7 +261,8 @@ alignSent as cs p cl ex hy (s1,s2) = unions' [as, as', as'']
             where
               h = alignHeads tu -- heads 
               -- subtree alignments
-              sas = unions' $ map (alignSent' as cs) [(t,u) | t <- ts', u <- us']
+              sas = 
+                unions' $ map (alignSent' as cs) [(t,u) | t <- ts', u <- us']
                 where (ts',us') = (sortByLabel ts,sortByLabel us)
                         where sortByLabel = sortOn (udSimpleDEPREL . root)
 
