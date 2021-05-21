@@ -97,7 +97,7 @@ prMeta m = "reasons: " ++ showSet (reasons m)
     showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
 
 -- | Map of alignments (used internally to simplify combining metadata)
-type AlignmentMap = M.Map AlignedTrees Meta
+type AlignMap = M.Map AlignedTrees Meta
 
 {- Helper functions for alignment maps-}
 
@@ -110,17 +110,17 @@ m `combineMeta` n = M {
 
 -- | Insert a new alignment combining metadata if an equivalent one is already
 -- present
-insert' :: (AlignedTrees,Meta) -> AlignmentMap -> AlignmentMap 
+insert' :: (AlignedTrees,Meta) -> AlignMap -> AlignMap 
 insert' (at,m) = M.insertWith combineMeta at m
 
 -- | Perform the union of two maps combining the metadata of equivalent
 -- alignments
-union' :: AlignmentMap -> AlignmentMap -> AlignmentMap 
+union' :: AlignMap -> AlignMap -> AlignMap 
 union' = M.unionWith combineMeta
 
 -- | Perform the union of n maps combining the metadata of equivalent
 -- alignments
-unions' :: [AlignmentMap] -> AlignmentMap
+unions' :: [AlignMap] -> AlignMap
 unions' = M.unionsWith combineMeta
 
 -- | Type of manual annotations.
@@ -201,7 +201,7 @@ align as cs p cl ex (s:ss) =
   where as' = M.fromListWith combineMeta as
 
 -- | Sentence-level alignment function. Can be use independently of align   
-alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g. 
+alignSent :: AlignMap              -- ^ a map of known alignments (e.g. 
                                        -- from statistical tools)
           -> [Criterion]               -- ^ a list of criteria (sorted by 
                                        -- priority)
@@ -214,7 +214,7 @@ alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g.
           -> Bool                      -- ^ a flag indicating whether CA is
                                        -- being used as hybrid
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
-          -> AlignmentMap              -- ^ a map of alignments
+          -> AlignMap              -- ^ a map of alignments
 alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
   where
     (t1,t2) = (udSentence2tree s1, udSentence2tree s2)
@@ -230,6 +230,7 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
         -- alignments "by exclusion"
         byExclusion = if ex then alignRest basic cs (t1,t2) else M.empty
 
+    alignSent' :: AlignMap -> [Criterion] -> (UDTree,UDTree) -> AlignMap
     alignSent' as cs (t@(RTree n ts), u@(RTree m us)) 
       -- 1+ criteria match
       | (not . null) matchingCs = prune as'
@@ -245,7 +246,8 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
                 sentIds = S.singleton sid 
               }) 
           -- applying criteria 
-          matchingCs = map snd (filter fst (zip [f t u | f <- map func cs] cs))
+          matchingCs = 
+            map snd (filter fst (zip [f t u | f <- map func cs] cs))
           c = head matchingCs -- 1st determines reasons & if heads are aligned
           -- new alignments, subtrees included
           as' = case (isJust p,(not . null) ts 
@@ -267,7 +269,7 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
                         where sortByLabel = sortOn (udSimpleDEPREL . root)
 
     -- call alignSent' on all pairs of clauses found in t and u
-    alignClauses :: AlignmentMap -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+    alignClauses :: AlignMap -> [Criterion] -> (UDTree,UDTree) -> AlignMap
     alignClauses as cs (t,u) = 
         unions' $ map (alignSent' as (cs ++ [clause])) clausePairs
       where 
@@ -280,7 +282,7 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
 
     -- call alignSent' on all pairs of unaligned nominals + modifiers
     -- ("alignment by exclusion")
-    alignRest :: AlignmentMap -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+    alignRest :: AlignMap -> [Criterion] -> (UDTree,UDTree) -> AlignMap
     alignRest as cs (t,u) = 
       unions' $ map (alignSent' as matchingCs) nomPairs
         where
@@ -353,11 +355,12 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
                 ats = filterByLabel "amod" ts 
     
 -- | Helper function removing the less valid alternative alignments
-prune :: AlignmentMap -> AlignmentMap
+prune :: AlignMap -> AlignMap
 -- two different sorting functions are used one after another so it's 
 -- easier to change the code to use only one of them or change the order 
 -- in which they are applied
-prune m = M.fromList $ nubBy areAlt $ sortByFertility $ sortByReasons $ M.toList m
+prune m = 
+  M.fromList $ nubBy areAlt $ sortByFertility $ sortByReasons $ M.toList m
   where 
     -- check if two alignments are alternative to each other comparing THE
     -- ACTUAL TREES, and not their "linearizations"
@@ -385,7 +388,7 @@ propagate :: [Criterion]                 -- ^ a list of criteria
           -> ([UDSentence],[UDSentence]) -- ^ a pair of lists of UD sentences 
                                          -- (the sentences to propagate on) in
                                          -- L1, L2
-          -> UDTree                      -- ^ a previously extracted L1 concept
+          -> UDTree                      -- ^ a previously extracted concept
           -> Maybe Alignment             -- ^ an alignment, if found
 propagate cs segment byExcl ([],[]) _ = Nothing 
 propagate cs segment byExcl (t:ts,u:us) c =
