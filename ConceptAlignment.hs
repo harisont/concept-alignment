@@ -215,128 +215,138 @@ alignSent :: AlignmentMap              -- ^ a map of known alignments (e.g.
                                        -- be performed 
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
           -> AlignmentMap              -- ^ a map of alignments
-alignSent as cs p cl ex s@(s1,s2) = 
-  if ex then extra `M.union` basic else basic
-  where 
-    basic = if cl then alignClauses (t,u) else alignSent' cs (t,u)
-    extra = alignRest basic -- alignments obtained "by exclusion"
-    id = if sentId s1 == sentId s2 
-              then sentId s1 
-              else error "unaligned sentences"
-    (t,u) = (udSentence2tree s1, udSentence2tree s2)
-
-    -- the list of criteria is needed because of how alignClause works
-    alignSent' :: [Criterion] -> (UDTree,UDTree) -> AlignmentMap
-    alignSent' cs (t@(RTree n ts),u@(RTree m us)) = if (not . null) matchingCs
-      then case (isJust p,(not . null) ts 
-                          && (not . null) us 
-                          && headAlign (head matchingCs)) of
-        -- not using a gf-ud pattern
-        (False,True) -> insert' h (insert' a as) `union'` as'
-        (False,False) -> insert' a as `union'` as'
-        -- using a gf-ud pattern: ignore head alignment altogether
-        (True,_) -> if alignPattern (fromJust p) a
-          then insert' a as `union'` as'
-          else as `union'` as'
-      else M.empty
-      where 
-        a = (AT (t,u), initMeta {
-            reasons = S.unions $ map reas matchingCs,
-            sentIds = S.singleton id 
-          })
-        h = alignHeads a
-        -- subtree alignments
-        as' = prune $ unions' $ [alignSent' cs (t,u) | t <- ts', u <- us']
+alignSent as cs p cl ex (s1,s2) = unions' [as, as', as'']
+  where
+    (t1,t2) = (udSentence2tree s1, udSentence2tree s2)
+    sid = if sentId s1 == sentId s2 
+          then sentId s1 
+          else error "unaligned sentences"
+    -- "basic" alignment based on sentence/clause recursive alignment
+    as' = if cl then alignClauses sid cs (t1,t2) else alignSent' sid cs (t1,t2)
+    as'' = if ex then undefined else M.empty -- TODO: alignRest
+    
+-- the list of criteria is needed because of how alignClause works
+alignSent' :: String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+alignSent' sid cs (t@(RTree n ts), u@(RTree m us)) 
+  -- 1+ criteria match
+  | (not . null) cs' = prune as'
+  -- TODO:
+  -- | A (t,u) `M.member` as = [
+  --     (A (t,u),(S.singleton PREV,1)), 
+  --     (alignHeads (A (t,u)),(S.fromList [HEAD,PREV], 1))
+  --   ]
+  -- | linearize (A (t,u)) `elem` map ltrees las = [
+  --     (A (t,u),(S.singleton FAST,1))
+  --   ]
+  | otherwise = M.empty
+    where
+      -- applying criteria 
+      cs' = map snd (filter fst (zip [f t u | f <- map func cs] cs))
+      c = head cs' -- the first determines reasons & if heads are aligned
+      -- new alignments, subtrees included
+      as' = case (False,headAlign c,False) of -- TODO:
+        -- not using a pattern: add head if necessary
+        (False,True,_) -> h `insert'` (tu `insert'` sas)
+        (False,False,_) -> tu `insert'` sas
+        -- using a pattern: only add alignment if something has changed
+        (True,_,True) -> undefined -- TODO:tup `insert'` sas
+        (True,_,False) -> sas
+        where
+          tu = (AT (t,u), initMeta {
+            reasons = reas c,
+            sentIds = S.singleton sid 
+          }) 
+          h = alignHeads tu -- heads 
+          -- subtree alignments
+          sas = unions' $ map (alignSent' sid cs) [(t,u) | t <- ts', u <- us']
             where (ts',us') = (sortByLabel ts,sortByLabel us)
                     where sortByLabel = sortOn (udSimpleDEPREL . root)
-        matchingCs = 
-          map snd (filter fst (zip [f t u | f <- map func cs] cs))
 
-    -- call alignSent' on all pairs of clauses found in t and u
-    alignClauses :: (UDTree,UDTree) -> AlignmentMap
-    alignClauses (t,u) = 
-        unions' $ map (alignSent' (cs ++ [clause])) clausePairs
-      where 
-        clausePairs = [(ct,cu) | ct <- cts, cu <- cus, 
-                                 length (clauses ct) == length (clauses cu)]
-        -- get all clauses, sorted by dep. relation and distance from root
-        (cts,cus) = (sortCs $ clauses t, sortCs $ clauses u)
-        sortCs = sortOn (\(RTree n ts) -> 
-          (udSimpleDEPREL n,dependencyDistance n))
+-- call alignSent' on all pairs of clauses found in t and u
+alignClauses :: String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
+alignClauses sid cs (t,u) = 
+    unions' $ map (alignSent' sid (cs ++ [clause])) clausePairs
+  where 
+    clausePairs = [(ct,cu) | ct <- cts, cu <- cus, 
+                             length (clauses ct) == length (clauses cu)]
+    -- get all clauses, sorted by dep. relation and distance from root
+    (cts,cus) = (sortCs $ clauses t, sortCs $ clauses u)
+    sortCs = sortOn (\(RTree n ts) -> 
+      (udSimpleDEPREL n,dependencyDistance n))
+    
+-- call alignSent' on all pairs of unaligned nominals + modifiers
+-- ("alignment by exclusion") TODO:
+--alignRest :: AlignmentMap -> AlignmentMap
+--alignRest as = 
+--  unions' $ map (alignSent' cs') nomPairs
+--    where
+--      nomPairs = [(nt,nu) | nt <- nts, nt `notElem` las, 
+--                            nu <- nus, nu `notElem` ras,
+--                            length (nommods nt) == length (nommods nu)]
+--      -- get all nominals and modifiers, sorted by label 
+--      -- and distance from root
+--      (nts,nus) = (sortNs $ nommods t, sortNs $ nommods u)
+--      sortNs = sortOn (\(RTree n ts) -> 
+--        (udSimpleDEPREL n,dependencyDistance n))
+--      (las,ras) = (map (\(AT (t,u),v) -> t) (M.toList as), 
+--                   map (\(AT (t,u),v) -> u) (M.toList as))
+--      cs' = map 
+--        (\(C f _ h s) -> C f (S.singleton REST) h s) 
+--        (filter strict cs)
 
-    -- call alignSent' on all pairs of unaligned nominals + modifiers
-    -- ("alignment by exclusion")
-    alignRest :: AlignmentMap -> AlignmentMap
-    alignRest as = 
-      unions' $ map (alignSent' cs') nomPairs
-        where
-          nomPairs = [(nt,nu) | nt <- nts, nt `notElem` las, 
-                                nu <- nus, nu `notElem` ras,
-                                length (nommods nt) == length (nommods nu)]
-          -- get all nominals and modifiers, sorted by label 
-          -- and distance from root
-          (nts,nus) = (sortNs $ nommods t, sortNs $ nommods u)
-          sortNs = sortOn (\(RTree n ts) -> 
-            (udSimpleDEPREL n,dependencyDistance n))
-          (las,ras) = (map (\(AT (t,u),v) -> t) (M.toList as), 
-                       map (\(AT (t,u),v) -> u) (M.toList as))
-          cs' = map 
-            (\(C f _ h s) -> C f (S.singleton REST) h s) 
-            (filter strict cs)
+-- check if an alignment matches a certain gf-ud pattern.
+alignPattern :: UDPattern -> Alignment -> Bool
+alignPattern p a = ifMatchUDPattern p (sl a) && ifMatchUDPattern p (tl a)
 
-    -- check if an alignment matches a certain gf-ud pattern.
-    alignPattern :: UDPattern -> Alignment -> Bool
-    alignPattern p a = ifMatchUDPattern p (sl a) && ifMatchUDPattern p (tl a)
+-- head alignment: given an alignment, return a new one  
+-- for their "heads", respecting any compounds and aux+verbs (and more?)
+alignHeads :: Alignment -> Alignment
+alignHeads a
+  -- if there are compound constructions, look for their counterparts and
+  -- align accordingly
+  | (not . null) cts = 
+      initHeadAlignment $ AT (RTree n cts, RTree m (compCountps ts us))
+  | (not . null) cus = 
+      initHeadAlignment $ AT (RTree n (compCountps us ts), RTree m cus)
+  -- if the roots are verbs (to avoid messing with copulas) and only one
+  -- of them has 1+ auxiliaries, align verb | verb + auxiliaries
+  | all isVerb [n,m] && (not . null) ats && null aus = 
+      initHeadAlignment $ AT (RTree n ats, RTree m [])
+  | all isVerb [n,m] && null ats && (not . null) aus = 
+      initHeadAlignment $ AT (RTree n [], RTree m aus) 
+  | otherwise = initHeadAlignment $ AT (RTree n [], RTree m [])
+  where
+    AT (RTree n ts,RTree m us) = trees a
+    -- select subtrees labelled in a certain way 
+    filterByLabel l xs = filter (`isLabelled` l) xs
 
-    -- head alignment: given an alignment, return a new one  
-    -- for their "heads", respecting any compounds and aux+verbs (and more?)
-    alignHeads :: Alignment -> Alignment
-    alignHeads a
-      -- if there are compound constructions, look for their counterparts and
-      -- align accordingly
-      | (not . null) cts = 
-          initHeadAlignment $ AT (RTree n cts, RTree m (compCountps ts us))
-      | (not . null) cus = 
-          initHeadAlignment $ AT (RTree n (compCountps us ts), RTree m cus)
-      -- if the roots are verbs (to avoid messing with copulas) and only one
-      -- of them has 1+ auxiliaries, align verb | verb + auxiliaries
-      | all isVerb [n,m] && (not . null) ats && null aus = 
-          initHeadAlignment $ AT (RTree n ats, RTree m [])
-      | all isVerb [n,m] && null ats && (not . null) aus = 
-          initHeadAlignment $ AT (RTree n [], RTree m aus) 
-      | otherwise = initHeadAlignment $ AT (RTree n [], RTree m [])
+    ats = filterByLabel "aux" ts
+    aus = filterByLabel "aux" us
+    cts = filterByLabel "compound" ts
+    cus = filterByLabel "compound" us
+
+    initHeadAlignment tu = (tu, (meta a) { 
+        reasons = S.singleton HEAD `S.union` reasons (meta a)
+      })
+
+    -- given two lists of subtrees, select those that, in the second,
+    -- could correspond to a compound construction in the first, i.e.
+    compCountps :: [UDTree] -> [UDTree] -> [UDTree]
+    compCountps ts us = cus ++ fus' ++ nus' ++ aus'
       where
-        AT (RTree n ts,RTree m us) = trees a
-        -- select subtrees labelled in a certain way 
-        filterByLabel l xs = filter (`isLabelled` l) xs
-    
-        ats = filterByLabel "aux" ts
-        aus = filterByLabel "aux" us
-        cts = filterByLabel "compound" ts
         cus = filterByLabel "compound" us
-    
-        initHeadAlignment tu = (tu, (meta a) { 
-            reasons = S.singleton HEAD `S.union` reasons (meta a)
-          })
-    
-        -- given two lists of subtrees, select those that, in the second,
-        -- could correspond to a compound construction in the first, i.e.
-        compCountps :: [UDTree] -> [UDTree] -> [UDTree]
-        compCountps ts us = cus ++ fus' ++ nus' ++ aus'
+        fus' = if length fus > length fts then fus else []
+          where 
+            fus = filterByLabel "flat" us
+            fts = filterByLabel "flat" ts
+        nus' = if length nus > length nts then nus else []
           where
-            cus = filterByLabel "compound" us
-            fus' = if length fus > length fts then fus else []
-              where 
-                fus = filterByLabel "flat" us
-                fts = filterByLabel "flat" ts
-            nus' = if length nus > length nts then nus else []
-              where
-                nus = filterByLabel "nmod" us
-                nts = filterByLabel "nmod" ts
-            aus' = if length aus > length ats then aus else []
-              where
-                aus = filterByLabel "amod" us
-                ats = filterByLabel "amod" ts 
+            nus = filterByLabel "nmod" us
+            nts = filterByLabel "nmod" ts
+        aus' = if length aus > length ats then aus else []
+          where
+            aus = filterByLabel "amod" us
+            ats = filterByLabel "amod" ts 
     
 -- | Helper function removing the less valid alternative alignments
 prune :: AlignmentMap -> AlignmentMap
