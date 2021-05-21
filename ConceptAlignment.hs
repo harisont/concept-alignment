@@ -223,7 +223,7 @@ alignSent as cs p cl ex (s1,s2) = unions' [as, as', as'']
           else error "unaligned sentences"
     -- "basic" alignment based on sentence/clause recursive alignment
     as' = if cl then alignClauses sid cs (t1,t2) else alignSent' sid cs (t1,t2)
-    as'' = if ex then undefined else M.empty -- TODO: alignRest
+    as'' = if ex then alignRest sid (t1,t2) cs as' else M.empty
     
 -- the list of criteria is needed because of how alignClause works
 alignSent' :: String -> [Criterion] -> (UDTree,UDTree) -> AlignmentMap
@@ -275,24 +275,24 @@ alignClauses sid cs (t,u) =
       (udSimpleDEPREL n,dependencyDistance n))
     
 -- call alignSent' on all pairs of unaligned nominals + modifiers
--- ("alignment by exclusion") TODO:
---alignRest :: AlignmentMap -> AlignmentMap
---alignRest as = 
---  unions' $ map (alignSent' cs') nomPairs
---    where
---      nomPairs = [(nt,nu) | nt <- nts, nt `notElem` las, 
---                            nu <- nus, nu `notElem` ras,
---                            length (nommods nt) == length (nommods nu)]
---      -- get all nominals and modifiers, sorted by label 
---      -- and distance from root
---      (nts,nus) = (sortNs $ nommods t, sortNs $ nommods u)
---      sortNs = sortOn (\(RTree n ts) -> 
---        (udSimpleDEPREL n,dependencyDistance n))
---      (las,ras) = (map (\(AT (t,u),v) -> t) (M.toList as), 
---                   map (\(AT (t,u),v) -> u) (M.toList as))
---      cs' = map 
---        (\(C f _ h s) -> C f (S.singleton REST) h s) 
---        (filter strict cs)
+-- ("alignment by exclusion")
+alignRest :: String -> (UDTree,UDTree) -> [Criterion] -> AlignmentMap -> AlignmentMap
+alignRest sid (t,u) cs as = 
+  unions' $ map (alignSent' sid cs') nomPairs
+    where
+      nomPairs = [(nt,nu) | nt <- nts, nt `notElem` las, 
+                            nu <- nus, nu `notElem` ras,
+                            length (nommods nt) == length (nommods nu)]
+      -- get all nominals and modifiers, sorted by label 
+      -- and distance from root
+      (nts,nus) = (sortNs $ nommods t, sortNs $ nommods u)
+      sortNs = sortOn (\(RTree n ts) -> 
+        (udSimpleDEPREL n,dependencyDistance n))
+      (las,ras) = (map (\(AT (t,u),v) -> t) (M.toList as), 
+                   map (\(AT (t,u),v) -> u) (M.toList as))
+      cs' = map 
+        (\(C f _ h s) -> C f (S.singleton REST) h s) 
+        (filter strict cs)
 
 -- check if an alignment matches a certain gf-ud pattern.
 alignPattern :: UDPattern -> Alignment -> Bool
