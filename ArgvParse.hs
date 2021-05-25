@@ -15,6 +15,7 @@ data Flag = Pharaoh String
           | Clauses 
           | Rest
           | Linearize
+          | Simple
           | Help
           | Reasons
   deriving (Show,Eq)

@@ -18,15 +18,15 @@ main = do
         [old,src,trg] -> if Help `elem` flags
             then putStrLn help >> exitSuccess
             else do
-                cs <- conlluFile2UDTrees old
+                cs <- parseUDFile old
                 ts <- parseUDFile src
                 us <- parseUDFile trg
                 let segment = Clauses `elem` flags
                 let byExcl = Rest `elem` flags
+                let s = Simple `elem` flags
                 let fp = listToMaybe [path | Path path <- flags] 
                 let fp' = fromJust fp
-                let cs' = map unadjust cs
-                let as = map (propagate criteria segment byExcl (ts,us)) cs'
+                let as = map (propagate criteria segment byExcl s (ts,us)) cs
                 if Linearize `elem` flags
                     then 
                         if isJust fp 
@@ -46,27 +46,20 @@ main = do
             putStrLn "Wrong number of arguments."
             putStrLn help
             exitWith (ExitFailure 1)
-    where
-        -- use original label
-        unadjust :: UDTree -> UDTree
-        unadjust (RTree n ts) = RTree n { 
-            udDEPREL = fromMaybe (udDEPREL n) (getOrigLabel n)
-        } ts
-            where getOrigLabel n = 
-                    listToMaybe [head ls | UDData "ORIG_LABEL" ls <- udMISC n]
 
 {- Argument parsing -} 
 
 options :: [OptDescr Flag]
 options = [ 
-      Option ['f']  ["file"]      (ReqArg Path "FILE")      "write the output to a file" 
-    , Option []     ["clauses"]   (NoArg Clauses)           "align clause-by-clause"
-    , Option []     ["rest"]      (NoArg Rest)              "try to align all nominals and modifiers"
-    , Option ['l']  ["linearize"] (NoArg Linearize)         "print out alignments in .ca format instead of trees"
-    , Option ['h']  ["help"]      (NoArg Help)              "show this help message"
+      Option ['f']  ["file"]      (ReqArg Path "FILE") "write the output to a file" 
+    , Option []     ["clauses"]   (NoArg Clauses)      "align clause-by-clause"
+    , Option []     ["rest"]      (NoArg Rest)         "try to align all nominals and modifiers"
+    , Option ['l']  ["linearize"] (NoArg Linearize)    "print out alignments in .ca format instead of trees"
+    , Option []     ["same-text"] (NoArg Simple)       "specify that the text used for propagation is a translation of the one that was used for extraction"  
+    , Option ['h']  ["help"]      (NoArg Help)         "show this help message"
     ]
 
 help :: String
 help = usageInfo 
-        "Usage: stack exec -- PropagateConcepts SL_concepts.conllu SL.conllu TL.conllu [flags]"
+        "Usage: stack exec -- propagate-concepts SL_concepts.conllu SL.conllu TL.conllu [flags]"
         options
