@@ -397,7 +397,7 @@ propagate :: [Criterion]                 -- ^ a list of criteria
           -> Maybe Alignment             -- ^ an alignment, if found
 propagate cs segment byExcl _ ([],[]) _ = Nothing 
 propagate cs segment byExcl s (t:ts,u:us) c =
-  if (s && sentIds' c == sentId t) || not s
+  if (s && sentId t `S.member` sentIds' c) || not s
     then
       let 
         t' = udSentence2tree t
@@ -426,7 +426,10 @@ propagate cs segment byExcl s (t:ts,u:us) c =
       isJust $ listToMaybe $ 
         sortOn depthDiff (filter (isHeadUDTree c') (allSubRTrees t))
 
-sentIds' = undefined
+-- return the id of a sentence, taken from the comment that precedes it
+sentIds' :: UDSentence -> S.Set String 
+sentIds' s = read $ last $ splitOn "sentence IDs: " $ last $ udCommentLines s :: S.Set String
+
 
 -- check if a UD tree is the head of another
 isHeadUDTree :: UDTree -> UDTree -> Bool
