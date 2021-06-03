@@ -57,8 +57,10 @@ stack exec -- propagate-concepts SL_concepts.conllu SL.conllu TL.conllu
 ```
 
 All `extract-concepts` options that are also relevant for CP (i.e. all
-of them excepts `–maxsize` and `pharaoh`) are also valid for this second
+of them excepts `maxsize` and `pharaoh`) are also valid for this second
 executable.
+
+If propagation is performed using a translation of the same set of sentences (the sentence ids must correspond) used for the extraction step, using the (__recommended__) `same-text` flag can help improve performance and precision (while recall might decrease slightly).
 
 ### `generate-grammar`
 
