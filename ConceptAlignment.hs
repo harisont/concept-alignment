@@ -401,7 +401,8 @@ propagate cs segment byExcl s (t:ts,u:us) c =
     then
       let 
         t' = udSentence2tree t
-        as = M.toList $ alignSent M.empty cs Nothing segment byExcl False (t,u)
+        as = 
+          M.toList $ alignSent M.empty cs Nothing segment byExcl False (t,u)
         as' = case (c' `isSubUDTree'` t', c' `isHeadSubUDTree` t') of
           (True,_) -> sortOnDepth as
           (_,True) -> sortOnDepth $ 
@@ -428,7 +429,9 @@ propagate cs segment byExcl s (t:ts,u:us) c =
 
 -- return the id of a sentence, taken from the comment that precedes it
 sentIds' :: UDSentence -> S.Set String 
-sentIds' s = read $ last $ splitOn "sentence IDs: " $ last $ udCommentLines s :: S.Set String
+sentIds' s = S.fromList $ splitOn " " (
+  filter (\c -> c `notElem` ['{', '}', ',', '\"']) 
+  $ last $ splitOn "sentence IDs: " (concat $ udCommentLines s))
 
 
 -- check if a UD tree is the head of another
