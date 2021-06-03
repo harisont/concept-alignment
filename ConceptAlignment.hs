@@ -264,7 +264,7 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
               h = alignHeads tu -- heads 
               -- subtree alignments
               sas = 
-                unions' $ map (alignSent' as cs) [(t,u) | t <- ts', u <- us']
+                unions' $ [alignSent' as cs (t,u) | t <- ts', u <- us']
                 where (ts',us') = (sortByLabel ts,sortByLabel us)
                         where sortByLabel = sortOn (udSimpleDEPREL . root)
 
@@ -385,37 +385,54 @@ propagate :: [Criterion]                 -- ^ a list of criteria
           -> Bool                        -- ^ a flag indicating whether 
                                          -- alignment "by exclusion" should 
                                          -- also be performed 
+          -> Bool                        -- ^ a flag indicating if the 
+                                         -- propagation text is the same as
+                                         -- the extraction text, i.e. if the
+                                         -- sentence ID should be taken into 
+                                         -- account
           -> ([UDSentence],[UDSentence]) -- ^ a pair of lists of UD sentences 
                                          -- (the sentences to propagate on) in
                                          -- L1, L2
-          -> UDTree                      -- ^ a previously extracted concept
+          -> UDSentence                  -- ^ a previously extracted concept
           -> Maybe Alignment             -- ^ an alignment, if found
-propagate cs segment byExcl ([],[]) _ = Nothing 
-propagate cs segment byExcl (t:ts,u:us) c =
-  let 
-    t' = udSentence2tree t
-    as = M.toList $ alignSent M.empty cs Nothing segment byExcl False (t,u)
-    as' = case (c `isSubUDTree'` t', c `isHeadSubUDTree` t') of
-      (True,_) -> sortOnDepth as
-      (_,True) -> sortOnDepth $ 
-                    filter (\a -> HEAD `S.member` reasons (meta a)) as
-      (False,False) -> []
-    in case find (\a -> c =~ sl a) as' of
-      Nothing -> propagate cs segment byExcl (ts,us) c
-      n -> n
-    where 
-      -- difference between the depth of the SL aligned subtree and c:
-      -- the smaller, the better (mostly used to avoid that root nodes are
-      -- aligned with full sentences, but also makes sense in general)
-      depthDiff :: RTree a -> Int
-      depthDiff t = abs (depthRTree t - depthRTree c)
-      sortOnDepth :: [Alignment] ->[Alignment]
-      sortOnDepth = sortOn (depthDiff . sl)
-      -- check if c is the head of one of t's subtrees
-      isHeadSubUDTree :: UDTree -> UDTree -> Bool
-      isHeadSubUDTree c t = 
-        isJust $ listToMaybe $ 
-          sortOn depthDiff (filter (isHeadUDTree c) (allSubRTrees t))
+propagate cs segment byExcl _ ([],[]) _ = Nothing 
+propagate cs segment byExcl s (t:ts,u:us) c =
+  if (s && sentId t `S.member` sentIds' c) || not s
+    then
+      let 
+        t' = udSentence2tree t
+        as = 
+          M.toList $ alignSent M.empty cs Nothing segment byExcl False (t,u)
+        as' = case (c' `isSubUDTree'` t', c' `isHeadSubUDTree` t') of
+          (True,_) -> sortOnDepth as
+          (_,True) -> sortOnDepth $ 
+                        filter (\a -> HEAD `S.member` reasons (meta a)) as
+          (False,False) -> []
+        in case find (\a -> c' =~ sl a) as' of
+          Nothing -> propagate cs segment byExcl s (ts,us) c
+          n -> n
+    else propagate cs segment byExcl s (ts,us) c
+  where 
+    c' = unadjust $ udSentence2tree c
+    -- difference between the depth of the SL aligned subtree and c:
+    -- the smaller, the better (mostly used to avoid that root nodes are
+    -- aligned with full sentences, but also makes sense in general)
+    depthDiff :: RTree a -> Int
+    depthDiff t = abs (depthRTree t - depthRTree c')
+    sortOnDepth :: [Alignment] ->[Alignment]
+    sortOnDepth = sortOn (depthDiff . sl)
+    -- check if c' is the head of one of t's subtrees
+    isHeadSubUDTree :: UDTree -> UDTree -> Bool
+    isHeadSubUDTree c' t = 
+      isJust $ listToMaybe $ 
+        sortOn depthDiff (filter (isHeadUDTree c') (allSubRTrees t))
+
+-- return the id of a sentence, taken from the comment that precedes it
+sentIds' :: UDSentence -> S.Set String 
+sentIds' s = S.fromList $ splitOn " " (
+  filter (\c -> c `notElem` ['{', '}', ',', '\"']) 
+  $ last $ splitOn "sentence IDs: " (concat $ udCommentLines s))
+
 
 -- check if a UD tree is the head of another
 isHeadUDTree :: UDTree -> UDTree -> Bool
@@ -503,8 +520,17 @@ alignment2sentencePair a =
   where 
     udTree2adjustedSentence = adjustUDIds . udTree2sentence . createRoot
     addMetaAsComment s = s {
-      udCommentLines = ["# " ++ (prMeta $ meta a)]
+      udCommentLines = ["# " ++ prMeta (meta a)]
     } 
+
+-- use original label TODO: refactor
+unadjust :: UDTree -> UDTree
+unadjust (RTree n ts) = RTree n { 
+    udDEPREL = fromMaybe (udDEPREL n) (getOrigLabel n)
+} ts
+    where getOrigLabel n = 
+            listToMaybe [head ls | UDData "ORIG_LABEL" ls <- udMISC n]
+
 
 
 {- Selection of alignments for MT -}

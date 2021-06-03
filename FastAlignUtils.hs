@@ -26,13 +26,13 @@ parseBi s = [(head s',last s') | s' <- map (splitOn " ||| ") (lines s)]
 -- | Given a list of (target, language) sentences and a list of alignment
 -- indices, return the corresponding pairs of (multi)words as 
 -- a set of Alignments
-phFileToAlignments :: [(String,String)] -> [[(Int,[Int])]] -> AlignmentMap
+phFileToAlignments :: [(String,String)] -> [[(Int,[Int])]] -> AlignMap
 phFileToAlignments _ [] = M.empty -- length is supposed to be the same though
 phFileToAlignments [] _ = M.empty
 phFileToAlignments (s:ss) (ps:pss) = 
     phSentToAlignment s ps `union'` phFileToAlignments ss pss
   where
-    phSentToAlignment :: (String,String) -> [(Int,[Int])] -> AlignmentMap
+    phSentToAlignment :: (String,String) -> [(Int,[Int])] -> AlignMap
     phSentToAlignment _ [] = M.empty
     phSentToAlignment (src,trg) ((i,js):ps) = 
         a `insert'` phSentToAlignment (src,trg) ps
