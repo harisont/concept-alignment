@@ -1,5 +1,6 @@
 module Eval where
 
+import Data.List
 import System.Exit
 import System.Environment (getArgs)
 import System.Console.GetOpt
@@ -35,13 +36,15 @@ main = do
         then putStrLn $ reasonStats alignments
         else putStrLn ""
 
+isAnnotated :: UDSentence -> Bool
+isAnnotated s = any (\l -> "# correctness:" `isPrefixOf` l) (udCommentLines s)
+
+annotate = undefined
+
 basicStats = undefined
 reasonStats = undefined
 diffStats = undefined
 propStats = undefined
-
-isAnnotated = undefined
-annotate = undefined
 
 {- Argument parsing -} 
 
