@@ -243,7 +243,8 @@ The rose tree is is easily obtained from the CoNLL-U notation that UD parsers pr
     3 con ADP 4 case
     \end{verbatim}
   \end{subfigure}
-  \caption{The graphical, simplified CoNNL-U and sorted rose tree representation of a pair of UD sentences. With the default criteria, the resulting alignments are: $\langle$\textit{She studies consistently, Lei studia con costanza}$\rangle$, $\langle$\textit{studies, studia}$\rangle$, $\langle$\textit{she, lei}$\rangle$ and $\langle$\textit{consistently, con costanza}$\rangle$.}
+  \caption{The graphical, simplified CoNNL-U and sorted rose tree representation of a pair of UD sentences. With the default criteria, which among other things allow for matching adverbial with adjectival modifiers, the resulting alignments are: $\langle$\textit{She studies consistently, Lei studia con costanza}$\rangle$, $\langle$\textit{studies, studia}$\rangle$, $\langle$\textit{she, lei}$\rangle$ and $\langle$\textit{consistently, con costanza}$\rangle$.}
+  \label{ex}
 \end{figure*}
 
 % algorithm description
@@ -286,7 +287,7 @@ When this is the case, it is often straightforward to define alignment criteria 
 While many distinctions of this kind are specific to particular language pairs or even stylistical, some of them occur independently of what languages are involved and do not depend on idiomatic usage nor aspectual, discourse, domain or word knowledge.   
 Drawing inspiration from \cite{dorr-1994-machine}, we refer to them as \textit{translation divergences} and handle some of the most common ones explicitly. 
 For instance, \textit{categorial divergences} occur when the POS tag of a word in the source language changes in its translation.
-A ubiquitous example of is that of adverbial modifiers (with the UD label \texttt{advmod}) translated as prepositional phrases (with the UD label \texttt{obl}, for \textit{oblique}), such as in the English-Italian pair $\langle$\textit{She studies \textbf{consistently}, Lei studia \textbf{con costanza}}$\rangle$.
+An ubiquitous example of is that of adverbial modifiers (with the UD label \texttt{advmod}) translated as prepositional phrases (with the UD label \texttt{obl}, for \textit{oblique}), such as in the English-Italian pair $\langle$\textit{She studies \textbf{consistently}, Lei studia \textbf{con costanza}}$\rangle$ (see Figure \ref{ex}).
 \textit{Structural divergences}, where a direct object in one language is rendered as an oblique in the other, as in the English-Swedish pair $\langle$\textit{I told \textbf{him}, Jag berättade \textbf{för honom}.}$\rangle$), are also frequently encountered.
 
 \paragraph{Known alignment} \label{ka}
@@ -393,7 +394,7 @@ However, the the Italian translation mentions a train (``\textit{treno}'') in th
   \textbf{correct}                & 916 (77\%)                                   & 1112 (85\%)                                  & 1205 (66\%)                                                                    & 1296 (66\%)                                                                    \\
   \textbf{usable in MT}                      & 880 (74\%)                                   & 1099 (84\%)                                  & 1157 (63\%)                                                                    & 1248 (64\%)                                                                    \\
   \end{tabular}
-  \caption{Comparison between the extraction of alignments of any size from manually annotated PUD treebanks and from automatically parsed sentences from the course plans corpora.}
+  \caption{Comparison between the grammar-based extraction of alignments of any size from manually annotated PUD treebanks and from automatically parsed sentences from the course plans corpora.}
   \label{raw_fast}
   \end{table*}
 
