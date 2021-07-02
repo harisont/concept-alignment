@@ -120,7 +120,8 @@ This is analogous to the well-known earlier word and phrase alignment techniques
 
 % CP
 An interesting and less studied variant of CA is \textit{Concept Propagation} (CP), useful for cases where a set of concepts is already known and the goal is to identify the expressions corresponding to each of them in a new language, potentially even working with a different text in the same domain.
-While our system does implement basic CP functionalities, in this paper we focus on CE and restrict its application to bilingual corpora. 
+While our system does implement basic CP functionalities, in this paper we focus on its most mature portion: CE. 
+As results analogous to those that could be obtained via multilingual extraction can be obtained more easily with a combination of CE and CP, we for the moment restrict ourselves to bilingual corpora.  
 
 % contextualizing our proposal
 As stated in the Introduction, most existing alignment solutions are based on statistical approaches and are, as a consequence, unsuitable for small datasets. 
@@ -262,6 +263,7 @@ A relevant implementation detail is that, in this context, the head of a tree is
 
 % iterations
 When working on multiple sentences, the algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be used when working on later sentences and to keep track of the number of occurrences of each alignment throughout the entire text.
+Furthermore, it is possible to initialize the algorithm with a nonempty set of alignments, obtained with the same program or by means of a statistical tool outputting alignments in Pharaoh format.
 
 \subsubsection{Alignment criteria} \label{criteria}
 % why list criteria 
@@ -333,19 +335,52 @@ $\langle$X \textit{gives} Y Z, X \textit{dà} Z \textit{a} Y$\rangle$.
   \end{table*}
 
 \subsection{Generating grammar rules}
-The CE module described so far outputs pairs of UD trees. 
-While converting them to GF ASTs is one of \texttt{gf-ud}'s core functionalities, building a compilable GF translation lexicon is needed to turn such trees into grammar rules.
+% from UD trees to GF rules: outline
+The alignments outputted by the CE module described so far are represented as pairs of UD (sub)trees in CoNLL-U format. 
+While converting them to GF ASTs is one of \texttt{gf-ud}'s core functionalities, such trees also need be converted into the grammar rules of a compilable GF translation lexicon.
+To this end, our grammar generation module requires a \textit{morphological dictionary} of the languages at hand and an \textit{extraction grammar}. 
 
-To this end, our grammar generation module uses a morphological dictionary of the languages at hand and an \textit{extraction grammar}. 
-The extraction grammar defines the syntactic categories and functions the entries of the automatically generated lexicon are built with.
+% morphodicts
+Morphological dictionaries, implemented for several languages as part of the RGL, are large collections of lemmas associated with their inflectional forms. 
+
+% extraction grammar
+An extraction grammar, on the other hand, defines the syntactic categories and functions the entries of the automatically generated lexicon are built with.
 For example, entries can be prepositional phrases (PP) or verb phrases (VP) constructed by the following GF functions:
 
 \begin{Verbatim}[fontsize=\small]
   PrepNP : Prep -> NP -> PP # case head
   PrepPP : VP   -> PP -> VP # head obl
 \end{Verbatim}
-The dependency labels appended to the function types instruct \texttt{gf-ud} to build GF trees from UD trees that match these labels.
 
+% role of gf-ud
+The dependency labels appended to the function types instruct \texttt{gf-ud} to build GF trees from UD trees that match these labels. 
+
+% trees to rules
+The final translation lexicon, i.e. a GF grammar that extends the extraction grammar, is then derived from these GF trees. 
+In its abstract syntax, the name of each concept is associated with its grammatical category, i.e. the category of the root of the GF tree.
+For example:
+
+\begin{Verbatim}[fontsize=\small]
+  fun in_the_field__inom_område_PP : PP ;
+\end{Verbatim}
+
+The concrete syntaxes, on the other hand, contain the linearization rules for each concept, directly based on the trees obtained from \texttt{gf-ud}. 
+For instance, in English:
+
+\begin{Verbatim}[fontsize=\small]
+  lin in_the_field__inom_område_PP = 
+    PrepNP 
+      in_Prep 
+      (DetCN the_Det (UseN field_N)) ;
+\end{Verbatim}
+
+Most function words, such as \texttt{in\_Prep}, and many content words, such as \texttt{field\_N}, are available through the morphological dictionaries.
+When this is not the case, they are assumed to be regular and an additional rule is generated for them. 
+For instance, if the English morphological dictionary didn't contain the word ``\textit{field}'', we would have:
+
+\begin{Verbatim}[fontsize=\small]
+  oper field_N = mkN "field" ;
+\end{Verbatim}
 
 \section{Evaluation} \label{evaluation}
 % mini-roadmap
@@ -412,7 +447,7 @@ While \texttt{fast\_align} is designed to align every word in the text (or expli
 
 \subsubsection{Results on raw text} \label{raw}
 % mani avanti, table 2
-The course plan corpora are significantly harder to work with, the additional challenge being that our CE module relies on the quality of automatic parsing.
+The course plan corpora are significantly harder to work with, the additional challenges being the inexactness of many translations (which is the direct cause of some of the alignment errors encountered in our evaluation) and the fact that our CE module relies, in this case, on the quality of automatic lemmatization, POS-tagging and parsing.
 In Table \ref{raw_fast}, we compare the results obtained on manually annotated data and the course plans corpora parsed with UDPipe.  
 
 % precision
@@ -506,7 +541,7 @@ Some errors regarding the extracted concepts are also interesting to analyze: th
 We have presented a syntax-based alignment method with a focus on its applications in domain-specific translation lexicon generation. Compared with the existing statistical tools, our system has the following advantages:
 \begin{itemize} \setlength\itemsep{0.1em}
   \item it performs consistently well even on small parallel corpora
-  \item it is able to simultaneously extract correspondences between individual words, multiword expressions and full phrases, including discontinuous constituents
+  \item it is able to simultaneously extract correspondences between individual words, multiword expressions and longer phrases, including discontinuous constituents
   \item in conjunction with \texttt{gf-ud} pattern matching, it can be used to extract specific types of correspondences, such as predication patterns  
   \item it can automatically generate compilable, morphology-aware GF translation lexica
   \item it can be configured to easily handle systematic, possibly language pair or corpus specific translation divergences.
