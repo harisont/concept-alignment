@@ -424,8 +424,11 @@ In fact, even though percentages seem similar for English-Swedish, the CSE corpu
 The results are less encouraging in terms of recall: the number of alignments extracted from the course plan corpora is similar to that obtained from the PUD treebank sample, despite the difference in size. 
 This is explained in part by the presence, in the course plans corpora, of a large amount of very short sentences, and in part by the fact that parse errors introduced by UDPipe make it impossible to align many subsentences without a significant loss in terms of precision.  
 
+% qualitative analysis: multiwords
+Our system is, on the other hand, capable of extracting multiword alignments that are unlikely to be identified by a statistical tool, especially in the case of such a small dataset. Examples of this are the noun phrases  $\langle$\textit{the aim of the course, l'obiettivo del corso, syftet med kursen}$\rangle$ (a concept found in both corpora and, as such, trilingual), $\langle$\textit{Natural Language Processing, språkteknologi}$\rangle$ and $\langle$\textit{object oriented programming, programmazione ad oggetti}$\rangle$.
+
 \subsection{MT experiments} \label{mtexp}
-% genereral idea behind MT experiments
+% general idea behind MT experiments
 The second set of experiments has the objective of assessing the quality of the final output of the system we propose: GF translation lexica. 
 Because we are now focusing on using CA in the context of domain-specific MT, we do not make use of the PUD treebanks, where sentences come from a variety of different sources, but just of the course plans corpora. 
 We do not construct a grammar specific to such domain: for small-scale MT experiments, it is sufficient to extend the extraction grammar itself with preexisting syntax rules defined in the RGL. 
