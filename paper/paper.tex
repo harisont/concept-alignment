@@ -5,7 +5,7 @@
 \documentclass[11pt]{article}
 
 % Remove the "review" option to generate the final version.
-\usepackage[review]{acl}
+\usepackage{acl}
 
 % Standard package includes
 \usepackage{times}
@@ -61,8 +61,9 @@
   Digital Grammars \\
   \texttt{arianna@digitalgrammars.com} \\\And
   Aarne Ranta \\
-  Department of Computer Science and Engineering, \\
-  University of Gothenburg \\
+  University of Gothenburg,\\
+  Department of Computer Science \\
+  and Engineering; \\
   Digital Grammars \\
   \texttt{aarne.ranta@cse.gu.se} \\}
 
@@ -169,7 +170,7 @@ The outline of the algorithm is given in the following pseudocode:
 % input
 Here, the input consists of a list of priority-sorted \textit{alignment criteria}, i.e. rules to determine whether two dependency trees should be aligned with each other, and a pair $(t,u)$ of UD trees to align.
 An example alignment criterion is sameness of syntactic label, for instance, that subjects are aligned with subjects and objects with objects; the details will be discussed in Section \ref{criteria}.  
-From an implementation point of view, UD trees are rose trees (trees with arbitrary numbers of branches) where each node represents a word with its dependents as subtrees.
+From an implementation point of view, UD trees are rose trees (trees with arbitrary numbers of branches) where each node represents a word with its dependents as subtrees (see Figure \ref{ex}).
 The rose tree is easily obtained from the CoNLL-U notation that UD parsers produce.
 
 \begin{figure*}[h]
@@ -244,7 +245,7 @@ The rose tree is easily obtained from the CoNLL-U notation that UD parsers produ
     3 con ADP 4 case
     \end{verbatim}
   \end{subfigure}
-  \caption{The graphical, simplified CoNNL-U and sorted rose tree representation of a pair of UD sentences. With the default criteria, which among other things allow for matching adverbial with adjectival modifiers, the resulting alignments are: $\langle$\textit{She studies consistently, Lei studia con costanza}$\rangle$, $\langle$\textit{studies, studia}$\rangle$, $\langle$\textit{she, lei}$\rangle$ and $\langle$\textit{consistently, con costanza}$\rangle$.}
+  \caption{The graphical, simplified CoNNL-U and sorted rose tree representation of a pair of UD sentences. With the default criteria, which among other things allow for matching adverbial with adjectival modifiers, the resulting alignments are: $\langle$\textit{She studies consistently, Lei studia con costanza}$\rangle$ (matching \texttt{root} label), $\langle$\textit{studies, studia}$\rangle$ (head alignment), $\langle$\textit{she, lei}$\rangle$ (matching \texttt{nsubj} label) and $\langle$\textit{consistently, con costanza}$\rangle$ (translation divergence; \texttt{amod} and \texttt{advmod} treated as equivalent).}
   \label{ex}
 \end{figure*}
 
@@ -263,7 +264,7 @@ A relevant implementation detail is that, in this context, the head of a tree is
 
 % iterations
 When working on multiple sentences, the algorithm can be applied in an iterative fashion, so that knowledge gathered when a sentence pair is aligned can be used when working on later sentences and to keep track of the number of occurrences of each alignment throughout the entire text.
-Furthermore, it is possible to initialize the algorithm with a nonempty set of alignments, obtained with the same program or by means of a statistical tool outputting alignments in Pharaoh format.
+Furthermore, it is possible to initialize the algorithm with a nonempty set of alignments, obtained with the same program or by means of a statistical tool outputting alignments in Pharaoh format and to combine the results of several extraction processes into a single translation lexicon.
 
 \subsubsection{Alignment criteria} \label{criteria}
 % why list criteria 
@@ -400,7 +401,8 @@ When it comes to testing the program on raw text, we use two small ($< 1000$ sen
 For brevity, we will refer to these two datasets as to the DMI and the CSE corpora.
 This data, available in the project repository, was collected and sentence-aligned specifically for this work and a related Bachelor's thesis project \cite{thesis}.
 When using raw text, our parser of choice is UDPipe \cite{straka-etal-2016-udpipe}. 
-In particular, we use the ParTUT English and Italian models for the DMI corpus and models trained on the bilingual LinES English-Swedish treebank for the CSE corpus.
+In particular, we use the ParTUT English and Italian models for the DMI corpus and models trained on the bilingual LinES English-Swedish treebank for the CSE corpus
+\footnote{The pretrained UDPipe models and information about their performance are available at \url{ufal.mff.cuni.cz/udpipe/1/models}}.
 
 \subsection{Evaluating CE} \label{ceval}
 % why evaluate CE independently
@@ -546,6 +548,9 @@ We have presented a syntax-based alignment method with a focus on its applicatio
   \item it can automatically generate compilable, morphology-aware GF translation lexica
   \item it can be configured to easily handle systematic, possibly language pair or corpus specific translation divergences.
 \end{itemize}
+
+While they do require manual corrections and completions to an extent that varies according to the quality of the data and the strictness of the criteria used, alignments obtained with our method can reduce the time required for bootstrapping the translation lexicon building process for a domain-specific CNL significantly. 
+In fact, especially if a comprehensive morphological dictionary is available, part of the alignments will be ready to use in a GF-based system without any intervention.
 
 % sw
 The tangible fruits of this work are a Haskell library and a number of executables offering a user friendly interface to perform CE, lexicon generation and various kinds of evaluations. 
