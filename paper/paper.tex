@@ -69,7 +69,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Grammar-based domain-specific MT systems are a common use case for CNL.
+Grammar-based domain-specific MT systems are a common use case for CNLs.
 High-quality translation lexica are a crucial part of such systems, but involve time consuming work and significant linguistic knowledge. 
 With parallel example sentences available, statistical alignment tools
 can help automate part of the process, but they are not suitable for
@@ -101,7 +101,7 @@ For this reason, we refer to the task our system attempts to automate as \textit
 A \textit{concept} is a semantic unit expressed by a word or a construction, which is also a unit of \textit{compositional translation}, where translation is performed by mapping concepts to concepts in a shared syntactic structure.
 
 % additional advantage 2: morphology
-Conceiving conepts as \textit{lemmas} equipped with morphological variations rather than fixed word forms or phrases allows us to generate translation lexica complete with grammatical category and inflection, so that correct target language forms can be selected in each syntactic context.
+Conceiving concepts as \textit{lemmas} equipped with morphological variations rather than fixed word forms or phrases allows us to generate translation lexica complete with grammatical category and inflection, so that correct target language forms can be selected in each syntactic context.
 
 % roadmap
 This paper is structured as follows. 
@@ -134,7 +134,7 @@ In the case of translation, similarly to what happens in programming language co
 % UD
 UD, on the other hand, is a dependency grammar formalism meant for cross-linguistically consistent grammatical annotation.
 As opposed to constituency, \textit{dependency} is a word-to-word correspondence: each word is put in relation with the one it depends on, called its \textit{head}, via a directed labelled link specifying the syntactic relation between them.
-Importantly for our application, the standard format for UD trees, CoNNL-U, gives information not only on the syntactic role of each word, but also on its Part-Of-Speech (POS), lemma, and morphological features.  
+Importantly for our application, the standard format for UD trees, CoNNL-U, gives information not only on the syntactic role of each word, but also on its Part-Of-Speech (POS) tag, lemma, and morphological features.  
 
 % role of UD and GF
 While both formalisms independently solve the issues related to having to work with grammars that are inconsistent with each other, UD is especially appealing since, being dependency trees an easier target, several robust parsers, such as \cite{straka-etal-2016-udpipe} and \cite{chen-manning-2014-fast} are available.
@@ -169,7 +169,7 @@ The outline of the algorithm is given in the following pseudocode:
 Here, the input consists of a list of priority-sorted \textit{alignment criteria}, i.e. rules to determine whether two dependency trees should be aligned with each other, and a pair $(t,u)$ of UD trees to align.
 An example alignment criterion is sameness of syntactic label, for instance, that subjects are aligned with subjects and objects with objects; the details will be discussed in Section \ref{criteria}.  
 From an implementation point of view, UD trees are rose trees (trees with arbitrary numbers of branches) where each node represents a word with its dependents as subtrees.
-The rose tree is is easily obtained from the CoNLL-U notation that UD parsers produce.
+The rose tree is easily obtained from the CoNLL-U notation that UD parsers produce.
 
 \begin{figure*}[h]
   \centering
@@ -277,7 +277,7 @@ This is desirable since we assume that the parallel texts that are fed to our pr
 As noted above, the CoNNL-U notation provides information on the grammatical categories of each word, represented as Universal POS tags \cite{petrov-etal-2012-universal}. 
 Intuitively, if the nodes of two trees in matching contexts have the same POS tags, the two trees are more likely to correspond to each other than if not. 
 This is especially true if we focus, for instance, solely on the open class words (defined as in the UD documentation\footnote{\url{universaldependencies.org/u/pos/all.html}}), thus ignoring function words such as prepositions, determiners and auxiliary verbs, which tend to behave differently across different languages.
-A useful relation to define between dependency trees is, then, that of \textit{POS-equivalence}: two dependency trees $t$, $u$ are POS-equivalent if $M_1 = M_2 \neq \emptyset$, where $M_i$ is defined as the multiset of POS tags of all the open class word nodes of $t_i$. 
+A useful relation to define between dependency trees is, then, that of \textit{POS-equivalence}: two dependency trees $t_1$, $t_2$ are POS-equivalent if $M_1 = M_2 \neq \emptyset$, where $M_i$ is defined as the multiset of POS tags of all the open class word nodes of $t_i$. 
 Applied as a backup for label matching, this criterion can be used to capture correspondences that would otherwise be missed, thus increasing recall, but a decrease in precision is also to be expected. 
 However, since alignment criteria are defined as boolean functions, it is easy to combine them so to that they have to apply simultaneously. This can be useful in cases where precision is more important than recall.
 
@@ -287,7 +287,7 @@ When this is the case, it is often straightforward to define alignment criteria 
 While many distinctions of this kind are specific to particular language pairs or even stylistical, some of them occur independently of what languages are involved and do not depend on idiomatic usage nor aspectual, discourse, domain or word knowledge.   
 Drawing inspiration from \cite{dorr-1994-machine}, we refer to them as \textit{translation divergences} and handle some of the most common ones explicitly. 
 For instance, \textit{categorial divergences} occur when the POS tag of a word in the source language changes in its translation.
-An ubiquitous example of is that of adverbial modifiers (with the UD label \texttt{advmod}) translated as prepositional phrases (with the UD label \texttt{obl}, for \textit{oblique}), such as in the English-Italian pair $\langle$\textit{She studies \textbf{consistently}, Lei studia \textbf{con costanza}}$\rangle$ (see Figure \ref{ex}).
+An ubiquitous example of this is that of adverbial modifiers (with the UD label \texttt{advmod}) translated as prepositional phrases (with the UD label \texttt{obl}, for \textit{oblique}), such as in the English-Italian pair $\langle$\textit{She studies \textbf{consistently}, Lei studia \textbf{con costanza}}$\rangle$ (see Figure \ref{ex}).
 \textit{Structural divergences}, where a direct object in one language is rendered as an oblique in the other, as in the English-Swedish pair $\langle$\textit{I told \textbf{him}, Jag berättade \textbf{för honom}.}$\rangle$), are also frequently encountered.
 
 \paragraph{Known alignment} \label{ka}
@@ -382,7 +382,7 @@ While precision and recall are two well-known performance metrics, the lack of a
 What is more, since some alignments are only correct in the specific context of the sentence pair in which they occur, we make a further distinction between correct alignments that are relevant for a translation lexicon and alignments that are useful for comparing the sentences but should not be used for MT. 
 As an extreme example of a pair-specific alignment, consider the sentences $\langle$\textit{He missed the boat, Ha perso il treno}$\rangle$. 
 In both languages, the idea of missing a chance is expressed with idiomatic expressions very similar to each other. 
-However, the the Italian translation mentions a train (``\textit{treno}'') in the place of a boat.
+However, the Italian translation mentions a train (``\textit{treno}'') in the place of a boat.
 
 \begin{table*}[h]
   \centering
@@ -427,7 +427,7 @@ This is explained in part by the presence, in the course plans corpora, of a lar
 \subsection{MT experiments} \label{mtexp}
 % genereral idea behind MT experiments
 The second set of experiments has the objective of assessing the quality of the final output of the system we propose: GF translation lexica. 
-Because we are now focussing on using CA in the context of domain-specific MT, we do not make use of the PUD treebanks, where sentences come from a variety of different sources, but just of the course plans corpora. 
+Because we are now focusing on using CA in the context of domain-specific MT, we do not make use of the PUD treebanks, where sentences come from a variety of different sources, but just of the course plans corpora. 
 We do not construct a grammar specific to such domain: for small-scale MT experiments, it is sufficient to extend the extraction grammar itself with preexisting syntax rules defined in the RGL. 
 
 % test corpus construction
@@ -506,7 +506,7 @@ We have presented a syntax-based alignment method with a focus on its applicatio
   \item it is able to simultaneously extract correspondences between individual words, multiword expressions and full phrases, including discontinuous constituents
   \item in conjunction with \texttt{gf-ud} pattern matching, it can be used to extract specific types of correspondences, such as predication patterns  
   \item it can automatically generate compilable, morphology-aware GF translation lexica
-  \item it can be configured to easily handle systematic, possibly language-pair or corpus specific translation divergences.
+  \item it can be configured to easily handle systematic, possibly language pair or corpus specific translation divergences.
 \end{itemize}
 
 % sw
