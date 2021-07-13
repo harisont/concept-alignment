@@ -42,6 +42,8 @@ data/experiments/*.tex
 data/experiments/*.pdf
 .vscode/
 data/pud_treebanks/
+data/ud-treebanks-v2.6/
+data/PUD_test/
 
 # pocketbook extracts
 *.html
@@ -56,6 +58,8 @@ presentation/beamerthememhthm.sty
 
 # temporary secrets
 grammars/*.gf
+
+paper/acl_latex*
 
 # UD treebanks
 data/ud-treebanks-v2.6
