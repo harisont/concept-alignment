@@ -529,6 +529,15 @@ alignment2sentencePair a =
       udCommentLines = ["# " ++ prMeta (meta a)]
     } 
 
+-- | Convert a pair of CoNNL-U sentences into an Alignment
+sentencePair2alignment :: (UDSentence,UDSentence) -> Alignment
+sentencePair2alignment (ss,ts) = 
+  (AT (udSentence2tree ss,udSentence2tree ts),meta)
+  where 
+    meta = rdMeta $ drop 2 $ fromJust $ find 
+                                          (\l -> "# reasons" `isPrefixOf` l) 
+                                          (udCommentLines ss)
+
 -- use original label TODO: refactor
 unadjust :: UDTree -> UDTree
 unadjust (RTree n ts) = RTree n { 
