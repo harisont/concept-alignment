@@ -556,7 +556,14 @@ unadjust (RTree n ts) = RTree n {
     where getOrigLabel n = 
             listToMaybe [head ls | UDData "ORIG_LABEL" ls <- udMISC n]
 
+type Path = String
 
+-- | Get alignments from two CoNNL-U files (shorthand)
+getAlignmentsFromCoNNLUFiles :: Path -> Path -> IO [Alignment]
+getAlignmentsFromCoNNLUFiles p1 p2 = do 
+  p1' <- parseUDFile p1
+  p2' <- parseUDFile p2
+  return $ zipWith (curry sentencePair2alignment) p1' p2'
 
 {- Selection of alignments for MT -}
 
