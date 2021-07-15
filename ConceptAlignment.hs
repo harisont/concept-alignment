@@ -78,21 +78,24 @@ meta (_,m) = m
 
 -- | The metadata of an alignment are:
 data Meta = M {
-  reasons :: S.Set Reason,  -- ^ reasons for alignment
-  sentIds :: S.Set String   -- ^ ids of the sentences it was inferred from
+  reasons :: S.Set Reason,        -- ^ reasons for alignment
+  sentIds :: S.Set String,        -- ^ ids of the sents it was inferred from
+  correctness :: Maybe Annotation -- ^ correctness annotation
 } deriving (Show,Read,Eq,Ord)
 
 -- | Initialize metadata with default vals
 initMeta :: Meta
 initMeta = M {
   reasons = S.empty,
-  sentIds = S.empty
+  sentIds = S.empty,
+  correctness = Nothing
 }
 
 -- | Renders metadata as a human-friendly string
 prMeta :: Meta -> String
 prMeta m = "reasons: " ++ showSet (reasons m)
       ++ " sentence IDs: " ++ showSet (sentIds m)
+      ++ " correctness: " ++ maybe "_" show (correctness m) 
   where 
     showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
 
@@ -105,7 +108,10 @@ type AlignMap = M.Map AlignedTrees Meta
 combineMeta :: Meta -> Meta -> Meta
 m `combineMeta` n = M {
   reasons = reasons m `S.union` reasons n,
-  sentIds = sentIds m `S.union` sentIds n
+  sentIds = sentIds m `S.union` sentIds n,
+  correctness = if correctness m == correctness n 
+                  then correctness m 
+                  else Nothing
 }
 
 -- | Insert a new alignment combining metadata if an equivalent one is already
@@ -128,7 +134,7 @@ unions' = M.unionsWith combineMeta
 -- is found (=) or correct and potentially reusable, at least in the same 
 -- domain (+)
 data Annotation = Incorrect | Specific | Correct
-  deriving Eq
+  deriving (Eq,Ord)
 
 instance Show Annotation where
   show Incorrect = "-"
