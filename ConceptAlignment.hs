@@ -99,6 +99,16 @@ prMeta m = "reasons: " ++ showSet (reasons m)
   where 
     showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
 
+-- | Read metadata from human-friendly strings
+rdMeta :: String -> Meta
+rdMeta s = M {
+  reasons = read (drop 9 rs) :: S.Set Reason,
+  sentIds = read is :: S.Set String,
+  correctness = if cs == "_" then Nothing else Just (read cs :: Annotation)
+} where 
+    [rs,xs] = splitOn " sentence IDs: " s
+    [is,cs] = splitOn " correctness: " xs
+
 -- | Map of alignments (used internally to simplify combining metadata)
 type AlignMap = M.Map AlignedTrees Meta
 
