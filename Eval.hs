@@ -1,6 +1,6 @@
 module Eval where
 
---import Data.List
+import Data.List
 import Data.Maybe
 import System.Exit
 import System.Environment (getArgs)
@@ -16,16 +16,16 @@ main = do
     then putStrLn help >> exitSuccess 
     else do
       as <- case args of 
-        [n1,n2] -> getAlignmentsFromUDFiles n1 n2
+        [n1,n2] -> getAlignmentsFromCoNNLUFiles n1 n2
         [cmd,o1,o2,n1,n2] -> do
-          olds <- getAlignmentsFromUDFiles o1 o2
-          news <- getAlignmentsFromUDFiles n1 n2
+          olds <- getAlignmentsFromCoNNLUFiles o1 o2
+          news <- getAlignmentsFromCoNNLUFiles n1 n2
           news' <- if all isAnnotated news 
                     then return news 
                     else annotate olds news
           case cmd of
-            "extraction" -> putStrLn "TODO:"
-            "propagation" -> putStrLn "TODO:"
+            "extraction" -> putStrLn $ diffStats olds news'
+            "propagation" -> putStrLn $ propStats olds news'
           writeFile n1 (unlines $ map (show . fst) news')
           writeFile n2 (unlines $ map (show . snd) news')
           return news'
@@ -33,17 +33,14 @@ main = do
           putStrLn "Wrong number of arguments."
           putStrLn help
           exitWith (ExitFailure 1)
-      putStrLn "TODO:"
+      let stats = 
+            basicStats as 
+            ++ if Reasons `elem` flags then reasonStats as else "" 
+      putStrLn stats
 
-type Path = String
+{- Annotation -}
 
-getAlignmentsFromUDFiles :: Path -> Path -> IO [Alignment]
-getAlignmentsFromUDFiles p1 p2 = do 
-  p1' <- parseUDFile p1
-  p2' <- parseUDFile p2
-  return $ zipWith (curry sentencePair2alignment) p1' p2'
-
-
+-- | Check if an alignment is already annotated
 isAnnotated :: Alignment -> Bool
 isAnnotated (_,m) = isJust $ correctness m
 
@@ -74,6 +71,12 @@ annotate olds (new:news) = do
                           else Just (read a :: Annotation) 
         })
         else annotateManually new
+
+{- Statistics -}
+diffStats = undefined
+propStats = undefined
+basicStats = undefined
+reasonStats = undefined
 
 {- Argument parsing -} 
 
