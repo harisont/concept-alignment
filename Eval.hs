@@ -47,8 +47,33 @@ getAlignmentsFromUDFiles p1 p2 = do
 isAnnotated :: Alignment -> Bool
 isAnnotated (_,m) = isJust $ correctness m
 
+-- | Annotate the alignments contained in a file, keeping the information
+-- provided by an older annotated file into account
 annotate :: [Alignment] -> [Alignment] -> IO [Alignment]
-annotate = undefined 
+annotate olds [] = return []
+annotate olds (new:news) = do
+  new' <- case new `elemIndex` olds of
+    Nothing -> annotateManually new
+    Just i -> return (
+      trees new,
+      (meta new) { 
+        correctness = correctness $ meta (olds !! i) 
+      })
+  news' <- annotate olds news
+  return (new':news')
+  where 
+    annotateManually new = do
+      putStrLn $ prLinearizedAlignment new
+      putStrLn "(annotate with +, = or -:)" 
+      a <- getLine
+      -- "à" is an alias for "=" and is just bc of IT keyboard layout ergonomics
+      if a `elem` ["+", "=", "-", "à"]
+        then return (trees new, (meta new) {
+          correctness = if a == "à" 
+                          then Just Specific
+                          else Just (read a :: Annotation) 
+        })
+        else annotateManually new
 
 {- Argument parsing -} 
 
