@@ -516,9 +516,9 @@ abstractUDTree :: UDTree -> RTree Label
 abstractUDTree = mapRTree udSimpleDEPREL
 
 
-{- Alignments to CoNLL-U files -}
+{- Alignments to CoNLL-U files and vice versa -}
 
--- | convert an alignment into a pair of CoNNL-U sentences
+-- | Convert an Alignment into a pair of CoNNL-U sentences
 alignment2sentencePair :: Alignment -> (UDSentence,UDSentence)
 alignment2sentencePair a = 
   (addMetaAsComment $ udTree2adjustedSentence $ sl a, 
