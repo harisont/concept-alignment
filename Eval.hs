@@ -47,10 +47,7 @@ main = do
     writeAlgnsToFiles as f1 f2 = do
       writeFile f1 (conllize fst) 
       writeFile f2 (conllize snd) 
-      where 
-        conllize f = unlines $ map 
-                    (\(s,n) -> prUDSentence n (f $ alignment2sentencePair s)) 
-                    (as `zip` [1..])
+      where conllize f = unlines $ zipWith (\n s -> prUDSentence n (f $ alignment2sentencePair s)) [1..] as
 
 {- Annotation -}
 
