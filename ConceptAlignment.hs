@@ -114,6 +114,23 @@ rdMeta s = M {
 isAnnotated :: Alignment -> Bool
 isAnnotated (_,m) = isJust $ correctness m
 
+-- | Check if an annotated alignment is marked as correct (+ or =)
+isCorrect :: Alignment -> Bool
+isCorrect a = fromJust (correctness (meta a)) `elem` [Specific, Correct]
+
+-- | Check if an annotated alignment is marked as incorrect (-)
+isIncorrect :: Alignment -> Bool
+isIncorrect = not . isCorrect
+
+-- | Check if an annotated alignment is marked as useful 
+-- (i.e. correct and not too context specific)
+isUseful :: Alignment -> Bool
+isUseful a = fromJust (correctness (meta a)) == Correct
+
+-- | Check if an alignment has been found because of the given reasons
+isBecauseOf :: [Reason] -> Alignment -> Bool
+isBecauseOf rs a = toList (reasons $ meta a) == rs
+
 -- | Map of alignments (used internally to simplify combining metadata)
 type AlignMap = M.Map AlignedTrees Meta
 
