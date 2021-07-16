@@ -17,7 +17,14 @@ main = do
     then putStrLn help >> exitSuccess 
     else do
       as <- case args of 
-        [n1,n2] -> getAlignmentsFromCoNNLUFiles n1 n2
+        [n1,n2] -> do
+          algns <- getAlignmentsFromCoNNLUFiles n1 n2
+          algns' <- if all isAnnotated algns
+                      then return algns
+                      else annotate [] algns
+          writeFile n1 (unlines $ map (\(s,n) -> (prUDSentence n (fst $ alignment2sentencePair s))) (algns' `zip` [1..]))
+          writeFile n2 (unlines $ map (\(s,n) -> (prUDSentence n (snd $ alignment2sentencePair s))) (algns' `zip` [1..]))
+          return algns'
         [cmd,o1,o2,n1,n2] -> do
           olds <- getAlignmentsFromCoNNLUFiles o1 o2
           news <- getAlignmentsFromCoNNLUFiles n1 n2
@@ -186,8 +193,8 @@ options =
 
 help :: String
 help = usageInfo 
-        ("Usage: stack exec -- EvAlign annotatedSL.conllu annotatedTL.conllu [flags], or\n"
+        ("Usage: stack exec -- EvAlign SL.conllu TL.conllu [flags], or\n"
      ++ "        stack exec -- EvAlign extraction annotatedSL.conllu annotatedTL.conllu newSL.conllu newTL.conllu [flags], or"
      ++ "        stack exec -- EvAlign propagation annotatedSL.conllu annotatedTL.conllu newSL.conllu newTL.conllu [flags] "
-     ++ "(NOTE: newXX.conllu does not need to be pre-annotated)")
+     ++ "(NOTE: SL.conllu, TL.conllu and newXX.conllu do not need to be pre-annotated)")
         options

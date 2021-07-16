@@ -102,12 +102,13 @@ prMeta m = "reasons: " ++ showSet (reasons m)
 -- | Read metadata from human-friendly strings
 rdMeta :: String -> Meta
 rdMeta s = M {
-  reasons = read (drop 9 rs) :: S.Set Reason,
-  sentIds = read is :: S.Set String,
+  reasons = readSet (drop 9 rs) :: S.Set Reason,
+  sentIds = readSet is :: S.Set String,
   correctness = if cs == "_" then Nothing else Just (read cs :: Annotation)
 } where 
     [rs,xs] = splitOn " sentence IDs: " s
     [is,cs] = splitOn " correctness: " xs
+    readSet s = S.fromList (read $ "[" ++ tail (init s) ++ "]")
 
 -- | Map of alignments (used internally to simplify combining metadata)
 type AlignMap = M.Map AlignedTrees Meta
