@@ -78,23 +78,58 @@ meta (_,m) = m
 
 -- | The metadata of an alignment are:
 data Meta = M {
-  reasons :: S.Set Reason,  -- ^ reasons for alignment
-  sentIds :: S.Set String   -- ^ ids of the sentences it was inferred from
+  reasons :: S.Set Reason,        -- ^ reasons for alignment
+  sentIds :: S.Set String,        -- ^ ids of the sents it was inferred from
+  correctness :: Maybe Annotation -- ^ correctness annotation
 } deriving (Show,Read,Eq,Ord)
 
 -- | Initialize metadata with default vals
 initMeta :: Meta
 initMeta = M {
   reasons = S.empty,
-  sentIds = S.empty
+  sentIds = S.empty,
+  correctness = Nothing
 }
 
 -- | Renders metadata as a human-friendly string
 prMeta :: Meta -> String
 prMeta m = "reasons: " ++ showSet (reasons m)
       ++ " sentence IDs: " ++ showSet (sentIds m)
+      ++ " correctness: " ++ maybe "_" show (correctness m) 
   where 
     showSet s = "{" ++ intercalate ", " (S.toList $ S.map show s) ++ "}"
+
+-- | Read metadata from human-friendly strings
+rdMeta :: String -> Meta
+rdMeta s = M {
+  reasons = readSet (drop 9 rs) :: S.Set Reason,
+  sentIds = readSet is :: S.Set String,
+  correctness = if cs == "_" then Nothing else Just (read cs :: Annotation)
+} where 
+    [rs,xs] = splitOn " sentence IDs: " s
+    [is,cs] = splitOn " correctness: " xs
+    readSet s = S.fromList (read $ "[" ++ tail (init s) ++ "]")
+
+-- | Check if an alignment is already annotated
+isAnnotated :: Alignment -> Bool
+isAnnotated (_,m) = isJust $ correctness m
+
+-- | Check if an annotated alignment is marked as correct (+ or =)
+isCorrect :: Alignment -> Bool
+isCorrect a = fromJust (correctness (meta a)) `elem` [Specific, Correct]
+
+-- | Check if an annotated alignment is marked as incorrect (-)
+isIncorrect :: Alignment -> Bool
+isIncorrect = not . isCorrect
+
+-- | Check if an annotated alignment is marked as useful 
+-- (i.e. correct and not too context specific)
+isUseful :: Alignment -> Bool
+isUseful a = fromJust (correctness (meta a)) == Correct
+
+-- | Check if an alignment has been found because of the given reasons
+isBecauseOf :: [Reason] -> Alignment -> Bool
+isBecauseOf rs a = S.toList (reasons $ meta a) == rs
 
 -- | Map of alignments (used internally to simplify combining metadata)
 type AlignMap = M.Map AlignedTrees Meta
@@ -105,7 +140,10 @@ type AlignMap = M.Map AlignedTrees Meta
 combineMeta :: Meta -> Meta -> Meta
 m `combineMeta` n = M {
   reasons = reasons m `S.union` reasons n,
-  sentIds = sentIds m `S.union` sentIds n
+  sentIds = sentIds m `S.union` sentIds n,
+  correctness = if correctness m == correctness n 
+                  then correctness m 
+                  else Nothing
 }
 
 -- | Insert a new alignment combining metadata if an equivalent one is already
@@ -128,7 +166,7 @@ unions' = M.unionsWith combineMeta
 -- is found (=) or correct and potentially reusable, at least in the same 
 -- domain (+)
 data Annotation = Incorrect | Specific | Correct
-  deriving Eq
+  deriving (Eq,Ord)
 
 instance Show Annotation where
   show Incorrect = "-"
@@ -510,9 +548,9 @@ abstractUDTree :: UDTree -> RTree Label
 abstractUDTree = mapRTree udSimpleDEPREL
 
 
-{- Alignments to CoNLL-U files -}
+{- Alignments to CoNLL-U files and vice versa -}
 
--- | convert an alignment into a pair of CoNNL-U sentences
+-- | Convert an Alignment into a pair of CoNNL-U sentences
 alignment2sentencePair :: Alignment -> (UDSentence,UDSentence)
 alignment2sentencePair a = 
   (addMetaAsComment $ udTree2adjustedSentence $ sl a, 
@@ -523,6 +561,15 @@ alignment2sentencePair a =
       udCommentLines = ["# " ++ prMeta (meta a)]
     } 
 
+-- | Convert a pair of CoNNL-U sentences into an Alignment
+sentencePair2alignment :: (UDSentence,UDSentence) -> Alignment
+sentencePair2alignment (ss,ts) = 
+  (AT (udSentence2tree ss,udSentence2tree ts),meta)
+  where 
+    meta = rdMeta $ drop 2 $ fromJust $ find 
+                                          (\l -> "# reasons" `isPrefixOf` l) 
+                                          (udCommentLines ss)
+
 -- use original label TODO: refactor
 unadjust :: UDTree -> UDTree
 unadjust (RTree n ts) = RTree n { 
@@ -531,7 +578,14 @@ unadjust (RTree n ts) = RTree n {
     where getOrigLabel n = 
             listToMaybe [head ls | UDData "ORIG_LABEL" ls <- udMISC n]
 
+type Path = String
 
+-- | Get alignments from two CoNNL-U files (shorthand)
+getAlignmentsFromCoNNLUFiles :: Path -> Path -> IO [Alignment]
+getAlignmentsFromCoNNLUFiles p1 p2 = do 
+  p1' <- parseUDFile p1
+  p2' <- parseUDFile p2
+  return $ zipWith (curry sentencePair2alignment) p1' p2'
 
 {- Selection of alignments for MT -}
 

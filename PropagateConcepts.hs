@@ -26,7 +26,8 @@ main = do
                 let s = Simple `elem` flags
                 let fp = listToMaybe [path | Path path <- flags] 
                 let fp' = fromJust fp
-                let as = map (propagate criteria segment byExcl s (ts,us)) cs
+                let cs' = filter (\c -> correctness (rdMeta $ drop 2 $ last $ udCommentLines c) `elem` [Nothing, Just Correct]) cs
+                let as = map (propagate criteria segment byExcl s (ts,us)) cs'
                 if Linearize `elem` flags
                     then 
                         if isJust fp 
