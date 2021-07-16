@@ -31,6 +31,8 @@ import UDAnnotations hiding (getEnv)
 import GFConcepts
 import UD2GF
 
+import ConceptAlignment
+
 main = do
   argv <- getArgs
   (flags,args) <- parseArgv argv help options
@@ -187,7 +189,8 @@ isConllu p = takeExtension p == ".conllu"
 
 -- | Given n lists of UD sentences obtained via CP and/or CE (in general, with 
 -- aligned by sent_id), only get the concepts found in all n langs (so that
--- the lists in the resulting sentences are also aligned implicitly) 
+-- the lists in the resulting sentences are also aligned implicitly).
+-- It ignores alignments that have been manually annotated as incorrect.
 getAlignments :: [[UDSentence]] -> [[UDSentence]]
 getAlignments ss =  
   transpose $ mapMaybe getAlignment ids
@@ -196,7 +199,9 @@ getAlignments ss =
       getAlignment :: String -> Maybe [UDSentence]
       getAlignment id = 
         let as = map (find (\s -> sentId s == id)) ss
-        in if all isJust as then Just $ map fromJust as else Nothing
+        in if all isJust as && all (\c -> correctness (rdMeta $ drop 2 $ last $ udCommentLines (fromJust c)) `elem` [Nothing, Just Correct]) as
+            then Just $ map fromJust as 
+            else Nothing
 
 -- | Like UDAnnotations.getEnv, but uses pgf instead of paths
 -- (this is a bad solution but I don't necessarily want to rely on the pgf

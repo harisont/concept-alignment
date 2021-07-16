@@ -73,7 +73,9 @@ executable translate
 
 executable generate-grammar
   main-is: GenerateGrammar.hs
-  other-modules: ArgvParse
+  other-modules: 
+    ArgvParse,
+    ConceptAlignment
   build-depends:
     base,
     gf,
@@ -83,7 +85,8 @@ executable generate-grammar
     containers,
     process,
     pretty,
-    split
+    split,
+    multiset
   ghc-options: -main-is GenerateGrammar
   default-language: Haskell2010
 
