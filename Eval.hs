@@ -22,8 +22,7 @@ main = do
           algns' <- if all isAnnotated algns
                       then return algns
                       else annotate [] algns
-          writeFile ("annotated_" ++ n1) (unlines $ map (\(s,n) -> (prUDSentence n (fst $ alignment2sentencePair s))) (algns' `zip` [1..]))
-          writeFile ("annotated_" ++ n2) (unlines $ map (\(s,n) -> (prUDSentence n (snd $ alignment2sentencePair s))) (algns' `zip` [1..]))
+          writeAlgnsToFiles algns' ("annotated_" ++ n1) ("annotated_" ++ n2)
           return algns'
         [cmd,o1,o2,n1,n2] -> do
           olds <- getAlignmentsFromCoNNLUFiles o1 o2
@@ -34,8 +33,7 @@ main = do
           case cmd of
             "extraction" -> putStrLn $ diffStats olds news'
             "propagation" -> putStrLn $ propStats olds news'
-          writeFile ("annotated_" ++ n1) (unlines $ map (\(s,n) -> (prUDSentence n (fst $ alignment2sentencePair s))) (news' `zip` [1..]))
-          writeFile ("annotated_" ++ n2) (unlines $ map (\(s,n) -> (prUDSentence n (snd $ alignment2sentencePair s))) (news' `zip` [1..]))
+          writeAlgnsToFiles news' ("annotated_" ++ n1) ("annotated_" ++ n2)
           return news'
         _ -> do
           putStrLn "Wrong number of arguments."
@@ -45,6 +43,14 @@ main = do
             basicStats as 
             ++ if Reasons `elem` flags then reasonStats as else "" 
       putStrLn stats
+  where
+    writeAlgnsToFiles as f1 f2 = do
+      writeFile f1 (conllize fst) 
+      writeFile f2 (conllize snd) 
+      where 
+        conllize f = unlines $ map 
+                    (\(s,n) -> prUDSentence n (f $ alignment2sentencePair s)) 
+                    (as `zip` [1..])
 
 {- Annotation -}
 
