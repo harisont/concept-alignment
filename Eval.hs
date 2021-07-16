@@ -22,8 +22,8 @@ main = do
           algns' <- if all isAnnotated algns
                       then return algns
                       else annotate [] algns
-          writeFile n1 (unlines $ map (\(s,n) -> (prUDSentence n (fst $ alignment2sentencePair s))) (algns' `zip` [1..]))
-          writeFile n2 (unlines $ map (\(s,n) -> (prUDSentence n (snd $ alignment2sentencePair s))) (algns' `zip` [1..]))
+          writeFile ("annotated_" ++ n1) (unlines $ map (\(s,n) -> (prUDSentence n (fst $ alignment2sentencePair s))) (algns' `zip` [1..]))
+          writeFile ("annotated_" ++ n2) (unlines $ map (\(s,n) -> (prUDSentence n (snd $ alignment2sentencePair s))) (algns' `zip` [1..]))
           return algns'
         [cmd,o1,o2,n1,n2] -> do
           olds <- getAlignmentsFromCoNNLUFiles o1 o2
@@ -34,8 +34,8 @@ main = do
           case cmd of
             "extraction" -> putStrLn $ diffStats olds news'
             "propagation" -> putStrLn $ propStats olds news'
-          writeFile n1 (unlines $ map (show . fst) news')
-          writeFile n2 (unlines $ map (show . snd) news')
+          writeFile ("annotated_" ++ n1) (unlines $ map (\(s,n) -> (prUDSentence n (fst $ alignment2sentencePair s))) (news' `zip` [1..]))
+          writeFile ("annotated_" ++ n2) (unlines $ map (\(s,n) -> (prUDSentence n (snd $ alignment2sentencePair s))) (news' `zip` [1..]))
           return news'
         _ -> do
           putStrLn "Wrong number of arguments."
