@@ -57,7 +57,7 @@ isAnnotated (_,m) = isJust $ correctness m
 annotate :: [Alignment] -> [Alignment] -> IO [Alignment]
 annotate olds [] = return []
 annotate olds (new:news) = do
-  new' <- case new `elemIndex` olds of
+  new' <- case trees new `elemIndex` map trees olds of
     Nothing -> annotateManually new
     Just i -> return (
       trees new,
