@@ -110,6 +110,10 @@ rdMeta s = M {
     [is,cs] = splitOn " correctness: " xs
     readSet s = S.fromList (read $ "[" ++ tail (init s) ++ "]")
 
+-- | Check if an alignment is already annotated
+isAnnotated :: Alignment -> Bool
+isAnnotated (_,m) = isJust $ correctness m
+
 -- | Map of alignments (used internally to simplify combining metadata)
 type AlignMap = M.Map AlignedTrees Meta
 

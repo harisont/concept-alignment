@@ -51,10 +51,6 @@ main = do
 
 {- Annotation -}
 
--- | Check if an alignment is already annotated
-isAnnotated :: Alignment -> Bool
-isAnnotated (_,m) = isJust $ correctness m
-
 -- | Annotate the alignments contained in a file, keeping the information
 -- provided by an older annotated file into account
 annotate :: [Alignment] -> [Alignment] -> IO [Alignment]
