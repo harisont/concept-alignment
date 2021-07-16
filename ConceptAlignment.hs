@@ -129,7 +129,7 @@ isUseful a = fromJust (correctness (meta a)) == Correct
 
 -- | Check if an alignment has been found because of the given reasons
 isBecauseOf :: [Reason] -> Alignment -> Bool
-isBecauseOf rs a = toList (reasons $ meta a) == rs
+isBecauseOf rs a = S.toList (reasons $ meta a) == rs
 
 -- | Map of alignments (used internally to simplify combining metadata)
 type AlignMap = M.Map AlignedTrees Meta
