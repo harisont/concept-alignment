@@ -94,18 +94,61 @@ Graphical, CoNNL-U and Rose Tree representation of the same UD tree.
 ## Matching dependency labels
 ![](figures/boat_dep_labels.png)
 
+- $\langle$_she missed the boat, ha perso il treno_$\rangle$
+- $\langle$_missed the boat, perso il treno_$\rangle$
+- $\langle$_the boat, il treno_$\rangle$
+- $\langle$_the, il_$\rangle$
+
 ## Aligning heads of maching trees
+![](figures/boat_dep.png)
+
+- $\langle$_missed, ha perso_$\rangle$ 
+  - (incl. auxiliary in head)
+- *$\langle$_boat, treno_$\rangle$
+- $\langle$_the, il_$\rangle$
 
 ## Using POS tags
 ![](figures/boat_dep_pos.png)
 
-## Reusing known alignments
+- more reliable ignoring function words
+- in this case, same results as when matching labels
+- can increase precision if used in conjuncion with labels
+- can increase recall when labels do not coincide
 
 ## Translation divergences
+__Divergence__: systematic cross-linguistic distinction. 
+
+- categorial
+  - $\langle$_Gioara listens **distractedly**_, _Gioara lyssnar **distraherad**_$\rangle$
+  - $\langle$_Herbert completed his **doctoral** thesis_, _Herbert ha completato la sua tesi **di dottorato**_$\rangle$
+- conflational
+  - $\langle$_Filippo is interested in **game development**_, _Filippo är intresserad av **spelutveckling**_$\rangle$
+- structural
+  - $\langle$_I called **Francesco**_, _Ho telefonato **a Francesco**_$\rangle$
+- head swapping
+  - $\langle$_Anna **usually** goes for walks_, _Anna **brukar** promenera_$\rangle$ 
+- thematic
+  - $\langle$_**Yana** likes **books**_, _**A Yana** piacciono **i libri**_$\rangle$
+
+## Reusing known alignments
+- Allows using CA in conjunction with statistical tools
+- iterative application
 
 ## Searching for specific patterns
+- `gf-ud` pattern matching allows looking for specific syntactic patterns
+- possible generalization via pattern replacement
+
+Example predication patterns:
+
+- $\langle$_`subj` missed `obj`,`subj` ha perso `obj`_$\rangle$
+- $\langle$_`subj` told `iobj` `obj`,`subj` berättade `obj` för `obl`_$\rangle$
 
 # Propagating concepts to a new language
+
+## Concept Propagation
+- So far, we focused on how to identify correspondences in bilingual parallel texts (_Concept Extraction_)
+- what happens when we need to handle a third language?
+  - _Concept Propagation_: finding expression corresponding to a known concept in a new language
 
 ## Scenario 1
 
