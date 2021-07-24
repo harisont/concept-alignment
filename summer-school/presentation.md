@@ -151,29 +151,68 @@ Example predication patterns:
   - _Concept Propagation_: finding expression corresponding to a known concept in a new language
 
 ## Scenario 1
+![](figures/s1.png)
 
 ## Scenario 2
-
-## Detailed overview
+![](figures/s2.png)
 
 # Generating grammar rules
 
 ## Requirements
+- aligned UD trees
+- extraction grammar
+- morphological dictionaries
 
 ## Morphological dictionaries
+Purely morphological unilingual dictionaries.
+
+Example:
+
+```
+...
+lin morphologic_A = 
+  mkAMost "morphologic" "morphologicly" ;
+lin morphological_A = 
+  mkAMost "morphological" "morphologically" ;
+lin morphology_N = 
+  mkN "morphology" "morphologies" ;
+...
+```
 
 ## Extraction grammar
+Defines the syntactic categories and functions to build lexical entries.
+
+Example (prepositional noun phrases):
+
+```
+PrepNP : Prep -> NP -> PP # case head
+```
 
 ## Lexical rules
+Abstract:
+
+```
+fun in_the_field__inom_området_PP : PP ;
+```
+
+English concrete:
+
+```
+lin in_the_field__inom_område_PP = 
+  PrepNP in_Prep (DetCN the_Det (UseN field_N))
+```
 
 # Refining the generated lexicon
+- interactive selection
+- CoNNL-U synoptic viewer
 
-## Interactive selection
-
-## Postprocessing
-
-# Conclusions
+## Detailed overview
+![](figures/full_overview.png)
 
 ## Summary
+- concept extraction (UD)
+- concept propagation (UD)
+- GF lexicon generation
+- postprocessing tools
 
 # Questions?
