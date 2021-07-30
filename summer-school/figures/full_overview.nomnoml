@@ -1,0 +1,29 @@
+# direction:down
+# arrowSize:0.7
+# fillArrows:true
+//# stroke: #ffffff
+# zoom:6
+# lineWidth: 1.5
+# title: full_overview
+# fill: #fef6d3
+
+[<label> L1 string] -> [UD parsing]
+[<label> L2 string] -> [UD parsing]
+[<label> L3 string] -> [UD parsing]
+
+[UD parsing] -> [<label> L1 UD trees]
+[UD parsing] -> [<label> L2 UD trees]
+[UD parsing] -> [<label> L3 UD trees]
+
+[<label> L1 UD trees] -> [CE]
+[<label> L2 UD trees] -> [CE]
+
+[<label> L3 UD trees] -> [CP]
+
+[CE] -> [<label> L1-L2 aligned subtrees]
+
+[CP] -> [<label> L1-L2-L3 aligned subtrees]
+
+[<label> L1-L2 aligned subtrees] -> [<label> L1-L2-L3 aligned subtrees]
+[<label> L1-L2-L3 aligned subtrees] -> [gf-ud++]
+[gf-ud++] -> [<label> GF translation lexicon]
