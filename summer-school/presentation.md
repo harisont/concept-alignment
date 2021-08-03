@@ -16,7 +16,7 @@ theme: mhthm
 ## The problem
 - manually building a translation lexicon
   - is time consuming
-  - requires significant linguistic knowledge
+  - requires significant linguistic knowledge \pause
 - desire to __automate__ this process at least in part \pause
   - possible when __example parallel data__ are available
 
@@ -46,7 +46,7 @@ Standard approaches are statistical (IBM models).
 - __cons__: \pause
   - _require_ large amounts of raw data \pause
   - correspondences between strings \pause $\to$ no morphological info \pause
-  - "fixed" level of abstraction (word or phrase)
+  - "fixed" level of abstraction (word, phrase or sentence)
 
 ## Syntax-based approaches I
 Alternative: tree-to-tree alignment.
@@ -80,7 +80,7 @@ Phrase alignment
 - quality of the analysis is crucial
   - lack of robust GF parsers \pause
 - dependency trees are an easier target for a parser
-  - robust parsers such as UDPipe
+  - neural parsers such as __UDPipe__
 
 ## Overview
 ![](figures/high-level_overview.png)
@@ -93,7 +93,7 @@ Phrase alignment
 
 ## UD trees
 ![](figures/ud_formats.png)
-Graphical, CoNNL-U and Rose Tree representation of the same UD tree.
+Graphical, CoNNL-U and Rose Tree representation of the same UD tree. \pause
 
 - dependency-labelled links between words (head-dependent pairs) \pause
 - POS tags \pause
@@ -113,7 +113,7 @@ Graphical, CoNNL-U and Rose Tree representation of the same UD tree.
 
 ## Aligning heads of maching trees
 
-- *$\langle$_the boat, il treno_$\rangle$ \pause
+- $\langle$_the boat, il treno_$\rangle$ \pause
 $\to$ *$\langle$_boat, treno_$\rangle$ \pause
 - $\langle$_missed the boat, perso il treno_$\rangle$ \pause $\to$ $\langle$_missed, ha perso_$\rangle$ \pause (including the auxiliary)
 
@@ -150,15 +150,15 @@ __Divergence__: systematic cross-linguistic distinction. \pause
 
 Example predication patterns:
 
-- $\langle$_[`subj`] missed [`obj`],[`subj`] ha perso [`obj`]_$\rangle$
-- $\langle$_[`subj`] told [`iobj`] [`obj`],[`subj`] berättade [`obj`] för [`obl`]_$\rangle$
+- $\langle$_she missed the boat, ha perso il treno_$\rangle$ $\to$ $\langle$_[`subj`] missed [`obj`], ha perso [`obj`]_$\rangle$
+- $\langle$_she told you that, hon berättade det för dig_$\rangle$ $\to$ $\langle$_[`subj`] told [`iobj`] [`obj`],[`subj`] berättade [`obj`] för [`obl`]_$\rangle$
 
 # Propagating concepts to a new language
 
 ## Concept Propagation
 - So far, we focused on how to identify correspondences in bilingual parallel texts (**_Concept Extraction_**) \pause
 - what happens when we need to handle a third language?
-  - **_Concept Propagation_**: finding expression corresponding to a known concept in a new language
+  - **_Concept Propagation_**: finding the expression corresponding to a known concept in a new language
 
 ## Scenario 1
 ![](figures/s1.png)
@@ -170,8 +170,9 @@ Example predication patterns:
 
 ## Requirements
 - aligned UD trees \pause
-- morphological dictionaries \pause
-- extraction grammar 
+- dependency configurayions for `gf-ud` \pause
+- __morphological dictionaries__ \pause
+- __extraction grammar__
 
 ## Morphological dictionaries
 Purely morphological unilingual dictionaries.
@@ -218,17 +219,20 @@ lin in_the_field__inom_område_PP =
   PrepNP in_Prep (DetCN the_Det (UseN field_N))
 ```
 
-## Refining the generated lexicon
-- interactive selection
-- CoNNL-U synoptic viewer
-
 ## Detailed view
 ![](figures/full_overview.png)
 
+## Refining the generated lexicon
+Postprocessing tools: \pause
+
+- interactive selection \pause
+- CoNNL-U synoptic viewer
+  
 ## Summary
-- concept extraction (UD) \pause
-- concept propagation (UD) \pause
+- (parsing) \pause
+- concept extraction \pause
+- concept propagation \pause
 - GF lexicon generation \pause
-- postprocessing tools
+- postprocessing
 
 # Questions?
