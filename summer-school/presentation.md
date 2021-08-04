@@ -230,9 +230,23 @@ Postprocessing tools: \pause
   
 ## Summary
 - (parsing) \pause
-- concept extraction \pause
-- concept propagation \pause
+- Concept Extraction \pause
+- Concept Propagation \pause
 - GF lexicon generation \pause
 - postprocessing
+
+## Links
+Links to everything mentioned in this talk, and more:
+
+- __[An overview of the IBM models](http://www.statmt.org/survey/Topic/IBMModels)__
+- __[`fast_align`](https://github.com/clab/fast_align)__
+- __[the UD standard](https://universaldependencies.org/)__
+- __[UDPipe](https://ufal.mff.cuni.cz/udpipe)__
+- __[B. J. Dorr's paper on translation divergences](https://dl.acm.org/doi/abs/10.5555/203987.203993)__
+- __[`gf-ud`](https://github.com/GrammaticalFramework/gf-ud)__
+- __[the `concept-alignment` repo](https://github.com/harisont/concept-alignment)__
+- __[my thesis report](https://raw.githubusercontent.com/harisont/concept-alignment/master/thesis/final_report/synbased_ca_for_mt.pdf)__ where everything is explained in detail but not everything is up to date
+- __[the paper on CE](https://raw.githubusercontent.com/harisont/concept-alignment/master/paper/paper.pdf)__ I wrote together with Aarne
+- __[the CoNNL-U synoptic viewer](https://github.com/DigitalGrammarsAB/synoptic-conllu-viewer)__
 
 # Questions?
