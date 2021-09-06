@@ -1,6 +1,6 @@
 ---
 title: Concept Alignment for Multilingual Machine Translation
-subtitle: 04.07.2021
+subtitle: 04.08.2021
 author: Arianna Masciolini
 theme: mhthm
 ---
