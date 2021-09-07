@@ -6,24 +6,24 @@ theme: mhthm
 ---
 
 ## Context
-- In __domain-specific MT__ precision is often more important than coverage
-- grammar-based pipelines (cf. GF) provide strong guarantees of __grammatical correctness__
+- In __domain-specific MT__, precision is often more important than coverage \pause
+- grammar-based pipelines (cf. GF) provide strong guarantees of __grammatical correctness__ \pause
 - __lexical exactness__ is as important as grammaticality
   - need for high-quality __translation lexica__ preserving semantics _and_ morphological correctness
 
 ## Translation lexica
-- often built __manually__
+- Often built __manually__
   - __time__ consuming
-  - significant __linguistic knowledge__ required 
+  - significant __linguistic knowledge__ required \pause
 - need for at least partial __automation__ 
   - __example parallel data__ required
 
 ## A parallel corpus
 ![](figures/alice_sentence.png)
 
-From Lewis Carroll, _Alice's adventures in Wonderland_. Parallel text at `paralleltext.io`
+From Lewis Carroll, _Alice's Adventures in Wonderland_. Parallel text at `paralleltext.io`
 
-## Alignment
+## Types of alignment
 Word alignment:
 ![](figures/alice_word.png)
 
@@ -44,9 +44,11 @@ Phrase alignment:
 | "fixed" level of abstraction (__word__ or __phrase__) | all levels of abstraction $\to$ __concept__ alignment|
 
 ## Our approach
-- inconsistencies between different grammar formalisms $\to$ translation lexicon implemented in __GF__
-- lack of robust constituency parsers while high-quality analysis is crucial $\to$ __UD__ parsing
+- Inconsistencies between different grammar formalisms $\to$ translation lexicon implemented in __GF__ \pause
+- lack of robust constituency parsers while high-quality analysis is crucial $\to$ __UD__ parsing (UDPipe) \pause
 - `gf-ud` for conversion
+
+\pause
 
 ![](figures/high-level_overview.png)
 
@@ -54,21 +56,23 @@ Phrase alignment:
 ![](figures/ud_formats.png)
 Graphical, CoNNL-U and Rose Tree representation of the same UD tree.
 
-- framework for cross-linguistically consistent grammatical annotation
-- dependency-labelled links between words (head-dependent pairs)
+- Framework for cross-linguistically consistent grammatical annotation \pause
+- dependency-labelled links between words (head-dependent pairs) \pause
 - cannot be used for target language generation
-  
+
 ## Grammatical Framework
-- constituency grammar formalism/programming language for __multilingual grammars__
-  - one abstract syntax
-  - multiple concrete syntaxes
-- compilation-like approach to translation (parsing + linearization)
+![](figures/parsetree.png)
+
+- Constituency grammar formalism for __multilingual grammars__ (one abstract syntax + a concrete syntax per language)
+- compilation-like translation (parsing + linearization)
 
 # Concept Extraction
 
 ## Definitions
 
 __*Concept*__: semantic unit of compositional translation expressed by a word or construction, conceived as a lemma equipped with morphological variations.
+
+\pause
 
 __*Alignment*__: tuple of equivalent concrete expressions in different languages; represents a concept.
 
@@ -83,6 +87,8 @@ __*Alignment*__: tuple of equivalent concrete expressions in different languages
 - *$\langle$_the boat, il treno_$\rangle$ 
 - $\langle$_the, il_$\rangle$
 
+\pause
+
 Simple improvement: aligning heads of matching subtrees
 
 - $\langle$_she missed the boat, ha perso il treno_$\rangle$, $\langle$_missed the boat, perso il treno_$\rangle$ $\to$ $\langle$_missed, ha perso_$\rangle$  (including the auxiliary)
@@ -93,13 +99,13 @@ $\to$ *$\langle$_boat, treno_$\rangle$
 ## POS equivalence
 ![](figures/boat_dep_pos.png) 
 
-- more reliable __ignoring function words__ 
-- in this case, basically same results as when matching labels 
-- can increase recall when labels do not coincide 
+- more reliable __ignoring function words__ \pause
+- in this case, basically same results as when matching labels \pause 
+- can increase recall when labels do not coincide \pause
 - can increase precision if used __in conjuncion with labels__
 
 ## Known translation divergence
-__Divergence__: systematic cross-linguistic distinction. 
+__*Divergence*__: systematic cross-linguistic distinction. \pause
 
 - categorial
   - $\langle$_Gioara listens **distractedly**_, _Gioara lyssnar **distraherad**_$\rangle$
@@ -114,12 +120,12 @@ __Divergence__: systematic cross-linguistic distinction.
   - $\langle$_**Yana** likes **books**_, _**A Yana** piacciono **i libri**_$\rangle$
 
 ## Known alignment
-- allows using CA in conjunction with statistical tools 
+- Allows using CA in conjunction with statistical tools \pause
 - iterative application
 
 ## Searching for specific patterns
-- `gf-ud` pattern matching allows looking for specific syntactic patterns 
-- possible generalization via pattern replacement 
+- `gf-ud` pattern matching to look for specific syntactic patterns \pause
+- possible generalization via pattern replacement \pause
 
 Example predication patterns:
 
@@ -129,9 +135,9 @@ Example predication patterns:
 # Grammar rules generation
 
 ## Requirements
-- aligned UD trees 
-- `gf-ud`  
-- __morphological dictionaries__ 
+- aligned UD trees \pause
+- `gf-ud`  \pause
+- __morphological dictionaries__ \pause
 - __extraction grammar__
 
 ## Morphological dictionaries
@@ -181,6 +187,13 @@ UD tree alignments are evaluated:
 - independently from the quality of UD parsing (100-sentence subset of the manually annotated PUD corpus)
 - on raw text (DMI and CSE course plans corpora)
 
+\pause
+
+Metrics: 
+
+- % correct alignments
+- % "useful" alignments
+
 ## Results on PUD corpus
 \begin{table}[h]
   \centering
@@ -194,7 +207,9 @@ UD tree alignments are evaluated:
   \end{tabular}
   \end{table}
 
-  - CE module compared with `fast_align`, so extracting only one-to-many and many-to-one alignments
+  \pause
+
+  - CE module compared with `fast_align`, so extracting only one-to-many and many-to-one alignments \pause
   - CE has much higher precision, even when `fast_align` is trained on full 1000-sentence corpus
 
 ## Results on course plans corpora
@@ -210,17 +225,19 @@ UD tree alignments are evaluated:
   \end{tabular}
   \end{table}
 
-  - comparison between experiments on manually annotated treebanks and raw text
-  - precision decreases, but is still higher than `fast_align`'s
+  \pause
+
+  - Comparison between experiments on manually annotated treebanks and raw text \pause
+  - precision decreases, but is still higher than `fast_align`'s \pause
   - recall much lower
 
 ## MT experiments
-- no need to write an _ad hoc_ grammar: extend extraction grammar with existing RGL functions 
-- 2 bilingual lexica from course plans corpora
+- No need for an _ad hoc_ grammar: extend extraction grammar with existing RGL functions \pause
+- 2 bilingual lexica from course plans corpora \pause
 - corpus of sentences to translate generated in the GF shell
-  - semi-random lexical and grammatical variations on a set of semantically plausible sentences
-- metric: BLEU scores
-- reference translations obtained by manual postprocessing of the automatic ones 
+  - semi-random lexical and grammatical variations on a set of semantically plausible sentences \pause
+- metric: BLEU scores \pause
+- reference translations obtained by manual postprocessing of the automatic ones \pause
   - avoid low scores due to different but equally valid lexical and grammatical choices
 
 ## Results
@@ -237,22 +254,24 @@ UD tree alignments are evaluated:
   \label{tableu}
 \end{table}
 
-- better results for English-Swedish (due to systematic errors in Italian)
+\pause
+
+- Better results for English-Swedish (due to systematic errors in Italian) \pause
 - sentence-level scores range from 0 (sometimes due to a single semantic error) to 100
 
 ## Conclusions
-- extraction technique performing consistently well on small datasets
-- simultaneous extraction of word, phrase, ... alignments, incl. discontinuous expressions
-- can be used to look for specific types of correspondences, e.g. predication patterns
-- automatic generation of compilable, morphology-aware GF translation lexica
-- configurable to handle language pair- or corpus-specific divergences
-- requires manual corrections and completions, but can reduce the time required for bootstrapping translation lexica significantly
-- consists of a Haskell library + executables
+- Extraction technique performing consistently well even on small datasets \pause
+- simultaneous extraction of word, phrase, ... alignments, incl. discontinuous expressions \pause
+- possibility to search for specific types of correspondences, e.g. predication patterns \pause
+- customizable divergence patterns \pause
+- output: compilable, morphology-aware GF translation lexica \pause
+- require manual corrections and completions, but can significantly reduce lexicon bootstrapping time \pause
+- available as Haskell library + executables
 
 ## Current and future work
 
-- Concept Propagation 
-  - same text in new language (equivalent to multilingual CE)
-  - new text in new language (within same domain)
-- integration with statistical tools
+- Concept Propagation \pause
+  - same text in new language (equivalent to multilingual CE) \pause
+  - new text in new language (within same domain) \pause
+- integration with statistical tools \pause
 - postprocessing tools
