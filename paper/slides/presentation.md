@@ -52,19 +52,19 @@ Phrase alignment:
 
 ![](figures/high-level_overview.png)
 
+## Grammatical Framework
+![](figures/parsetree.png)
+
+- Constituency grammar formalism for __multilingual grammars__ (one abstract syntax + a concrete syntax per language) \pause
+- compilation-like translation (parsing + linearization)
+
 ## Universal Dependencies
 ![](figures/ud_formats.png)
 Graphical, CoNNL-U and Rose Tree representation of the same UD tree.
 
 - Framework for cross-linguistically consistent grammatical annotation \pause
-- dependency-labelled links between words (head-dependent pairs) \pause
-- cannot be used for target language generation
-
-## Grammatical Framework
-![](figures/parsetree.png)
-
-- Constituency grammar formalism for __multilingual grammars__ (one abstract syntax + a concrete syntax per language)
-- compilation-like translation (parsing + linearization)
+- cannot be used for target language generation \pause
+- dependency-labelled links between words (head-dependent pairs)
 
 # Concept Extraction
 
