@@ -175,8 +175,8 @@ options =
 
 help :: String
 help = usageInfo 
-        ("Usage: stack exec -- EvAlign SL.conllu TL.conllu [flags], or\n"
-     ++ "        stack exec -- EvAlign extraction annotatedSL.conllu annotatedTL.conllu newSL.conllu newTL.conllu [flags], or"
-     ++ "        stack exec -- EvAlign propagation annotatedSL.conllu annotatedTL.conllu newSL.conllu newTL.conllu [flags] "
+        ("Usage: stack exec -- eval SL.conllu TL.conllu [flags], or\n"
+     ++ "        stack exec -- eval extraction annotatedSL.conllu annotatedTL.conllu newSL.conllu newTL.conllu [flags], or"
+     ++ "        stack exec -- eval propagation annotatedSL.conllu annotatedTL.conllu newSL.conllu newTL.conllu [flags] "
      ++ "(NOTE: SL.conllu, TL.conllu and newXX.conllu do not need to be pre-annotated)")
         options

@@ -47,7 +47,7 @@ main = do
           let opref = fromMaybe "grammars/Generated" (listToMaybe [o | Path o <- flags])
           generateGrammar aprefs epref mpref opref 
         _ -> do
-          putStrLn "Wrong number of arguments" 
+          putStrLn "Wrong number of arguments." 
           putStrLn help 
           exitWith (ExitFailure 1)
 

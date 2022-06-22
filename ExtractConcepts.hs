@@ -100,5 +100,5 @@ options =
 
 help :: String
 help = usageInfo 
-        "Usage: stack exec -- ExtractConcepts SL.conllu TL.conllu [flags]"
+        "Usage: stack exec -- extract-concepts SL.conllu TL.conllu [flags]"
         options
