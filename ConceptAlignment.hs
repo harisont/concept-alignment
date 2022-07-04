@@ -240,7 +240,7 @@ align as cs p cl ex (s:ss) =
   where as' = M.fromListWith combineMeta as
 
 -- | Sentence-level alignment function. Can be use independently of align   
-alignSent :: AlignMap              -- ^ a map of known alignments (e.g. 
+alignSent :: AlignMap                  -- ^ a map of known alignments (e.g. 
                                        -- from statistical tools)
           -> [Criterion]               -- ^ a list of criteria (sorted by 
                                        -- priority)
