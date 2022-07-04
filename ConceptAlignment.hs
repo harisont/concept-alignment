@@ -183,14 +183,15 @@ instance Read Annotation where
 type Alignment' = (Annotation,Alignment)
 
 -- | Reasons for alignment
-data Reason = DIV   -- known interlingual divergence
-            | UD    -- matching root UD label
-            | POS   -- POS-equivalence
-            | PASS  -- different voice, used together with DIV
-            | CL    -- due to clause segmentation and alignment
-            | REST  -- due to "alignment by exclusion"
-            | HEAD  -- composed of the heads of another alignment (alignHeads)
-            | KNOWN -- already found in another sentence or known a priori 
+data Reason = DIV     -- known interlingual divergence
+            | UD      -- matching root UD label
+            | POS     -- POS-equivalence
+            | PASS    -- different voice, used together with DIV
+            | CL      -- due to clause segmentation and alignment
+            | REST    -- due to "alignment by exclusion"
+            | HEAD    -- composed of the heads of another alignment (alignHeads)
+            | KNOWN   -- already found in another sentence or known a priori 
+            | UNKNOWN -- to be used when reason is not relevant
   deriving (Eq,Show,Read,Ord,Enum,Bounded)
 
 -- | Data type for alignment criteria. Each criterion is composed of
@@ -252,7 +253,7 @@ alignSent :: AlignMap              -- ^ a map of known alignments (e.g.
           -> Bool                      -- ^ a flag indicating whether CA is
                                        -- being used as hybrid
           -> (UDSentence,UDSentence)   -- ^ the sentences to align 
-          -> AlignMap              -- ^ a map of alignments
+          -> AlignMap                  -- ^ a map of alignments
 alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
   where
     (t1,t2) = (udSentence2tree s1, udSentence2tree s2)
