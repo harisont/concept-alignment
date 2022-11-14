@@ -88,7 +88,7 @@ statistics are needed.
 The grammar generation module can be run as follows:
 
 ```
-"Usage: stack exec -- generate-grammar alignments_prefixes"
+stack exec -- generate-grammar alignments_prefixes
 ```
 
 Here, `alignments_prefixes` is a list of space-separated prefixes of aligned CoNNL-U files to derive grammar rules from. 
