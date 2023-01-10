@@ -71,24 +71,24 @@ executable translate
   ghc-options: -main-is Translate
   default-language: Haskell2010
 
-executable generate-grammar
-  main-is: GenerateGrammar.hs
-  other-modules: 
-    ArgvParse,
-    ConceptAlignment
-  build-depends:
-    base,
-    gf,
-    gf-ud,
-    filepath,
-    directory,
-    containers,
-    process,
-    pretty,
-    split,
-    multiset
-  ghc-options: -main-is GenerateGrammar
-  default-language: Haskell2010
+--executable generate-grammar
+--  main-is: GenerateGrammar.hs
+--  other-modules: 
+--    ArgvParse,
+--    ConceptAlignment
+--  build-depends:
+--    base,
+--    gf,
+--    gf-ud,
+--    filepath,
+--    directory,
+--    containers,
+--    process,
+--    pretty,
+--    split,
+--    multiset
+--  ghc-options: -main-is GenerateGrammar
+--  default-language: Haskell2010
 
 library
   exposed-modules: ConceptAlignment
