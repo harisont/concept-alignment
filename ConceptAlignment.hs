@@ -500,6 +500,9 @@ contentTags :: UDTree -> MS.MultiSet POS
 contentTags = MS.fromList . filter relevant . map udUPOS . allNodesRTree
   where relevant p = p `elem` openPOS ++ ["NUM"] 
 
+contentLemmas :: UDTree -> MS.MultiSet String
+contentLemmas = MS.fromList . map snd . filter relevant . map (\w -> (udUPOS w, udLEMMA w)) . allNodesRTree
+  where relevant (p,l) = p `elem` openPOS ++ ["NUM"] 
 -- | Multiset of content tags of the subtrees of t
 subtreesTags :: UDTree -> MS.MultiSet POS
 subtreesTags t = MS.unions (map contentTags (subtrees t))
