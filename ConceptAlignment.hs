@@ -183,15 +183,19 @@ instance Read Annotation where
 type Alignment' = (Annotation,Alignment)
 
 -- | Reasons for alignment
-data Reason = DIV     -- known interlingual divergence
+data Reason = ID      -- identity (all fields are the same)
+            | FORM    -- same word form(s)
+            | LEMMA   -- same lemma(s) 
+            -- inherited from multilingual setting
             | UD      -- matching root UD label
             | POS     -- POS-equivalence
-            | PASS    -- different voice, used together with DIV
-            | CL      -- due to clause segmentation and alignment
+            | DIV     -- known interlingual divergence
             | REST    -- due to "alignment by exclusion"
-            | HEAD    -- composed of the heads of another alignment (alignHeads)
+            -- not used in l2-ud but necessary to compile
+            | HEAD    -- composed of the heads of another alignment
+            | PASS    -- active vs. passive voice
+            | CL      -- due to clause segmentation and alignment
             | KNOWN   -- already found in another sentence or known a priori 
-            | UNKNOWN -- to be used when reason is not relevant
   deriving (Eq,Show,Read,Ord,Enum,Bounded)
 
 -- | Data type for alignment criteria. Each criterion is composed of
