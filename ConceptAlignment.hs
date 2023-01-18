@@ -492,6 +492,10 @@ isHeadUDTree (RTree n ts) (RTree m _) = n =~ m && (hasAuxOnly || hasCompOnly)
 {- POS-utils -}
 
 -- | Multiset of the POS tags contained in a dep. tree
+tags :: UDTree -> MS.MultiSet POS
+tags = MS.fromList . map udUPOS . allNodesRTree
+
+-- | Multiset of the content POS tags contained in a dep. tree
 contentTags :: UDTree -> MS.MultiSet POS
 contentTags = MS.fromList . filter relevant . map udUPOS . allNodesRTree
   where relevant p = p `elem` openPOS ++ ["NUM"] 
