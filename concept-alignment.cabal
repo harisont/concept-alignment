@@ -90,6 +90,14 @@ executable generate-grammar
   ghc-options: -main-is GenerateGrammar
   default-language: Haskell2010
 
+executable function-align
+  main-is: FunctionAlign.hs
+  build-depends:
+    base,
+    gf,
+    containers
+  ghc-options: -main-is FunctionAlign
+
 library
   exposed-modules: ConceptAlignment
   build-depends:
