@@ -165,3 +165,15 @@ are:
     be performed for UD tree pairs matching that criterion, the latter
     marking the criterion as either strict (i.e. to be also used for
     "alignment by exclusion" or not.
+
+## Citation
+If you use this software in your research, please cite
+
+```
+@inproceedings{masciolini2021grammar,
+  title={Grammar-based concept alignment for domain-specific machine translation},
+  author={Masciolini, Arianna and Ranta, Aarne},
+  booktitle={Proceedings of the Seventh International Workshop on Controlled Natural Language (CNL 2020/21)},
+  year={2021}
+}
+```
