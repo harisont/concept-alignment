@@ -7,7 +7,8 @@ import qualified Data.MultiSet as MS
 import qualified Data.Set as S
 import qualified Data.Map as M
 import RTree
-import UDConcepts
+import UDStandard
+import UDTrees
 import UDPatterns
 
 {- Basic (mostly data types) definitions and instances for alignments etc. -}
@@ -37,7 +38,7 @@ prLinearizedAlignment (at,m) =
 -- | Check if an alignment "contains" another;
 -- used both in pruning and selection of alignments for MT
 contains :: Alignment -> Alignment -> Bool
-a `contains` b = (sl b `isSubRTree` sl a) && (tl b `isSubRTree` tl a)
+a `contains` b = (sl b `isSubtree` sl a) && (tl b `isSubtree` tl a)
 
 -- | Return the aligned trees of an alignment, just like when it was a record 
 -- type
@@ -47,8 +48,8 @@ trees (tu,_) = tu
 -- | Two pairs of aligned trees are considered equal whenever their
 -- linearizations are the same
 instance Eq AlignedTrees where
-  AT (t1,u1) == AT (t2,u2) = linearize t1 == linearize t2 
-                          && linearize u1 == linearize u2
+  AT (t1,u1) == AT (t2,u2) = prtUDTreeLin t1 == prtUDTreeLin t2 
+                          && prtUDTreeLin u1 == prtUDTreeLin u2
 
 
 -- | AlignedTrees basically represents a pair of UD trees, but it is a newtype
@@ -59,7 +60,7 @@ newtype AlignedTrees = AT (UDTree,UDTree)
 -- | Use instead of show to inspect an alignment's trees in their linearized
 -- form
 prLinearizedAlignedTrees :: AlignedTrees -> String
-prLinearizedAlignedTrees (AT (t,u)) = linearize t ++ " ||| " ++ linearize u
+prLinearizedAlignedTrees (AT (t,u)) = prtUDTreeLin t ++ " ||| " ++ prtUDTreeLin u
 
 -- | Aligned trees can be ordered based on:
 -- 1. size of their left tree
@@ -69,7 +70,7 @@ prLinearizedAlignedTrees (AT (t,u)) = linearize t ++ " ||| " ++ linearize u
 instance Ord AlignedTrees where
   a <= b = k a <= k b
     where 
-      k x = (depthRTree sla,depthRTree tla,linearize sla,linearize tla)
+      k x = (depth sla,depth tla,prtUDTreeLin sla,prtUDTreeLin tla)
         where AT (sla,tla) = x
 
 -- | Return the metadata of an alignment, just like when it was a record type
@@ -260,7 +261,7 @@ alignSent :: AlignMap                  -- ^ a map of known alignments (e.g.
           -> AlignMap                  -- ^ a map of alignments
 alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
   where
-    (t1,t2) = (udSentence2tree s1, udSentence2tree s2)
+    (t1,t2) = (sentence2tree s1, sentence2tree s2)
     sid = if sentId s1 == sentId s2 
           then sentId s1 
           else error "unaligned sentences"
@@ -280,13 +281,13 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
       | hy && AT (t,u) `M.member` as = 
           (AT (t,u), initMeta {
                 reasons = S.singleton KNOWN,
-                sentIds = S.singleton sid 
+                sentIds = S.singleton $ fromJust sid 
               }) `insert'` as -- TODO: recursion? optimization via update?
       | otherwise = M.empty
         where
           tu = (AT (t,u), initMeta {
                 reasons = reas c,
-                sentIds = S.singleton sid 
+                sentIds = S.singleton $ fromJust sid 
               }) 
           -- applying criteria 
           matchingCs = 
@@ -345,7 +346,7 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
 
     -- check if an alignment matches a certain gf-ud pattern.
     alignPattern :: UDPattern -> Alignment -> Bool
-    alignPattern p a = ifMatchUDPattern p (sl a) && ifMatchUDPattern p (tl a)
+    alignPattern p a = matchesPattern p (sl a) && matchesPattern p (tl a)
 
     -- head alignment: given an alignment, return a new one  
     -- for their "heads", respecting any compounds and aux+verbs (and more?)
@@ -418,97 +419,26 @@ prune m =
     sortByFertility as = sortOn (\a -> - (length $ subas a)) as
       where subas a = filter (\a' -> a `contains` a') as
 
-{- Propagation functions -}
-
--- | Generic (not optimized for same text in n languages) propagation function
-propagate :: [Criterion]                 -- ^ a list of criteria 
-                                         -- (sorted by priority)
-          -> Bool                        -- ^ a flag indicating whether clause 
-                                         -- segmentation should be performed
-          -> Bool                        -- ^ a flag indicating whether 
-                                         -- alignment "by exclusion" should 
-                                         -- also be performed 
-          -> Bool                        -- ^ a flag indicating if the 
-                                         -- propagation text is the same as
-                                         -- the extraction text, i.e. if the
-                                         -- sentence ID should be taken into 
-                                         -- account
-          -> ([UDSentence],[UDSentence]) -- ^ a pair of lists of UD sentences 
-                                         -- (the sentences to propagate on) in
-                                         -- L1, L2
-          -> UDSentence                  -- ^ a previously extracted concept
-          -> Maybe Alignment             -- ^ an alignment, if found
-propagate cs segment byExcl _ ([],[]) _ = Nothing 
-propagate cs segment byExcl s (t:ts,u:us) c =
-  if (s && sentId t `S.member` sentIds' c) || not s
-    then
-      let 
-        t' = udSentence2tree t
-        as = 
-          M.toList $ alignSent M.empty cs Nothing segment byExcl False (t,u)
-        as' = case (c' `isSubUDTree'` t', c' `isHeadSubUDTree` t') of
-          (True,_) -> sortOnDepth as
-          (_,True) -> sortOnDepth $ 
-                        filter (\a -> HEAD `S.member` reasons (meta a)) as
-          (False,False) -> []
-        in case find (\a -> c' =~ sl a) as' of
-          Nothing -> propagate cs segment byExcl s (ts,us) c
-          n -> n
-    else propagate cs segment byExcl s (ts,us) c
-  where 
-    c' = unadjust $ udSentence2tree c
-    -- difference between the depth of the SL aligned subtree and c:
-    -- the smaller, the better (mostly used to avoid that root nodes are
-    -- aligned with full sentences, but also makes sense in general)
-    depthDiff :: RTree a -> Int
-    depthDiff t = abs (depthRTree t - depthRTree c')
-    sortOnDepth :: [Alignment] ->[Alignment]
-    sortOnDepth = sortOn (depthDiff . sl)
-    -- check if c' is the head of one of t's subtrees
-    isHeadSubUDTree :: UDTree -> UDTree -> Bool
-    isHeadSubUDTree c' t = 
-      isJust $ listToMaybe $ 
-        sortOn depthDiff (filter (isHeadUDTree c') (allSubRTrees t))
-
--- return the id of a sentence, taken from the comment that precedes it
-sentIds' :: UDSentence -> S.Set String 
-sentIds' s = S.fromList $ splitOn " " (
-  filter (\c -> c `notElem` ['{', '}', ',', '\"']) 
-  $ last $ splitOn "sentence IDs: " (concat $ udCommentLines s))
-
-
--- check if a UD tree is the head of another
-isHeadUDTree :: UDTree -> UDTree -> Bool
-isHeadUDTree (RTree n []) (RTree m _) = n =~ m
-isHeadUDTree (RTree n ts) (RTree m _) = n =~ m && (hasAuxOnly || hasCompOnly) 
-  where 
-    hasAuxOnly = all (`isLabelled` "aux") ts
-    hasCompOnly = all 
-      (\t -> 
-        udSimpleDEPREL (root t) `elem` ["compound", "flat", "nmod", "amod"]
-      ) 
-      ts
-
 {- POS-utils -}
 
 -- | Multiset of the POS tags contained in a dep. tree
-tags :: UDTree -> MS.MultiSet POS
-tags = MS.fromList . map udUPOS . allNodesRTree
+tags :: UDTree -> MS.MultiSet UPOS
+tags = MS.fromList . map udUPOS . allNodes
 
 -- | Multiset of the content POS tags contained in a dep. tree
-contentTags :: UDTree -> MS.MultiSet POS
-contentTags = MS.fromList . filter relevant . map udUPOS . allNodesRTree
+contentTags :: UDTree -> MS.MultiSet UPOS
+contentTags = MS.fromList . filter relevant . map udUPOS . allNodes
   where relevant p = p `elem` openPOS ++ ["NUM"] 
 
 contentLemmas :: UDTree -> MS.MultiSet String
-contentLemmas = MS.fromList . map snd . filter relevant . map (\w -> (udUPOS w, udLEMMA w)) . allNodesRTree
+contentLemmas = MS.fromList . map snd . filter relevant . map (\w -> (udUPOS w, udLEMMA w)) . allNodes
   where relevant (p,l) = p `elem` openPOS ++ ["NUM"] 
 -- | Multiset of content tags of the subtrees of t
-subtreesTags :: UDTree -> MS.MultiSet POS
+subtreesTags :: UDTree -> MS.MultiSet UPOS
 subtreesTags t = MS.unions (map contentTags (subtrees t))
 
 -- | POS: open classes
-openPOS :: [POS]
+openPOS :: [UPOS]
 openPOS = ["ADJ", "ADV", "INTJ", "NOUN", "PROPN", "VERB"]
 
 -- | Check if a node is a verb
@@ -518,14 +448,10 @@ isVerb h = udUPOS h == "VERB" || udUPOS h == "AUX"
 
 {- UD-utils -}
 
--- | Linearize a UD tree (ignoring initial whitespace)
-linearize :: UDTree -> String
-linearize = dropWhile (== ' ') . prUDTreeString
-
 -- | Check if a sentence contains a clause in passive voice
 isPassive :: UDTree -> Bool
 isPassive s = 
-  "pass" `elem` map (last . splitOn ":" . udDEPREL) (allNodesRTree s)
+  "pass" `elem` map (last . splitOn ":" . udDEPREL) (allNodes s)
 
 -- | Check if the label of the root of a tree is l
 isLabelled :: UDTree -> Label -> Bool
@@ -541,11 +467,11 @@ udSimpleDEPREL w = case break (==':') (udDEPREL w) of
 -- | Given a sentence tree s, return the list of its clauses (s included)
 clauses :: UDTree -> [UDTree]
 clauses s = 
-  s:[c | c <- allSubRTrees s, or [c `isLabelled` r | r <- clDEPRELs]]
+  s:[c | c <- allSubtrees s, or [c `isLabelled` r | r <- clDEPRELs]]
 
 -- | Given a UD tree, return the list of its nominals and modifiers
 nommods :: UDTree -> [UDTree]
-nommods t = [n | n <- allSubRTrees t, 
+nommods t = [n | n <- allSubtrees t, 
                       or [n `isLabelled` r | r <- nomDEPRELs ++ modDEPRELs]]
 
 clDEPRELs, nomDEPRELs, modDEPRELs :: [Label]
@@ -557,8 +483,7 @@ modDEPRELs = ["advmod", "amod", "discourse"]             -- modifiers
 -- | Construct an "abstract" UD tree (same shape, labels without subtypes 
 -- as nodes)
 abstractUDTree :: UDTree -> RTree Label
-abstractUDTree = mapRTree udSimpleDEPREL
-
+abstractUDTree = rtmap udSimpleDEPREL
 
 {- Alignments to CoNLL-U files and vice versa -}
 
@@ -568,7 +493,7 @@ alignment2sentencePair a =
   (addMetaAsComment $ udTree2adjustedSentence $ sl a, 
   addMetaAsComment $ udTree2adjustedSentence $ tl a)
   where 
-    udTree2adjustedSentence = adjustUDIds . udTree2sentence . createRoot
+    udTree2adjustedSentence = tree2sentence . subtree2tree
     addMetaAsComment s = s {
       udCommentLines = ["# " ++ prMeta (meta a)]
     } 
@@ -576,7 +501,7 @@ alignment2sentencePair a =
 -- | Convert a pair of CoNNL-U sentences into an Alignment
 sentencePair2alignment :: (UDSentence,UDSentence) -> Alignment
 sentencePair2alignment (ss,ts) = 
-  (AT (udSentence2tree ss,udSentence2tree ts),meta)
+  (AT (sentence2tree ss,sentence2tree ts),meta)
   where 
     meta = rdMeta $ drop 2 $ fromJust $ find 
                                           (\l -> "# reasons" `isPrefixOf` l) 
@@ -595,8 +520,8 @@ type Path = String
 -- | Get alignments from two CoNNL-U files (shorthand)
 getAlignmentsFromCoNNLUFiles :: Path -> Path -> IO [Alignment]
 getAlignmentsFromCoNNLUFiles p1 p2 = do 
-  p1' <- parseUDFile p1
-  p2' <- parseUDFile p2
+  p1' <- prsUDFile p1
+  p2' <- prsUDFile p2
   return $ zipWith (curry sentencePair2alignment) p1' p2'
 
 {- Selection of alignments for MT -}
@@ -616,7 +541,7 @@ selectForMT mmax as = nubBy
                                  || (not . null) (contentTags u)
     as'' = case mmax of
       (Just m) -> 
-        filter (\a -> sizeRTree (sl a) <= m || sizeRTree (tl a) <= m) as'
+        filter (\a -> size (sl a) <= m || size (tl a) <= m) as'
       Nothing -> as'
 
 -- | Check if an alignment is perfect, i.e. ig the structure of the two trees
@@ -629,5 +554,5 @@ isPerfect a = abstractUDTree (sl a) == abstractUDTree (tl a)
 isPerfectShallow :: Alignment -> Bool
 isPerfectShallow a = 
   root t' == root u' 
-  && map root (childrenRTree t') == map root (childrenRTree u') 
+  && map root (subtrees t') == map root (subtrees u') 
   where (t',u') = (abstractUDTree $ sl a,abstractUDTree $ tl a)
