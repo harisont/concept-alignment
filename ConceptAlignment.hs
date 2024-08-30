@@ -517,12 +517,6 @@ unadjust (RTree n ts) = RTree n {
 
 type Path = String
 
--- | Get alignments from two CoNNL-U files (shorthand)
-getAlignmentsFromCoNNLUFiles :: Path -> Path -> IO [Alignment]
-getAlignmentsFromCoNNLUFiles p1 p2 = do 
-  p1' <- prsUDFile p1
-  p2' <- prsUDFile p2
-  return $ zipWith (curry sentencePair2alignment) p1' p2'
 
 {- Selection of alignments for MT -}
 
