@@ -240,9 +240,11 @@ align :: [Alignment]               -- ^ a set of known alignments (e.g. from
       -> [Alignment]               -- ^ a set of alignments, implemented as
                                    -- a list to avoid unnecessary conversions
 align as _ _ _ _ [] = as
-align as cs p cl ex (s:ss) = 
-  align (M.toList $ alignSent as' cs p cl ex (null as) s) cs p cl ex ss
-  where as' = M.fromListWith combineMeta as
+align as cs p cl ex ((s1,s2):ss) = 
+  align (M.toList $ alignSent as' cs p cl ex (null as) (t1,t2)) cs p cl ex ss
+  where 
+    (t1,t2) = (sentence2tree s1, sentence2tree s2)
+    as' = M.fromListWith combineMeta as
 
 -- | Sentence-level alignment function. Can be use independently of align   
 alignSent :: AlignMap                  -- ^ a map of known alignments (e.g. 
@@ -257,14 +259,10 @@ alignSent :: AlignMap                  -- ^ a map of known alignments (e.g.
                                        -- be performed 
           -> Bool                      -- ^ a flag indicating whether CA is
                                        -- being used as hybrid
-          -> (UDSentence,UDSentence)   -- ^ the sentences to align 
+          -> (UDTree,UDTree)           -- ^ the sentences to align 
           -> AlignMap                  -- ^ a map of alignments
-alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
+alignSent as cs p cl ex hy (t1,t2) = as `union'` as'
   where
-    (t1,t2) = (sentence2tree s1, sentence2tree s2)
-    sid = if sentId s1 == sentId s2 
-          then sentId s1 
-          else error "unaligned sentences"
     as' = basic `union'` byExclusion
       where
         -- "basic" alignment based on sentence/clause recursive alignment
@@ -281,13 +279,13 @@ alignSent as cs p cl ex hy (s1,s2) = as `union'` as'
       | hy && AT (t,u) `M.member` as = 
           (AT (t,u), initMeta {
                 reasons = S.singleton KNOWN,
-                sentIds = S.singleton $ fromJust sid 
+                sentIds = S.empty
               }) `insert'` as -- TODO: recursion? optimization via update?
       | otherwise = M.empty
         where
           tu = (AT (t,u), initMeta {
                 reasons = reas c,
-                sentIds = S.singleton $ fromJust sid 
+                sentIds = S.empty
               }) 
           -- applying criteria 
           matchingCs = 
