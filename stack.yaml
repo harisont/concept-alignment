@@ -8,4 +8,4 @@ local-bin-path: .
 
 extra-deps:
 - github: harisont/deptreehs
-  commit: f51085aa9352f9b4fd19876b26e810ddb2622189
+  commit: 891c08c5579074a2f9654387a7bdb6a7dee9dfd3
